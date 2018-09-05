@@ -1,0 +1,31 @@
+{
+  "name": "Using-D3js",
+  "license": "CC-BY-NC-3.0",
+  "version": "0.1.0",
+  "author": "Eric McGregor <email@n0code.net>",
+  "description": "Sources for the book Using D3.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/erimcg/Using-D3js.git"
+  },
+  "dependencies": {
+    "acorn": "^5.1.0",
+    "codemirror": "^5.37.0",
+    "detect-it": "^3.0.5",
+    "hjson": "^3.1.0",
+    "jszip": "^2.5.0",
+    "markdown-it": "^8.4.0",
+    "markdown-it-sub": "^1.0.0",
+    "markdown-it-sup": "^1.0.0",
+    "mime": "^2.3.1",
+    "mold-template": "^2.0.1",
+    "uglify-js": "^2.0.0"
+  },
+  "devDependencies": {
+    "jsdom": "^11.2.0",
+    "promise": "^8.0.1"
+  },
+  "scripts": {
+    "test": "make test"
+  }
+}

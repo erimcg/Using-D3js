@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" version="3.0" xml:lang="en" unique-identifier="pub-id" prefix="cc: http://creativecommons.org/ns#">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:title id="title">Using D3.js</dc:title>
+    <meta refines="#title" property="title-type">main</meta>
+    <dc:creator id="creator">Eric McGregor</dc:creator>
+    <meta refines="#creator" property="file-as">McGregor, Eric</meta>
+    <meta refines="#creator" property="role" scheme="marc:relators">aut</meta>
+    <dc:identifier id="pub-id">net.n0code.usingd3js</dc:identifier>
+    <dc:language>en-US</dc:language>
+    <dc:rights>This work is shared with the public using the Attribution-NonCommercial 3.0 Unported (CC BY-NC 3.0) license.</dc:rights>
+    <link rel="cc:license" href="http://creativecommons.org/licenses/by-nc/3.0/"/>
+    <meta property="cc:attributionURL">usingd3js.n0code.net</meta>
+    <meta property="dcterms:modified">2018-02-25T22:07:00Z</meta>
+  </metadata>
+  <manifest>
+    <item id="titlepage" href="titlepage.xhtml" media-type="application/xhtml+xml"/>
+    <item id="frontmatter" href="frontmatter.xhtml" media-type="application/xhtml+xml"/>
+    <item id="toc" properties="nav" href="toc.xhtml" media-type="application/xhtml+xml"/>
+    <item id="c00_intro" href="00_intro.xhtml" media-type="application/xhtml+xml"/>
+    <item id="c01_values" href="01_chapter1.xhtml" media-type="application/xhtml+xml"/>
+    <item id="style" href="style.css" media-type="text/css"/>
+    <item id="font.cinzel.bold" href="font/cinzel_bold.otf" media-type="application/vnd.ms-opentype"/>
+    <item id="font.pt.regular" href="font/pt_mono.otf" media-type="application/vnd.ms-opentype"/>
+{{images}}
+  </manifest>
+  <spine>
+    <itemref idref="titlepage" linear="yes"/>
+    <itemref idref="frontmatter" linear="yes"/>
+    <itemref idref="toc" linear="yes"/>
+    <itemref idref="c00_intro" linear="yes"/>
+    <itemref idref="c01_chapter1" linear="yes"/>
+  </spine>
+</package>

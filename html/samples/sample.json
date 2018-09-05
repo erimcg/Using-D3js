@@ -1,0 +1,12 @@
+{
+  "0":{
+      "letter": "A",
+      "number": 1,
+      "color": "red"
+    },
+  "1": {
+      "letter": "B",
+      "number": 2,
+     "color": "blue"
+    }
+}

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<data>
+<item>
+    <letter>A</letter>
+    <number>1</number>
+    <color>red</color>
+</item>
+<item>
+    <letter>B</letter>
+    <number>2</number>
+    <color>blue</color>
+</item>
+</data>

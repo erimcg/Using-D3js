@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en-US">
+  <head>
+    <title>Table of Contents</title>
+    <link rel="stylesheet" href="style.css" type="text/css"/>
+    <style>
+      nav#toc { display: none; }
+
+      ol.toc {
+        margin: 1em 0;
+        padding: 0;
+        counter-reset: li;
+      }
+      ol.toc li:before {
+        counter-increment: li;
+        content: counter(li) ".";
+        display: inline-block;
+        width: 2em;
+        text-align: right;
+        margin-right: 0.5em;
+        font-size: 90%;
+      }
+      ol.toc li {
+        list-style: none;
+      }
+      ol.toc li.no-number:before {
+        content: "";
+      }
+      ol.toc span.parttitle {
+        display: block;
+        float: right;
+        font-family: inherit;
+        font-weight: normal;
+        font-size: 90%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Table of Contents</h1>
+
+    <!-- user-visible TOC -->
+    <ol class="toc">
+      <li class="no-number"><a href="00_intro.xhtml">Introduction</a></li>
+      <li style="counter-reset: li; position: relative">
+        <a href="01_chapter1.xhtml">Chapter 1</a>
+      </li>
+    </ol>
+
+    <!-- machine-readable TOC -->
+    <nav xmlns:epub="http://www.idpf.org/2007/ops" epub:type="toc" id="toc">
+      <ol>
+{{full_toc}}
+      </ol>
+    </nav>
+  </body>
+</html>

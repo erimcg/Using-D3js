@@ -1,0 +1,113 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Using D3.js</title>
+  <link rel=stylesheet href="css/ejs.css">
+  <style>
+    article { display: flex; margin: 0 2em; flex-wrap: wrap; max-width: none; max-width: calc(38em + 500px); }
+    #cover { flex-basis: 480px; max-width: 35em; flex-grow: 1; margin-right: 3em; }
+    #contents { flex-basis: 500px; flex-grow: 1; max-width: 35em;  }
+    #links { flex-basis: 100%; max-width: 35em; }
+    li.contents-intro:before { display: none; }
+    .toc h3 { float: right; font-family: inherit; margin: 0; font-weight: normal; font-size: 90%; }
+    @media screen and (max-width: 585px) { .toc h3 { display: none }}
+    @media screen and (max-width: 500px) { #cover { margin-right: 0 } article { margin: 0 } }
+    ul.links { list-style-type: circle; }
+    img.logo { vertical-align: text-top; padding: 0px 4px; border: 0; }
+  </style>
+</head>
+
+<article>
+<div id=cover>
+
+  <h1>Using D3.js</h1>
+
+  <p>In this text we discuss how to use the D3.js data visualization library.</p>
+
+  <p style="text-align: center; margin: 2em 0">
+    <img src="img/cover.jpg" alt="Cover image" style="border: 1px solid black; max-width: 100%; box-shadow: 4px 4px 7px rgba(0, 0, 0, 0.4)">
+  </p>
+
+  <p>Written by Eric McGregor.</p>
+    <p>Licensed under a <a href="https://creativecommons.org/licenses/by-nc/3.0/">Creative Commons attribution-noncommercial license</a>.</p>
+
+</div>
+
+<div id=contents>
+
+  <h2>Contents</h2>
+
+  <ol class='toc'>
+    <li class="contents-intro">
+      <a href="00_introduction.html">Introduction</a>
+    </li>
+    <h3>Selections</h3>
+    <li style="counter-reset: li">
+      <a href="01_selections.html">Selections</a>
+    </li>
+    <li>
+      <a href="02_modifying_elements.html">Modifying Selected Elements</a>
+    </li>
+    <li>
+      <a href="03_applying_functions.html">Applying Functions to Selected Elements</a>
+    </li>
+    <li>
+      <a href="04_adding_removing_elements.html">Adding and Removing Elements</a>
+    </li>
+    <h3>Data Joins</h3>
+    <li>
+      <a href="05_joining_data.html">Joining Data</a>
+    </li>
+    <li>
+      <a href="06_joining_object_data.html">Joining Object Data</a>
+    </li>
+    <li>
+      <a href="07_updating_data.html">Updating Data</a>
+    </li>
+    <li>
+      <a href="08_sorting_elements.html">Sorting Elements</a>
+    </li>
+    <h3>Importing Data</h3>
+    <li>
+      <a href="09_d3_fetch.html">Using D3-fetch</a>
+    </li>
+    <h3>Scales and Axis</h3>
+    <li>
+      <a href="10_scaling_functions.html">Scaling Functions</a>
+    </li>
+    <li>
+      <a href="11_continuous_scales.html">Continuous Scales</a>
+    </li>
+    <li>
+      <a href="12_axis.html">Axis</a>
+    </li>
+    <li>
+      <a href="13_working_with_dates.html">Working With Dates</a>
+    </li>
+    <li>
+      <a href="14_sequential_scales.html">Sequential Scales</a>
+    </li>
+    <li>
+      <a href="15_quantize_scales.html">Quantize Scales</a>
+    </li>
+    <li>
+      <a href="16_ordinal_scales.html">Ordinal Scales</a>
+    </li>
+    <li>
+      <a href="17_legends.html">Legends</a>
+    </li>
+  </ol>
+</div>
+
+<div id=links>
+
+  <h2>Other pages</h2>
+
+  <ul class="links">
+    <li><a href="code">Code sandbox and exercise solutions</a></li>
+    <li><a href="errata.html">Errata for the paper book</a></li>
+  </ul>
+
+</div>
+</article>
