@@ -1,3 +1,4 @@
+
 window.addEventListener("load", () => {
   // If there's no ecmascript 5 support, don't try to initialize
   if (!Object.create || !window.JSON) return
@@ -5,9 +6,7 @@ window.addEventListener("load", () => {
   document.body.addEventListener("click", e => {
     for (let n = e.target; n; n = n.parentNode) {
       if (n.className === "c_ident") return
-      /*let lang = n.nodeName === "PRE" && n.getAttribute("data-language")
-      if (/^(text\/)?(javascript|html)$/.test(lang))
-        return activateCode(n, e, lang)*/
+
       if (n.nodeName === "DIV" && n.className === "solution")
         n.className = "solution open"
     }
@@ -21,8 +20,7 @@ window.addEventListener("load", () => {
       let pre = pres[i]
       if (!/^(text\/)?(javascript|html)$/.test(pre.getAttribute("data-language")) ||
           chapNum == 1 && !/console\.log/.test(pre.textContent)) continue
-      sandboxHint = elt("div", {"class": "sandboxhint"},
-          "edit & run code by clicking it")
+      sandboxHint = elt("div", {"class": "sandboxhint"}, "edit & run code by clicking it")
       pre.insertBefore(sandboxHint, pre.firstChild)
       break
     }
@@ -49,8 +47,8 @@ window.addEventListener("load", () => {
 
   let keyMap = {
     Esc(cm) { cm.display.input.blur() },
-    "Ctrl-Enter"(cm) { runCode(cm.state.context) },
-    "Cmd-Enter"(cm) { runCode(cm.state.context) },
+    "Ctrl-Enter"(cm) { renderCode(cm.state.context) },
+    "Cmd-Enter"(cm) { renderCode(cm.state.context) },
     "Ctrl-Down"(cm) { hideEditor(cm.state.context) },
     "Ctrl-Esc"(cm) { resetSandbox(cm.state.context.sandbox) },
     "Cmd-Esc"(cm) { resetSandbox(cm.state.context.sandbox) }
@@ -80,7 +78,6 @@ window.addEventListener("load", () => {
       matchBrackets: true,
       lineNumbers: true
     })
-    //let editorMenu = wrap.firstChild.appendChild(elt("div", {"class": "editor-menu"}))
 
     let pollingScroll = null
     function pollScroll() {
@@ -94,7 +91,6 @@ window.addEventListener("load", () => {
       pollingScroll = setTimeout(pollScroll, 500)
     })
 
-    //wrap.style.marginLeft = wrap.style.marginRight = -Math.min(article.offsetLeft, 1000) + "px"
     wrap.style.marginLeft = wrap.style.marginRight = "0px"
     setTimeout(() => editor.refresh(), 600)
     if (e) {
@@ -120,7 +116,7 @@ window.addEventListener("load", () => {
     data.output = new SandBox.Output(out)
     node.dataeditor = data;
 
-    runCode(data, true);
+    renderCode(data, true);
 
     let sandboxMenu = wrap.appendChild(elt("div", {"class": "sandbox-menu"}));
     initializeMenu(data, sandboxMenu);
@@ -133,35 +129,20 @@ window.addEventListener("load", () => {
   function initializeMenu(data, node) {
     let items = [
       {type: "image",
-      src: "img/gray_revert_button.png",
-      title: "Reset code(ctrl/cmd-esc)",
-      style: "background: white",
-      handler: () => revertCode(data)},
-      {type: "image",
-        src: "img/gray_play_button.png",
-        title: "Run code (ctrl/cmd-enter)",
+        src: "img/gray_publish_button.png",
+        title: "Render (ctrl/cmd-enter)",
         style: "background: white",
-        handler: () => runCode(data)},
+        handler: () => renderCode(data)},
+      {type: "image",
+      src: "img/gray_reset_button.png",
+      title: "Reset (ctrl/cmd-esc)",
+      style: "background: white",
+      handler: () => resetCode(data)},
       {type: "image",
         src: "img/gray_hide_button.png",
-        title: "Hide editor",
+        title: "Hide",
         style: "background: white",
         handler: () => hideEditor(data)}
-    ];
-
-    items.forEach(item => {
-      let elm = node.appendChild(elt("input", item));
-      elm.addEventListener('click', item.handler);
-    });
-  }
-
-  function initializeSandboxMenu(data, node) {
-    let items = [
-      {type: "image",
-        src: "img/gray_show_button.png",
-        title: "Show editor",
-        style: "background: white",
-        handler: () => showEditor(data)}
     ];
 
     items.forEach(item => {
@@ -191,7 +172,7 @@ window.addEventListener("load", () => {
     return node
   }
 
-  function runCode(data, onload) {
+  function renderCode(data, onload) {
     data.output.clear()
     let val = data.editor.getValue()
     getSandbox(data.sandbox, data.isHTML, box => {
@@ -207,26 +188,27 @@ window.addEventListener("load", () => {
     })
 
     if (!onload) {
-      data.wrap.childNodes[2].childNodes[1].blur();
+      data.wrap.childNodes[2].childNodes[0].blur();
     }
   }
 
-  function revertCode(data) {
+  function resetCode(data) {
     data.editor.setValue(data.orig.textContent)
-    runCode(data)
+    data.wrap.childNodes[2].childNodes[1].blur();
+    renderCode(data)
   }
 
   function hideEditor(data) {
-    data.wrap.firstChild.style.display = 'none';
     data.wrap.childNodes[2].firstChild.style.visibility = "hidden";
     data.wrap.childNodes[2].childNodes[2].src = "img/gray_show_button.png";
     data.wrap.childNodes[2].childNodes[2].addEventListener('click', () => showEditor(data));
     data.wrap.childNodes[2].childNodes[2].title = "Show editor (ctrl-down)";
+
+    data.wrap.firstChild.style.display = 'none';
     document.body.focus();
   }
 
   function showEditor(data) {
-    data.wrap.firstChild.style.display = "block";
     data.wrap.childNodes[2].firstChild.style.visibility = "visible";
     data.wrap.childNodes[2].childNodes[2].src = "img/gray_hide_button.png";
     data.wrap.childNodes[2].childNodes[2].addEventListener('click', () => hideEditor(data));
@@ -237,43 +219,9 @@ window.addEventListener("load", () => {
       elm.style.top = "22px";
     }
 
+    data.wrap.firstChild.style.display = "block";
     data.editor.refresh();
     data.editor.focus();
-  }
-
-  function closeCode(data) {
-    if (data.isHTML && data.sandbox) return
-    data.wrap.parentNode.removeChild(data.wrap)
-    data.orig.style.display = ""
-  }
-
-  function openMenu(data, node) {
-
-    let menu = elt("div", {"class": "sandbox-open-menu"})
-    /* let items = [["Run code (ctrl/cmd-enter)", () => runCode(data)],
-                  ["Revert to original code", () => revertCode(data)],
-                  ["Reset sandbox (ctrl/cmd-esc)", () => resetSandbox(data.sandbox)]]*/
-    let items = [
-      ["Revert to original code", () => revertCode(data)],
-      ["Run code (ctrl/cmd-enter)", () => runCode(data)]]
-
-    if (!data.isHTML || !data.sandbox)
-      items.push(["Deactivate editor (ctrl-down)", () => { closeCode(data) }])
-
-    items.forEach(choice => menu.appendChild(elt("div", choice[0])))
-
-    function click(e) {
-      let target = e.target
-      if (e.target.parentNode == menu) {
-        for (let i = 0; i < menu.childNodes.length; ++i)
-          if (target == menu.childNodes[i])
-            items[i][1]()
-      }
-      menu.parentNode.removeChild(menu)
-      window.removeEventListener("click", click)
-    }
-    setTimeout(() => window.addEventListener("click", click), 20)
-    node.offsetParent.appendChild(menu)
   }
 
   let sandboxSnippets = {}
