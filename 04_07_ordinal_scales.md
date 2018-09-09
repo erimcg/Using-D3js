@@ -8,23 +8,26 @@ Unlike continuous, sequential, and quantize scales, ordinal scales work with dis
 
 D3 provides the following ordinal scale generators:
 
-+ [d3.scaleOrdinal([range])](https://github.com/d3/d3-scale/blob/master/README.md#ordinal-scales) - maps a discrete domain to a discrete range.</li>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#band-scales">d3.scaleBand()</a> - maps a discrete domain to a set of discrete points within a continuous interval.</li>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#point-scales">d3.scalePoint()</a> -</li>
-</ul>
-<h3>Ordinal Scales</h3>
++ [d3.scaleOrdinal([range])](https://github.com/d3/d3-scale/blob/master/README.md#ordinal-scales) - maps a discrete domain to a discrete range.
++ [d3.scaleBand()](https://github.com/d3/d3-scale/blob/master/README.md#band-scales) - maps a discrete domain to a set of discrete points within a continuous interval.
++ [d3.scalePoint()](https://github.com/d3/d3-scale/blob/master/README.md#point-scales)
+
+## Ordinal Scales
 Typically, when creating an ordinal scale, we'll provide an array of elements for the domain and an array of equal length for the range.  The generator will map each element in the domain, in order, to the elements in the range.
 
 In the example below we join data containing date strings to a set of rect elements that we plot on a time scale.  We create a color scale using scaleOrdinal that maps the years in [1970, 1971, 1972, 1973] to the colors in ["red", "orange", "green", "blue"] as defined below.
 <pre>var colorScale = d3.scaleOrdinal()
     .domain([1970, 1971, 1972, 1973])
     .range(["red", "orange", "green", "blue"]);</pre>
+
 We set their fill color using the colorScale function as shown below.
+
 <pre>.attr("fill", (d) =&gt; colorScale(parseTime(d.date).getFullYear()))</pre>
-[raw]
+
+```
 <script src="https://d3js.org/d3.v4.min.js"></script>
 
-<svg id="demo1" width="600" height="100"></svg>
+<svg id="demo1" width="580" height="100"></svg>
 
 <style>
     svg { background-color: lightblue; }
@@ -64,7 +67,7 @@ We set their fill color using the colorScale function as shown below.
 
     var xScale = d3.scaleTime()
         .domain(domain)
-        .range([25, 575]);
+        .range([25, 555]);
 
     var xAxis = d3.axisBottom(xScale)
         .ticks(d3.timeYear);
@@ -91,30 +94,37 @@ We set their fill color using the colorScale function as shown below.
         .attr("fill", (d) => colorScale(parseTime(d.date).getFullYear()));
 
 </script>
-[/raw]
+```
 
 Other methods and properties available to an ordinal scaling function are:
-<ul>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#ordinal_unknown">unknown([value])</a></li>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#ordinal_copy">copy()</a></li>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#scaleImplicit">scaleImplicit</a></li>
-</ul>
-<h3>Band Scales</h3>
-Band scales map a discrete domain to a set of <em>bands</em> within a continuous range.  The domain is specified using an array of values and the range is specified using a 2-element array to define a continuous interval.
 
-A band scale creates <em>k</em> uniformly sized bands across the range, where <em>k</em> is the cardinality (size) of the domain.  The width of the bands is called the <em>bandwidth</em> which can be obtained using the <code class="">bandwidth</code> method.
++ [unknown([value])](https://github.com/d3/d3-scale/blob/master/README.md#ordinal_unknown)
++ [copy()](https://github.com/d3/d3-scale/blob/master/README.md#ordinal_copy)
++ [scaleImplicit()](https://github.com/d3/d3-scale/blob/master/README.md#scaleImplicit)
 
-In the example below, we create a band scale using a domain containing 4 colors and a range consisting of the interval [25, 575].
+## Band Scales
+Band scales map a discrete domain to a set of *bands* within a continuous range.  The domain is specified using an array of values and the range is specified using a 2-element array to define a continuous interval.
+
+A band scale creates *k* uniformly sized bands across the range, where *k* is the cardinality (size) of the domain.  The width of the bands is called the *bandwidth* which can be obtained using the `bandwidth` method.
+
+In the example below, we create a band scale using a domain containing 4 colors and a range consisting of the interval [25, 555].
+
 <pre>var colors = ["red", "orange", "green", "blue"];
 
 var xScale = d3.scaleBand()
     .domain(colors)
-    .range([25, 575]);</pre>
-We join the colors to a set of rect elements, set the x-axis location using the band scaling function, and set the width of the rect elements to the bandwidth obtained using the <code class="">bandwidth</code> method.
-<pre>.attr("x", (d) =&gt; xScale(d))
-.attr("width", xScale.bandwidth())</pre>
-[raw]
-<svg id="demo2" width="600" height="100"></svg>
+    .range([25, 555]);
+</pre>
+
+We join the colors to a set of rect elements, set the x-axis location using the band scaling function, and set the width of the rect elements to the bandwidth obtained using the `bandwidth` method.
+
+<pre>
+.attr("x", (d) =&gt; xScale(d))
+.attr("width", xScale.bandwidth())
+</pre>
+
+```
+<svg id="demo2" width="580" height="100"></svg>
 
 <script>
     var svg = d3.select("#demo2");
@@ -123,7 +133,7 @@ We join the colors to a set of rect elements, set the x-axis location using the 
 
     var xScale = d3.scaleBand()
         .domain(colors)
-        .range([25, 575]);
+        .range([25, 555]);
 
     var xAxis = d3.axisBottom(xScale);
 
@@ -142,28 +152,32 @@ We join the colors to a set of rect elements, set the x-axis location using the 
         .attr("fill", (d) => d);
 
 </script>
-[/raw]
+```
 
 By default there is no padding between the bands. Padding can be added, however, by passing an array containing a value between 0 and 1 to one the following methods.
-<ul>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_paddingOuter">paddingOuter([padding])</a></li>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_paddingInner">paddingInner([padding])</a></li>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_padding">padding([padding])</a></li>
-</ul>
-The argument to these functions specifies the ratio of the <em>step distance</em> that should be reserved for padding.  The step distance is the distance between the start of one band and the start of an adjacent band.  That is, the step distance is the sum of the bandwidth and the inner padding width.
+
++ [paddingOuter([padding])](https://github.com/d3/d3-scale/blob/master/README.md#band_paddingOuter)
++ [paddingInner([padding])](https://github.com/d3/d3-scale/blob/master/README.md#band_paddingInner)
++ [padding([padding])](https://github.com/d3/d3-scale/blob/master/README.md#band_padding)
+
+The argument to these functions specifies the ratio of the *step distance* that should be reserved for padding.  The step distance is the distance between the start of one band and the start of an adjacent band.  That is, the step distance is the sum of the bandwidth and the inner padding width.
 
 In the example below we set the outer padding ratio to 0.25 and the inner padding ratio to 0.5.
-<pre>var colors = ["red", "orange", "green", "blue"];
+
+<pre>
+var colors = ["red", "orange", "green", "blue"];
 
 var xScale = d3.scaleBand()
     .domain(colors)
-    .range([25, 575])
+    .range([25, 555])
     .paddingOuter([.25])
-    .paddingInner([.5]);</pre>
+    .paddingInner([.5]);
+</pre>
+
 We set the location and width as before.
 
-[raw]
-<svg id="demo3" width="600" height="100"></svg>
+```
+<svg id="demo3" width="580" height="100"></svg>
 
 <script>
     var svg = d3.select("#demo3");
@@ -172,7 +186,7 @@ We set the location and width as before.
 
     var xScale = d3.scaleBand()
         .domain(colors)
-        .range([25, 575])
+        .range([25, 555])
         .paddingOuter([.25])
         .paddingInner([.5]);
 
@@ -193,30 +207,38 @@ We set the location and width as before.
         .attr("fill", (d) => d);
 
 </script>
-[/raw]
+```
 
 Other methods and properties available to an ordinal scaling function are:
-<ul>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_rangeRound">rangeRound([<i>range</i>])</a></li>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_round">round([<i>round</i>])</a></li>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_align">align([<i>align</i>])</a></li>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_bandwidth">bandwidth()</a></li>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_step">step()</a></li>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_copy">copy()</a></li>
-</ul>
-<h3>Point Scales</h3>
+
++ [rangeRound([<i>range</i>])](https://github.com/d3/d3-scale/blob/master/README.md#band_rangeRound)
++ [round([<i>round</i>])](https://github.com/d3/d3-scale/blob/master/README.md#band_round)
++ [align([<i>align</i>])](https://github.com/d3/d3-scale/blob/master/README.md#band_align)
++ [bandwidth()](https://github.com/d3/d3-scale/blob/master/README.md#band_bandwidth)
++ [step()](https://github.com/d3/d3-scale/blob/master/README.md#band_step)
++ [copy()](https://github.com/d3/d3-scale/blob/master/README.md#band_copy)
+
+## Point Scales
+
 Point scales are band scales where the bandwidth is set to zero.  That is, a point scale maps a discrete domain to a set of points that lie equally spaced within the range. As with band scales, by default, there is no padding.
 
-Below we create a point scale that uses the colors array for the domain and the interval [25, 575] as the range.
+Below we create a point scale that uses the colors array for the domain and the interval [25, 555] as the range.
+
 <pre>var colors = ["red", "orange", "green", "blue"];
 
 var xScale = d3.scalePoint()
  .domain(colors)
- .range([25, 575]);</pre>
+ .range([25, 555]);
+</pre>
+
 We join the colors data to a set of circle elements and set their center position on the x-axis using the point scale function.
-<pre> .attr("cx", (d) =&gt; xScale(d))</pre>
-[raw]
-<svg id="demo4" width="600" height="100"></svg>
+
+<pre>
+.attr("cx", (d) =&gt; xScale(d))
+</pre>
+
+```
+<svg id="demo4" width="580" height="100"></svg>
 
 <script>
     var svg = d3.select("#demo4");
@@ -225,7 +247,7 @@ We join the colors data to a set of circle elements and set their center positio
 
     var xScale = d3.scalePoint()
         .domain(colors)
-        .range([25, 575]);
+        .range([25, 555]);
 
     var xAxis = d3.axisBottom(xScale);
 
@@ -243,15 +265,14 @@ We join the colors data to a set of circle elements and set their center positio
         .attr("fill", (d) => d);
 
 </script>
-[/raw]
+```
 
 Other methods and properties available to an point scaling function are:
-<ul>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#point_padding">padding([padding])</a></li>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#point_rangeRound">rangeRound([<i>range</i>])</a></li>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#point_round">round([<i>round</i>])</a></li>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#point_align">align([<i>align</i>])</a></li>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#point_bandwidth">bandwidth()</a></li>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#point_step">step()</a></li>
- 	<li><a href="https://github.com/d3/d3-scale/blob/master/README.md#point_copy">copy()</a></li>
-</ul>
+
++ [padding([padding])](https://github.com/d3/d3-scale/blob/master/README.md#point_padding)
++ [rangeRound([<i>range</i>])](https://github.com/d3/d3-scale/blob/master/README.md#point_rangeRound)
++ [round([<i>round</i>])](https://github.com/d3/d3-scale/blob/master/README.md#point_round)
++ [align([<i>align</i>])](https://github.com/d3/d3-scale/blob/master/README.md#point_align)
++ [bandwidth()](https://github.com/d3/d3-scale/blob/master/README.md#point_bandwidth)
++ [step()](https://github.com/d3/d3-scale/blob/master/README.md#point_step)
++ [copy()](https://github.com/d3/d3-scale/blob/master/README.md#point_copy)

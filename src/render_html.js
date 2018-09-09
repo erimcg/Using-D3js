@@ -14,7 +14,14 @@ for (let arg of process.argv.slice(2)) {
   else file = arg == "-" ? "/dev/stdin" : arg
 }
 if (!file) throw new Error("No input file")
-let chapter = /^\d{2}_([^\.]+)/.exec(file) || [null, "hints"]
+
+let curFileTokens = /^(\d{2})_(\d{2})_(\w+)\.md$/.exec(file)
+let curFile = {
+  chapter: curFileTokens[1],
+  section: curFileTokens[2],
+  title: curFileTokens[3],
+  fileName: file
+}
 
 let {tokens, metadata} = transformTokens(require("./markdown").parse(fs.readFileSync(file, "utf8"), {}), {
   defined: epub ? ["book", "html"] : ["interactive", "html"],
@@ -25,11 +32,23 @@ let {tokens, metadata} = transformTokens(require("./markdown").parse(fs.readFile
 
 let close = epub ? "/" : ""
 
-let chapters = fs.readdirSync(__dirname + "/..")
-    .filter(file => /^\d{2}_\w+\.md$/.test(file))
+let files = fs.readdirSync(__dirname + "/..")
+    .filter(file => /^\d{2}_\d{2}_\w+\.md$/.test(file))
     .sort()
-    .map(file => /^\d{2}_(\w+)\.md$/.exec(file)[1])
-if (epub) chapters.push("hints")
+    .map(file => {
+      let tokens = /^(\d{2})_(\d{2})_(\w+)\.md$/.exec(file)
+      return {
+        chapter: tokens[1],
+        section: tokens[2],
+        title: tokens[3],
+        fileName: file
+      }
+    }
+    )
+
+//console.log(files)
+
+//if (epub) files.push("hints")
 
 function escapeChar(ch) {
   return ch == "<" ? "&lt;" : ch == ">" ? "&gt;" : ch == "&" ? "&amp;" : "&quot;"
@@ -134,11 +153,21 @@ let renderer = {
   link_open(token) {
     let alt = token.attrGet("alt"), href= token.attrGet("href")
     let maybeChapter = /^(\w+)(#.*)?$/.exec(href)
-    if (maybeChapter && chapters.includes(maybeChapter[1])) {
+
+    let fileInfo = null;
+    for (let f of files) {
+      if (f.title === maybeChapter) {
+        fileInfo = f;
+        break;
+      }
+    }
+
+    if (maybeChapter && fileInfo) {
       let number = ""
       if (maybeChapter[1] != "hints") {
-        linkedChapter = chapters.indexOf(maybeChapter[1])
-        number =  pad(linkedChapter) + "_"
+        let linkedChapter = fileInfo.chapter
+        let linkedSection = fileInfo.section
+        number =  pad(linkedChapter) + "_" + pad(linkedSection) + "_"
       }
       href = number + maybeChapter[1] + (epub ? ".xhtml" : ".html") + (maybeChapter[2] || "")
     }
@@ -183,11 +212,26 @@ function pad(n) {
 
 
 metadata.content = renderArray(tokens)
-let index
-if (chapter && (index = chapters.indexOf(chapter[1])) > -1) {
-  metadata.chap_num = index
-  if (index > 0) metadata.prev_link = `${pad(index - 1)}_${chapters[index - 1]}`
-  if (index < chapters.length - 1) metadata.next_link = `${pad(index + 1)}_${chapters[index + 1]}`
+let prevFile;
+let nextFile;
+
+for(let i = 0; i < files.length; i++) {
+  if (files[i].title === curFile.title) {
+    if (i-1 >= 0) {
+      prevFile = files[i - 1]
+    }
+    if (i+1 < files.length) {
+      nextFile = files[i+1]
+    }
+    break
+  }
+}
+
+if (curFile) {
+  metadata.section = curFile.section
+  metadata.chap_num = curFile.chapter
+  if (prevFile) metadata.prev_link = `${prevFile.chapter}_${prevFile.section}_${prevFile.title}`
+  if (nextFile) metadata.next_link = `${nextFile.chapter}_${nextFile.section}_${nextFile.title}`
 }
 
 let template = mold.bake("chapter", fs.readFileSync(__dirname + `/${epub ? "epub_" : ""}chapter.html`, "utf8"))
