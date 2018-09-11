@@ -10,7 +10,8 @@
     #contents { flex-basis: 500px; flex-grow: 1; max-width: 35em;  }
     #links { flex-basis: 100%; max-width: 35em; }
     li.contents-intro:before { display: none; }
-    .toc h3 { float: right; font-family: inherit; margin: 0; font-weight: normal; font-size: 90%; }
+    .toc h3 { margin: 5px 0; }
+    .toc li { margin: 0 0 0 40px; font-weight: normal; font-size: 90%; }
     @media screen and (max-width: 585px) { .toc h3 { display: none }}
     @media screen and (max-width: 500px) { #cover { margin-right: 0 } article { margin: 0 } }
     ul.links { list-style-type: circle; }
@@ -38,7 +39,7 @@
 
   <h2>Contents</h2>
 
-  <ol class='toc'>
+  <ul class='toc'>
     <li class="contents-intro">
       <a href="00_01_introduction.html">Introduction</a>
     </li>
@@ -97,14 +98,31 @@
     <li>
       <a href="04_08_legends.html">Legends</a>
     </li>
+    <h3>Shapes</h3>
     <li>
-      <a href="05_01_legends.html">Legends</a>
+      <a href="05_01_shapes.html">Shapes</a>
     </li>
-  </ol>
+    <li>
+      <a href="05_02_arcs_pie_charts.html">Arcs &amp; Pie Charts</a>
+    </li>
+    <h3>Layouts</h3>
+    <li>
+      <a href="06_01_hierarchal.html">Hierarchal Layouts</a>
+    </li>
+    <li>
+      <a href="06_02_trees.html">Trees</a>
+    </li>
+    <li>
+      <a href="06_03_word_clouds.html">Word Clouds</a>
+    </li>
+    <h3>Events</h3>
+    <li>
+      <a href="07_01_tooltips.html">Tooltips</a>
+    </li>
+  </ul>
 </div>
 
 <div id=links>
-
   <h2>Other pages</h2>
 
   <ul class="links">
