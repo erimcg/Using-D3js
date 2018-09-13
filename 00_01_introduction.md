@@ -1,15 +1,19 @@
 # Introduction
 
-[D3.js](https://d3js.org) (Data Driven Documents) is an open source JavaScript library that allows you to create dynamic data visualizations by manipulating a document's DOM.  It was created by Mike Bostic, a former graphics editor for the New York Times.
-
-The library allows you to create standard visualizations like line graphs, pie charts, and scatter plots, but was engineered to be incredibly flexible to also allow developers to create custom visualizations and complex visualizations like the [Steamgraph](https://bl.ocks.org/mbostock/4060954) shown below.
+[D3.js](https://d3js.org) (Data Driven Documents) is an open source JavaScript library created by [Mike Bostic](https://github.com/mbostock) that allows you to create an incredible array of dynamic data visualizations in a document's DOM.  With the library you can create standard visualizations like line graphs, pie charts, and scatter plots, but because the library was engineered to be incredibly flexible, you can also create custom visualizations and complex visualizations like the [Steamgraph](https://bl.ocks.org/mbostock/4060954) shown below.
 
 <style>
 #button {
-    display: block;
-    position: relative;
-    top: 10px;
-    left: 10px;
+  display: block;
+  position: relative;
+  top: 10px;
+  left: 10px;
+}
+.menu_button {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  top: 3px;
 }
 </style>
 
@@ -92,30 +96,28 @@ function bump(a, n) {
 
 </script>
 
-For hundreds of other great examples, you can browse the [D3.js GitHub Gallery](https://github.com/d3/d3/wiki/Gallery).
+You can see hundreds of other impressive examples by browsing the [D3.js GitHub Gallery](https://github.com/d3/d3/wiki/Gallery).
 
 ## What's in This Book
 
-This book is for those that are new to the D3.js library and those that are looking for a better understanding of how to use the main tools in D3.js.  Throughout the book I assume the reader knows HTML and CSS, and understands how to manipulate the DOM.  I also assume the reader is proficient in JavaScript.
+This book is for those that are new to the D3.js library and for those that are looking for a better understanding of how to use the D3.js API.  Throughout the book we assume the reader has a thorough understanding of HTML and CSS, and understands how to manipulate the DOM using JavaScript.
 
-This book does not teach data visualization ...
+In the chapters that follow, we demonstrate the various objects and methods in the library's API.  When doing so, we provide links to the official [D3.js API documentation](https://github.com/d3/d3/blob/master/API.md), discuss how to use the objects and methods, provide code examples, and give explanations for those examples.
 
-In the chapters that follow, I lead you through the various objects and methods in the library's API.  When doing so, I provide links to the official [D3.js API documentation](https://github.com/d3/d3/blob/master/API.md), discuss how to use the objects and methods, provide code examples, and give explanations for those examples.
+The code is provided in interactive *sandboxes* like the one below.
 
-The code is provided in interactive sandboxes like the one below.
-
-``` {cm: active}
+```
 <script>
-function handler() {
-    let node = document.getElementById('name')
-    node.innerHTML = 'Got it!'
-}
+  function handler() {
+      let node = document.getElementById('name')
+      node.innerHTML = 'Got it!'
+  }
 </script>
 
 <style>
-button {
-    background-color: lightblue;
-    border-radius: 10px;
+  button {
+      background-color: lightblue;
+      border-radius: 10px;
   }
 </style>
 
@@ -123,15 +125,13 @@ button {
 <button onclick='handler()'>Press me</button>
 ```
 
-  The sandbox consists of a [CodeMirror](https://codemirror.net) editor, a menu, and a rendering area. The editor contains lines of code, either HTML or JavaScript, that are numbered.
+  A sandbox consists of a [CodeMirror](https://codemirror.net) editor, a menu, and a rendering area. In the example, above the editor is hidden.  To make the editor visible, simply press the <img class="menu_button" src="img/gray_show_button.png"> button in the menu.  To close the editor, press the <img class="menu_button" src="img/gray_hide_button.png"> button.
 
-  Since it is impossible to illustrate every possible use of the various objects and functions in D3.js, the reader is encouraged to modify the code provided and actively experiment with the editor.  When doing so, you'll notice that if you make a change in the editor, the result is not immediately reflected in the rendering area.  To see the result of your changes, you must *Run* the code by pressing the run button in the upper right corner of the editor.  To reset the code to the original code, press the *reset* button.
-
-  Some of the code examples have the editor and rendering area open by default, others do not.  To open the editor on any code block, simply click on the code.
+  Since it is impossible to illustrate every possible use of the numerous objects and methods in D3.js, the reader is encouraged to experiment with the code.  When doing so, you'll notice that if you make a change to the code in the editor, the result is not immediately reflected in the rendering area.  To see the result of your changes, you must *rerender* the code by pressing the <img class="menu_button" src="img/gray_publish_button.png"> button in the editor's menu.  To *reset* the code to the original code that we provide, press the <img class="menu_button" src="img/gray_reset_button.png"> button.
 
 ## Getting Started
 
-You can download the latest version from the [D3.js web page](https://d3js.org) or use a link to the latest release of the library as shown below.
+To get started, you must [download](https://github.com/d3/d3/zipball/master) the latest version from the GitHub or use the CDN link to the latest release of the library as shown below.
 
 <pre>
 &lt;script src="https://d3js.org/d3.v5.min.js">&lt;/script>
