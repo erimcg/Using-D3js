@@ -131,7 +131,7 @@ The code is provided in interactive *sandboxes* like the one below.
 
 ## Getting Started
 
-To get started, you must [download](https://github.com/d3/d3/zipball/master) the latest version from the GitHub or use the CDN link to the latest release of the library as shown below.
+To get started, you must [download](https://github.com/d3/d3/zipball/master) the latest version of the D3.js library from the GitHub or use the CDN link to the latest release of the library as shown below.
 
 <pre>
 &lt;script src="https://d3js.org/d3.v5.min.js">&lt;/script>
