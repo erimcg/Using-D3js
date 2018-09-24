@@ -380,7 +380,7 @@ If the input data array contains numeric values, we can use the `pie.sort` funct
 
 <pre>
 var angleGen = d3.pie()
-    .sort((a,b) =&gt; -1);
+    .sort((a,b) =&gt; a > b ? 1 : -1);
 </pre>
 
 We then call the angle generator, passing in an array of data, to get the angle data.
@@ -396,7 +396,7 @@ var data = angleGen([1,1,1,1,4,2,2,4]);
     .attr("transform", "translate(100,100)");
 
   var angleGen = d3.pie()
-    .sort((a,b) => -1);
+    .sort((a,b) => a > b ? 1 : -1);
 
   var data = angleGen([1,1,1,1,4,2,2,4]);
 
@@ -442,7 +442,7 @@ We then create an angle generator with an accessor method and a comparator.
 <pre>
 var angleGen = d3.pie()
     .value((d) =&gt; d.size)
-    .sortValues((a,b) =&gt; 1);
+    .sortValues((a,b) =&gt; a < b ? 1 : -1);
 </pre>
 
 And create the angle data by calling the angle generator on the input data.
@@ -470,7 +470,7 @@ var data = angleGen(input);
 
   var angleGen = d3.pie()
     .value((d) => d.size)
-    .sortValues((a,b) => 1);
+    .sortValues((a,b) => a < b ? 1 : -1);
 
   var data = angleGen(input);
 
@@ -491,7 +491,124 @@ var data = angleGen(input);
 
 <svg id="demo8" width="200" height="200"></svg>
 ```
+## pie.startAngle() and pie.endAngle()
+If we need to change where the pie graph starts from we can use `pie.startAngle()` and pass in a new angle. This will change where the entire graph starts from and scale it properly.
 
+<pre>
+var angleGen
+    .startAngle(Math.PI / 2);
+</pre>
+
+Similar to `pie.startAngle()`, if we need to change where the pie graph ends, we can use `pie.endAngle()`
+
+<pre>
+var angleGen = d3.pie()
+    .startAngle(Math.PI / 4)
+    .endAngle(7 * Math.PI / 4);
+</pre>
+
+It is important to note that the pie graph is measured in radians, not degrees, so any angle passed in should be in radian form. If you are unsure of what the radian form is, you can use `radians = degrees * (Math.PI/180)` to convert degrees into radians.
+
+By default startAngle = 0 and endAngle = 2π.
+```
+<script>
+  d3.select("#demo9")
+    .append("g")
+    .attr("transform", "translate(100,100)");
+
+ var input = [
+    {name: "a", size: "1"},
+    {name: "b", size: "1"},
+    {name: "c", size: "1"},
+    {name: "d", size: "1"},
+    {name: "e", size: "4"},
+    {name: "f", size: "2"},
+    {name: "g", size: "2"},
+    {name: "h", size: "4"}
+  ];
+
+  var angleGen = d3.pie()
+    .startAngle(Math.PI / 4)
+    .endAngle(7 * Math.PI / 4)
+    .value((d) => d.size)
+    .sortValues((a,b) => a < b ? 1 : -1);
+
+  var data = angleGen(input);
+
+  var arcGen = d3.arc()
+    .innerRadius(0)
+    .outerRadius(90);
+
+  d3.select("#demo9 g")
+    .selectAll("path")
+    .data(data)
+    .enter()
+    .append("path")
+    .attr("d", arcGen)
+    .attr("fill", "pink")
+    .attr("stroke", "gray")
+    .attr("stroke-width", 1);
+</script>
+
+<svg id="demo9" width="200" height="200"></svg>
+```
+## pie.padAngle()
+Sometimes we need to display our graph in a less crowded way, using `pie.padAngle()` we can make space between our individual sections of the graph, making it seem less crowded.
+
+This looks best when we also set our `arcGen.innerRadius()` to have a higher value.
+
+<pre>
+var angleGen = d3.pie()
+    .padAngle(.05);
+    
+var arcGen = d3.arc()
+    .innerRadius(50)
+    .outerRadius(90);
+</pre>
+
+```
+<script>
+  d3.select("#demo10")
+    .append("g")
+    .attr("transform", "translate(100,100)");
+
+ var input = [
+    {name: "a", size: "1"},
+    {name: "b", size: "1"},
+    {name: "c", size: "1"},
+    {name: "d", size: "1"},
+    {name: "e", size: "4"},
+    {name: "f", size: "2"},
+    {name: "g", size: "2"},
+    {name: "h", size: "4"}
+  ];
+
+  var angleGen = d3.pie()
+    .startAngle(Math.PI / 4)
+    .endAngle(7 * Math.PI / 4)
+    .padAngle(.05)
+    .value((d) => d.size)
+    .sortValues((a,b) => a < b ? 1 : -1);
+
+  var data = angleGen(input);
+
+  var arcGen = d3.arc()
+    .innerRadius(50)
+    .outerRadius(90);
+
+  d3.select("#demo10 g")
+    .selectAll("path")
+    .data(data)
+    .enter()
+    .append("path")
+    .attr("d", arcGen)
+    .attr("fill", "pink")
+    .attr("stroke", "gray")
+    .attr("stroke-width", 1);
+</script>
+
+<svg id="demo10" width="200" height="200"></svg>
+```
 ## Colored Wedges
 One way to colorize the wedges is to create a color scale with the domain being the domain of values used to compute the angles.
 
@@ -508,22 +625,38 @@ We then simply fill the path element, we use the `value` property of the element
 
 ```
 <script>
-  d3.select("#demo9")
+  d3.select("#demo11")
     .append("g")
     .attr("transform", "translate(100,100)");
+    
+  var input = [
+      {name: "a", size: "1"},
+      {name: "b", size: "1"},
+      {name: "c", size: "1"},
+      {name: "d", size: "1"},
+      {name: "e", size: "4"},
+      {name: "f", size: "2"},
+      {name: "g", size: "2"},
+      {name: "h", size: "4"}
+  ];
+  
+  var angleGen = d3.pie()
+        .startAngle(Math.PI / 4)
+        .endAngle(7 * Math.PI / 4)
+        .padAngle(.05)
+        .value((d) => d.size)
+        .sortValues((a,b) => a < b ? 1 : -1);;
 
-  var angleGen = d3.pie();
-
-  var data = angleGen([1,1,1,1,4,2,2,4]);
+  var data = angleGen(input);
 
   var arcGen = d3.arc()
-    .innerRadius(0)
+    .innerRadius(50)
     .outerRadius(90);
 
   var colorScale = d3.scaleSequential(d3.interpolate("purple", "orange"))
     .domain([1,4]);
 
-  d3.select("#demo9 g")
+  d3.select("#demo11 g")
     .selectAll("path")
     .data(data)
     .enter()
@@ -535,5 +668,5 @@ We then simply fill the path element, we use the `value` property of the element
 
 </script>
 
-<svg id="demo9" width="200" height="200"></svg>
+<svg id="demo11" width="200" height="200"></svg>
 ```
