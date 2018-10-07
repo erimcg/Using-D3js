@@ -58,7 +58,7 @@ As you can see, each of the methods above can be used to set, remove, or get a c
 
 ## Chaining Method Calls
 
-Each of these above methods, and many others, return a `d3.selection` object.  Since we call these methods on a `selection` object and they also return a `selection` object, we can *chain* multiple `selection` method calls together in a single statement.  So, rather than writing something like this:
+Many of the methods above return a `d3.selection` object.  Since we call these methods on a `selection` object and they also return a `selection` object, we can *chain* multiple `selection` method calls together in a single statement.  So, rather than writing something like this:
 
 <pre>
 let sel = d3.selectAll("circle");
@@ -76,7 +76,7 @@ let sel = d3.selectAll("circle")
 
 ## Modifying Attributes, Styles, and Properties
 
-The library's author designed `selection.attr`, `selection.style`, and `selection.property` so that they are called and behave in a consistent manner.  Notice that each of them has an optional `value` argument.  Whether or not a sets, removes, or gets a characteristic depends on what is passed in for the `value` argument.  The pattern is as follows:
+The library's author designed `selection.attr`, `selection.style`, and `selection.property` so that they are called and behave in a consistent manner.  Notice that each of them has an optional `value` argument.  Whether or not a method sets, removes, or gets a characteristic depends on what is passed in for the `value` argument.  The pattern is as follows:
 
 + If a non-null `value` argument is provided to a method, the method is used as a setter for all of the elements in the selection.
 + If `null` is passed as the `value` argument then the method has the effect of clearing or removing the named characteristic from all of the elements in the selection.

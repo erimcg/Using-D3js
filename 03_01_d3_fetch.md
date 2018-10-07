@@ -1,8 +1,5 @@
 {{meta {docid: d3_fetch}}}
 
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="https://d3js.org/d3-fetch.v1.min.js"></script>
-
 <style>
     .lightblue {
         background-color: lightblue;
@@ -10,6 +7,22 @@
         margin: 5px;
     }
 </style>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3-fetch.v1.min.js"></script>
+
+<script>
+    function drawText(id, data) {
+        d3.select(id)
+            .selectAll("text")
+            .data(data)
+            .enter()
+            .append("text")
+            .attr("y", (d,i) => i * 20 + 20)
+            .attr("x", 10)
+            .text((d) => d.letter + " " + d.number + " " + d.color);
+    }
+</script>
 
 
 # Using D3-fetch
@@ -36,9 +49,7 @@ The [d3-fetch](https://github.com/d3/d3-fetch) convenience methods are shown bel
 
 Below are examples on how to use all but the last 2 methods.
 
-When calling the dsv, csv, tsv, json, xml, html, and text download functions, you'll find a call to `then` chained to the download function call as shown below. The code in the function passed to `then` is executed *after* the file is downloaded and the data within the file is ready to be used.  This pattern is necessary because the browser does not wait for the data to be downloaded.  Instead, the browser will request the download and continue with the rest of the code in the JavaScript file.  When the download has finished, the browser will jump to the code within the call to `then` and execute it.
-
-There are two things to note about this pattern. First, any code that relies on the data in the downloaded file must be executed *after* the file and been downloaded and executed by the function passed to `then`. Second, any code that is written after the `then` call, *may be* executed before the file has been downloaded or before the function passed to `then` is executed.
+When calling the dsv, csv, tsv, json, xml, html, and text download functions, you'll find a call to `then` chained to the download function call as shown below. The code in the function passed to `then` is executed *after* the file is downloaded and the data within the file is ready to be used.
 
 <pre>
 d3.dsv(delimiter, fileName)
@@ -49,7 +60,11 @@ d3.dsv(delimiter, fileName)
 // may be executed before the code passed to then() is executed!
 </pre>
 
-we convert the data that is returned by the helper functions to an array of objects, each having the properties letter, number, and color (if it is not already in that format).  We then pass an id to an svg element and the array to the following function in order to write the text contained in the file to the svg element.
+This pattern is necessary because the browser does not wait for the data to be downloaded.  Instead, the browser will request the download and continue with the rest of the code in the JavaScript file.  When the download has finished, the browser will jump to the code within the call to `then` and execute it.
+
+To be clear, any code that relies on the data in the downloaded file must be executed *after* the file has been downloaded and is usually included in the function passed to `then`. Second, any code that is written after the `then` call, *may be* executed before the file has been downloaded and before the function passed to `then` is executed.
+
+In the examples below we use the d3-fetch functions to retrieve the contents of various data files that we have on our server.  All of the files store similar information, just in different formats.  In each examples, we pass a function to `then` that converts the data that is returned by the helper functions to an array of objects, each having the properties letter, number, and color (if it is not already in that format).  We then pass the id of an svg element and the array of objects to `drawText` (shown below) which writes the text contained in the objects of the array to the svg element.
 
 <pre>
 function drawText(id, data) {
@@ -63,19 +78,6 @@ function drawText(id, data) {
       .text((d) =&gt; d.letter + " " + d.number + " " + d.color);
  }
  </pre>
-
-<script>
-    function drawText(id, data) {
-        d3.select(id)
-            .selectAll("text")
-            .data(data)
-            .enter()
-            .append("text")
-            .attr("y", (d,i) => i * 20 + 20)
-            .attr("x", 10)
-            .text((d) => d.letter + " " + d.number + " " + d.color);
-    }
-</script>
 
 ## d3.dsv
 

@@ -21,14 +21,13 @@
 
 # Selections
 
-As we'll soon see, more often than not, when we want to change a attribute or property of an element, we'll want to do the same for a whole set of elements in the DOM.  We can, of course, accomplish this with for-loops, but Bostock has engineered a smarter way: [Selections](https://github.com/d3/d3-selection/blob/master/README.md#selection).
+As we'll soon see, more often than not, when we want to change a attribute or property of an element, we'll want to do the same for a whole set of elements in the DOM.  Sometimes we can accomplish this by calling `getElementsByClassName` or `getElementsByTagName` and then using a for-loops to iterate over the selected elements. Bostock has engineered a smarter way: [Selections](https://github.com/d3/d3-selection/blob/master/README.md#selection).
 
 
 The D3 API has 3 methods that each return zero or more elements from the DOM in a [d3.selection](https://github.com/d3/d3-selection/blob/master/README.md#selection) object.  The `d3.selection` type is a subclass of `array` and contains methods that when called effect all of the elements contained in the `selection` object.
 
 
 The tutorial [How Selections Work](https://bost.ocks.org/mike/selection/) written by Bostock describes in depth how the d3.selection object works.  It is highly recommended that you read this tutorial after you've read this one.
-
 
 Per the API, the 3 methods that return selection objects are:
 + [d3.select(selector)](https://github.com/d3/d3-selection/blob/master/README.md#select) - select a single element from the document
@@ -119,7 +118,7 @@ d3.select("g")
 
 The [selection.filter(filter)](https://github.com/d3/d3-selection/blob/master/README.md#selection_filter) method takes a filter as an argument and returns a selection containing a subset of the objects in the selection on which it is called.  The *filter* argument can be either a selection string as discussed above or a function.  If the filter is a selection string, the method returns the elements in the selection that match the selection string.
 
-If the filter is a function, the function is called for each element in the selection, in order.  When called for an given element, it is passed three arguments:  the datum joined to the element **(d)**, an integer specifying the index of the element in the current group **(i)**, and the group itself ***(nodes)***.  The elements for which the function returns true are retained in the selection and the others are removed.
+If the filter is a function, the function is called for each element in the selection, in order.  When called for an given element, it is passed three arguments:  the datum joined to the element **(d)**, an integer specifying the index of the element in the current group of elements that the element belong to, and the group itself.  The elements for which the function returns true are retained in the selection and the others are removed.
 
 In the example below, the 5 circle elements have radii between 5 and 25.  We select all of the circle elements, filter the selection down to only those with radii greater than or equal to 20, then remove the elements left in the selection.
 
