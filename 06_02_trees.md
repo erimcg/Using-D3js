@@ -5,9 +5,9 @@
 
 # Trees
 
-[d3.tree()](https://github.com/d3/d3-hierarchy/blob/master/README.md#tree) returns a layout function that can be used to layout the nodes in a hierarchal model as a tree.
+[d3.tree()](https://github.com/d3/d3-hierarchy/blob/master/README.md#tree) returns a layout function that, when called, sets x and y coordinates for each node in the hierarchy in a manner that keeps nodes that are at the same level aligned.
 
-We'll often see this method used to create visualization, like the one below, where the nodes are represented by circles and the links are represented by lines drawn between the pairs of circles.
+Below we create a hierarchal model of some data, call a tree layout function to establish x and y coodinates for the nodes, and render circles and lines to represent nodes and lines, respectively.
 
 ```
 <svg id="demo1" width=200 height=120>
@@ -18,17 +18,14 @@ We'll often see this method used to create visualization, like the one below, wh
 </svg>
 
 <script>
-var data = {
-    "name": "A", "value": 10,
-    "children": [
-         {"name": "B", "value": 5},
-         {"name": "C", "value": 5,
-          "children": [
-              {"name": "E", "value": 1},
-              {"name": "F", "value": 1}
-          ]},
-         {"name": "D", "value": 5}
-     ]};
+var data = {"name": "A", "children": [
+                {"name": "B"},
+                {"name": "C", "children": [
+                    {"name": "E"},
+                    {"name": "F"}
+                ]},
+                {"name": "D"}
+            ]};
 
 var root = d3.hierarchy(data);
 
@@ -71,7 +68,7 @@ svg.select('g.nodes')
 </script>
 ```
 
-For this example we create an `svg` element, like the one below, to hold the visualization.
+We start by creating an `svg` element, like the one below, to hold the visual elements.
 
 <pre>
 &lt;svg id="demo1" width=200 height=120&gt;
@@ -85,12 +82,14 @@ For this example we create an `svg` element, like the one below, to hold the vis
 We pass a hierarchal data object to `d3.hierarchy` to create the hierarchal model and obtain a reference to the root node.
 
 <pre>
-var data = {"name":"A", "value":10, "children":[
-               {"name":"B", "value":5},
-               {"name":"C", "value":5, "children":[
-                   {"name":"E", "value":1},
-                   {"name":"F", "value":1}]},
-               {"name":"D", "value":5}]};
+var data = {"name": "A", "children": [
+                {"name": "B"},
+                {"name": "C", "children": [
+                    {"name": "E"},
+                    {"name": "F"}
+                ]},
+                {"name": "D"}
+            ]};
 
 var root = d3.hierarchy(data);
 </pre>
@@ -102,19 +101,21 @@ var treeLayout = d3.tree()
     .size([180, 100]);
 </pre>
 
-Next, we call the layout function, passing to it the root node.
+Next, we call the layout function, passing to it the root node.  The layout function adds `x` and `y` properties to each node in the model.
 
 <pre>
 treeLayout(root);
 </pre>
 
-The layout function adds `x` and `y` properties to each node in the model which can be used to position visual elements representing the nodes.  We can see the `x` and `y` properties when inspecting the root object.
+We can see the `x` and `y` properties when inspecting the root object, as shown in the screenshot below.
 
-<img class="alignnone wp-image-4530 size-large" src="http://www.n0code.net/wp/csci240/wp-content/uploads/sites/2/2018/04/Screen-Shot-2018-04-12-at-11.35.51-PM-1024x669.png" alt="" height="300" />
+<img src="img/screenshots/tree_node.png" alt="" height="300" />
 
-After updating the model with position information, we use the position information to render the lines, one for each link, and the circles, one for each node.
+After updating the model with position information (x and y properties), we use the position information to render the lines, one for each link, and the circles, one for each node.
 
-To render the lines we join the data returned by `root.links` to an empty selection, then in the entry selection append a line for each link.  Similarly, to render the circles we join the data returned by `root.descendants` to an empty selection and then in the entry selection we append a circle for each descendant node.
+To render the lines we join the link objects returned by `root.links` to an empty selection.  Each link has source.x, source.y, target.x, and target.y properties.  Then in the entry selection, we append a line element to the svg for each link.
+
+To render the circles we join the data returned by `root.descendants` to an empty selection.  In the entry selection, we append a circle element for each of the descendant nodes.  Since the layout function added x and y properties to each node we can use them to position each circle elements.
 
 <pre>
 var svg = d3.select("#demo1");
@@ -143,3 +144,4 @@ svg.select('g.nodes')
     .attr('stroke', "darkgray")
     .attr('stroke-width', 1);
 </pre>
+
