@@ -21,19 +21,16 @@
 
 # Selections
 
-As we'll soon see, more often than not, when we want to change a attribute or property of an element, we'll want to do the same for a whole set of elements in the DOM.  Sometimes we can accomplish this by calling `getElementsByClassName` or `getElementsByTagName` and then using a for-loops to iterate over the selected elements. Bostock has engineered a smarter way: [Selections](https://github.com/d3/d3-selection/blob/master/README.md#selection).
-
-
-The D3 API has 3 methods that each return zero or more elements from the DOM in a [d3.selection](https://github.com/d3/d3-selection/blob/master/README.md#selection) object.  The `d3.selection` type is a subclass of `array` and contains methods that when called effect all of the elements contained in the `selection` object.
-
+As we'll soon see, more often than not, when we want to change a attribute or property of an element, we'll want to do the same for a whole set of elements in the DOM.  Sometimes we can accomplish this by calling `getElementsByClassName` or `getElementsByTagName` and then use a for-loops to iterate over the selected elements. Bostock has engineered a smarter way: [Selections](https://github.com/d3/d3-selection/blob/master/README.md#selection).
 
 The tutorial [How Selections Work](https://bost.ocks.org/mike/selection/) written by Bostock describes in depth how the d3.selection object works.  It is highly recommended that you read this tutorial after you've read this one.
 
-Per the API, the 3 methods that return selection objects are:
+The D3 API has 3 methods that can be used to select elements from the DOM.  These are:
 + [d3.select(selector)](https://github.com/d3/d3-selection/blob/master/README.md#select) - select a single element from the document
 + [d3.selectAll(selector)](https://github.com/d3/d3-selection/blob/master/README.md#selectAll) - select multiple elements from the document
 + [d3.selection()](https://github.com/d3/d3-selection/blob/master/README.md#selection) - select the root element in the document
 
+Each returns zero or more elements from the DOM in a [d3.selection](https://github.com/d3/d3-selection/blob/master/README.md#selection) object.  The `d3.selection` type is a subclass of `array` and contains methods that when called effect all of the elements contained in the `selection` object.
 
 [d3.select(selector)](https://github.com/d3/d3-selection/blob/master/README.md#select) returns a `selection` containing zero or one element or node. A `selector` arguement can be either an string that holds any valid CSS selector or a reference to a node.  If the `selector` is a string, it returns a `selection` containing the *first* element found in the DOM that satisfies the CSS selector criteria.  If no element is found then it returns an empty `selection`.  If the selector is a reference to a node then it returns a `section` object containing that single node.
 

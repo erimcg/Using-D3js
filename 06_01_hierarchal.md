@@ -39,7 +39,7 @@ var root = d3.hierarchy(data);
 
 We show in the screenshot below the root node as returned by `d3.hierarchy`.
 
-<img class="alignnone wp-image-4530 size-large" src="img/screenshots/hierarchal_node.png" alt="" height="300" />
+<img src="img/screenshots/hierarchal_node.png" alt="" height="300" />
 
 ## Node Properties
 
@@ -86,9 +86,11 @@ In the example below we have a hierarchal object consisting of 6 nodes.  Each no
                  {"name":"D", "size":4}]};
 
   var root = d3.hierarchy(data);
+  var count = root.descendants().length;
+  var i = 0;
 
   var text = "";
-  root.each((d) => text += (d.data.size + " "));
+  root.each((d) => text += d.data.size + ((++i < count) ? ", " : " "));
 
   d3.select("#eachText").html(text);
 </script>
@@ -149,9 +151,10 @@ As a final example in this chapter we reverse the order of each node's children.
 ```
 <script>
   text = "";
+  i = 0;
 
   root.sort((a,b) => b.data.size - a.data.size)
-  .each((d) => text += (d.data.size + " "));
+  .each((d) => text += d.data.size + ((++i < count) ? ", " : ""));
 
   d3.select("#sortText").html(text);
 </script>
