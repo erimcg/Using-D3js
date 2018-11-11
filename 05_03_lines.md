@@ -180,30 +180,9 @@ To accommodate this, we will append into a new `g` element in our svg that is tr
 
 We will change up the ranges of the scales, and add the `g` element to the svg and make sure we select it. 
 <br>Setting up the lineRadial generator is almost identical to setting up the line generator except we replace the `x` with `angle` and `y` with `radius`:
-<pre>
-var xScale = d3.scaleLinear().domain([0, 6]).range([0, 2* Math.PI]);
-var yScale = d3.scaleLinear().domain([0,20]).range([40, 80]);
 
-var lineRadial = d3.lineRadial()
-     .angle(function(d) { return xScale(d.xValue); })
-     .radius(function(d) { return yScale(d.yValue); });
-     
-d3.select("#demo4")
-    .select("g") //making sure to select the g
-    .append("path")
-    .data([data])
-    .attr("d", lineRadial)
-    .attr("fill", "none")
-    .attr("stroke", "black");
-    
-//outside script
-&lt;svg id="demo4" width="200" height="200"&gt;
-    &lt;g transform="translate(100,100)"&gt;&lt;/g&gt; 
-    //new g element that positions the circle in the middle
-&lt;/svg&gt;
-</pre>
 
-```
+``` {cm: visible}
 <script>
  var data = [
     {xValue: 0, yValue: 0},
