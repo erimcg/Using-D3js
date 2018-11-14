@@ -8,9 +8,9 @@ D3's <a href="https://github.com/d3/d3-hierarchy">hierarchy</a> module provides 
 
 ## Model Construction
 
-The  [d3.hierarchy(data[,children])](https://github.com/d3/d3-hierarchy#hierarchy) method builds a model of hierarchal data in memory. The method has two parameters, the first one is an object containing hierarchal data and the second is an optional function that takes an object as an argument and returns an array of *child* objects of the object passed in.
+The  [d3.hierarchy(data[,children])](https://github.com/d3/d3-hierarchy#hierarchy) method builds a model of hierarchal data in memory. The method has two parameters, the first one is an object containing hierarchal data and the second is an optional function that takes an object as an argument and returns an array of *child* objects.
 
-When the `d3.hierarchal` method is called, it considers the first argument as the *root* object and creates a node for it.  If a second function argument is passed to the method, it is called with the root object as an argument.  If the second argument is omitted, it invokes the following function:
+When the `d3.hierarchal` method is called, it considers the first argument as the *root* object and creates a node for it.  If a second function argument is passed to the method, it is called with the root object as an argument so that it can determine the children of the root node.  If the second argument is omitted,  the following default function is used to determine the children of the root.
 
 <pre>
 function children(obj) {
