@@ -102,6 +102,7 @@ In the example below we have a hierarchal object consisting of 6 nodes.  Each no
 
 + [node.eachBefore(function)](https://github.com/d3/d3-hierarchy/blob/master/README.md#node_eachBefore) - the subtree rooted at *node* is traversed in *preorder traversal* order.  The function that is passed as an argument to `eachBefore` is invoked for each node and is passed the node.
 
+<a id="setting-value-prop"></a>
 ## Setting the Value Property
 
 The `sum` and `count` methods are used to set each descendant node's *value* property.  This property is used by some layout methods like [d3.treemap](https://github.com/d3/d3-hierarchy#treemap).
@@ -124,7 +125,7 @@ d3.select("#sumText").html("root.value: " + root.value);
 <div id="sumText"></div>
 ```
 
-When we call sum, we pass it a function.  The function takes as an argument the object in the node's data property and returns the number in that object's size property.
+When we call sum, we pass it a function.  The function takes as an argument the object in the node's data property and in our example, returns the number in the object's size property, which is accumulated with the values of its children.
 
 <pre>
   (d) => d.size
