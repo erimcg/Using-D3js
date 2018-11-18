@@ -5,9 +5,11 @@
 
 # Tree, Cluster, and Radial Layouts
 
+A tree is a visual representation of a hierarchal model, where the nodes are (usually) represented by circles and the links are represented by lines.  A cluster layout positions each leaf node of the tree at the same level and a radial layout positions the branches of the tree about the root node.
+
 ## Tree Layout
 
-[d3.tree()](https://github.com/d3/d3-hierarchy/blob/master/README.md#tree) is a function generator that returns a layout function that, when passed a root object of a hierarchy, sets the x and y coordinates for each node in the hierarchy in a manner that keeps nodes that are at the same depth aligned vertically.
+[d3.tree()](https://github.com/d3/d3-hierarchy/blob/master/README.md#tree) is a function generator that returns a layout function that, when passed a root object of a hierarchy model, sets the x and y coordinates for each node in the hierarchy in a manner that keeps nodes that are at the same depth aligned vertically.
 
 In order to render the tree shown below we do the following:
   * Create an JSON object that holds hierarchal data
@@ -642,9 +644,9 @@ svg7.select('g.nodes')
   .attr("fill", "lightblue")
   .attr('stroke', "darkgray")
   .attr('stroke-width', 1)
-    .attr("transform", d => `
-        rotate(${d.x}, 0, 0)
-    `);
+  .attr("transform", d => `
+      rotate(${d.x}, 0, 0)
+  `);
 
 var lineGen = d3.lineRadial()
   .angle(d => d.x * Math.PI / 180)
