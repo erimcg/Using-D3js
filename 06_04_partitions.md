@@ -12,7 +12,7 @@ rect {
 
 # Partition Layouts
 
-Like treemaps, the partition layout represents nodes in a hierarchy model as rectangles. In partitions, however, the rectangles for child nodes are not positioned inside their parents' rectangles, but are positioned adjacent to their parent's rectangles and the length of a rectangle is proportional to the value of the node's required `value` property.
+The partition layout represents nodes in a hierarchy model as rectangles with rectangles for child nodes positioned adjacent to the rectangles for their parents' and the length of a rectangle being proportional to the value of the node's `value` property.
 
 Below we show a tree and a partition, both created using the same hierarchal model.
 
@@ -40,11 +40,11 @@ var data = {"name": "A", "children": [
             ]};
 
 var drawTree = function() {
-  let root = d3.hierarchy(data);
+  let root = d3.hierarchy(data)
+    .count();
 
   let treeLayout4 = d3.tree()
     .size([200, 200]);
-    //.separation((a,b) => (a.depth > b.depth) ? a.depth : b.depth);
 
   treeLayout4(root);
 
@@ -81,7 +81,7 @@ var drawTree = function() {
 
 var drawPartition = function() {
   let root = d3.hierarchy(data)
-    .count();
+  .count();
 
   let partition = d3.partition()
     .size([210,210]);
@@ -122,7 +122,7 @@ We generate a partion layout using [d3.partition()](https://github.com/d3/d3-hie
 
 The [partition.round([boolean])](https://github.com/d3/d3-hierarchy#partition_round) method takes a boolean as an argument and sets whether or not the layout will round to exact pixel boundaries.
 
-Below we illustrate the [partition.padding([padding])](https://github.com/d3/d3-hierarchy#partition_padding) method which puts space between adjacent children and between children and their parent.
+Below we illustrate the [partition.padding([padding])](https://github.com/d3/d3-hierarchy#partition_padding) method which puts space between adjacent children and between children and their parent.  Note that we also sort the nodes in the hierarchal model before we  call the partition layout function.
 
 ```
 <script>
@@ -148,6 +148,7 @@ var data = {"name": "A", "children": [
             ]};
 
 let root = d3.hierarchy(data)
+  .sort((a,b) => b.height - a.height || a.data.name.localeCompare(b.data.name))
   .count();
 
 let partition = d3.partition()

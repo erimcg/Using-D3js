@@ -21,18 +21,19 @@ In order to render the tree shown below we do the following:
 ```
 <script>
 var data = {"name": "A", "children": [
-                {"name": "B"},
+                {"name": "D"},
                 {"name": "C", "children": [
-                    {"name": "E"},
-                    {"name": "F"}
+                    {"name": "F"},
+                    {"name": "E"}
                 ]},
-                {"name": "D"}
+                {"name": "B"}
             ]};
 
-var root = d3.hierarchy(data);
+var root = d3.hierarchy(data)
+  .sort((a,b) => b.height - a.height || a.data.name.localeCompare(b.data.name));
 
 var treeLayout = d3.tree()
-   .size([580, 80]);
+  .size([580, 80]);
 
 treeLayout(root);
 
@@ -66,12 +67,25 @@ svg.select('g.nodes')
   .attr("fill", "lightblue")
   .attr('stroke', "darkgray")
   .attr('stroke-width', 1);
+
+  // draw labels
+svg.select('g.labels')
+  .selectAll('text.label')
+  .data(root.descendants())
+  .enter()
+  .append('text')
+  .classed('label', true)
+  .style('fill', 'gray')
+  .attr('x', function(d) {return d.x-5;})
+  .attr('y', function(d) {return d.y+5;})
+  .html((d) => d.data.name);
 </script>
 
 <svg id="demo1" width=600 height=100>
     <g transform="translate(0,10)">
       <g class="links"></g>
       <g class="nodes"></g>
+      <g class="labels"></g>
     </g>
 </svg>
 ```
@@ -89,19 +103,20 @@ We start by creating an `svg` element, like the one below, to hold the visual el
 &lt;/svg&gt;
 </pre>
 
-We pass a hierarchal data object to `d3.hierarchy` to create the hierarchal model and to obtain a reference to the root node.
+We pass a hierarchal data object to `d3.hierarchy` to create the hierarchal model and to obtain a reference to the root node.  We can also sort the nodes in the tree.  Below, we sort the nodes by height, and for siblings, we sort them by name.
 
 <pre>
 var data = {"name": "A", "children": [
-                {"name": "B"},
-                {"name": "C", "children": [
-                    {"name": "E"},
-                    {"name": "F"}
+                {"name": "C"},
+                {"name": "D", "children": [
+                    {"name": "F"},
+                    {"name": "E"}
                 ]},
-                {"name": "D"}
+                {"name": "B"}
             ]};
 
-var root = d3.hierarchy(data);
+var root = d3.hierarchy(data)
+  .sort((a,b) => b.height - a.height || a.data.name.localeCompare(b.data.name));
 </pre>
 
 Then, we create a tree layout function by calling `d3.tree` and chain a call to [tree.size([size])](https://github.com/d3/d3-hierarchy/blob/master/README.md#tree_size), passing to `size` the dimensions of a region, that we want the tree to occupy. The layout function will then compute x and y coordinates for the nodes so that they fill the region.  In the example we specify a region 580 pixels wide and 80 pixels high.
@@ -165,7 +180,7 @@ The `d3.tree` tree layout function generator has three methods that can be calle
 
 ### tree.size
 
-The example shown above uses `tree.size([width, height])` to specify the overall width of the tree.
+The example shown above uses `tree.size([width, height])` to specify the overall width and height of the tree.
 
 ### tree.nodeSize
 
@@ -189,7 +204,8 @@ var data = {"name": "A", "size": 15, "children": [
                 {"name": "D", "size": 10}
             ]};
 
-var root = d3.hierarchy(data);
+var root = d3.hierarchy(data)
+    .sort((a,b) => b.height - a.height || a.data.name.localeCompare(b.data.name));
 
 var width = 30;
 var height = 60;
@@ -270,7 +286,8 @@ var data = {"name": "A", "children": [
                 {"name": "D"}
             ]};
 
-var root = d3.hierarchy(data);
+var root = d3.hierarchy(data)
+  .sort((a,b) => b.height - a.height || a.data.name.localeCompare(b.data.name));
 
 var width = 30;
 var height = 60;
@@ -374,7 +391,8 @@ var data = {"name": "A", "children": [
                 {"name": "D"}
             ]};
 
-var root = d3.hierarchy(data);
+var root = d3.hierarchy(data)
+  .sort((a,b) => b.height - a.height || a.data.name.localeCompare(b.data.name));
 
 var width = 30;
 var height = 60;
@@ -437,7 +455,8 @@ var data = {"name": "A", "children": [
                 {"name": "D"}
             ]};
 
-var root = d3.hierarchy(data);
+var root = d3.hierarchy(data)
+  .sort((a,b) => b.height - a.height || a.data.name.localeCompare(b.data.name));
 
 var width = 30;
 var height = 60;
@@ -517,7 +536,8 @@ var data = {"name": "A", "children": [
                 {"name": "D"}
             ]};
 
-var root = d3.hierarchy(data);
+var root = d3.hierarchy(data)
+  .sort((a,b) => b.height - a.height || a.data.name.localeCompare(b.data.name));
 
 var width = 30;
 var height = 60;
@@ -620,7 +640,8 @@ var data = {"name": "A", "children": [
                 {"name": "O"}
             ]};
 
-var root = d3.hierarchy(data);
+var root = d3.hierarchy(data)
+  .sort((a,b) => b.height - a.height || a.data.name.localeCompare(b.data.name));
 
 var radius = 100;
 

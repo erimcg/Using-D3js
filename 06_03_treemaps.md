@@ -1,4 +1,4 @@
-{{meta {docid: trees}}}
+{{meta {docid: treemaps}}}
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
 
@@ -59,7 +59,7 @@ Each node in the model is represented by a rectangle in the visualization and th
 
 ## The Treemap Layout
 
-[d3.treemap()](https://github.com/d3/d3-hierarchy/blob/master/README.md#treemap) returns a new treemap layout.  When we call the treemap layout, we pass it the root of a hierarchy model.  It then computes the location for each rectangle and sets 4 properties in each node: `x0`, `y0`, `x1`, and `y1`.  These properties represent the top left and bottom right corners of the rectangle.
+[d3.treemap()](https://github.com/d3/d3-hierarchy/blob/master/README.md#treemap) is a function generator that returns a new treemap layout.  When we call the treemap layout, we pass it the root of a hierarchy model.  It then computes the location for each rectangle and sets 4 properties in each node: `x0`, `y0`, `x1`, and `y1`.  These properties represent the top left and bottom right corners of the rectangle.
 
 The proportion of space that a child's rectangle covers inside its parent's rectangle is based on the values in the child's and the parent's `value` attributes.  For example, to fully pack a parent rectangle with rectangles for its children, the parent's `value` property should be equal to the sum of the childrens' `value` properties.
 
@@ -126,7 +126,7 @@ var drawTreemap = function(id) {
   if (id === "demo2") {
     root.sum(d => d.hasOwnProperty("population") ? d.population : 0);
   }
-  else if (id == "demo3") {
+  else if (id === "demo3") {
     root.eachAfter(d => {
       if (!d.hasOwnProperty("children")) {
         d.value = d.data.population;
@@ -168,12 +168,12 @@ drawTreemap("demo3");
 
 ## Sorting the Nodes
 
-A treemap visualization is often more informative when sibling rectangles are positioned from largest to smallest.  To accomplish this we simply need to sort the nodes using `node.sort(compare)` prior to calling the treemap layout. In the example below we set the `value` properties and then sort the children according to their `value` properties.
+A treemap visualization is often more informative when sibling rectangles are positioned from largest to smallest.  To accomplish this we simply need to sort the nodes using [node.sort(compare)](https://github.com/d3/d3-hierarchy#node_sort) prior to calling the treemap layout. In the example below we set the `value` properties and then sort the nodes by descending height and for nodes at the same height by descending value.
 
 <pre>
 var root = d3.hierarchy(data)
   .sum(d => d.hasOwnProperty("population") ? d.population : 0)
-  .sort((a, b) => b.value - a.value);
+  .sort((a, b) => b.height - a.height || b.value - a.value);
 </pre>
 
 ```
@@ -279,7 +279,7 @@ renderRect("demo10", d3.treemapResquarify);
 
 ## Rounding
 
-Per [D3v3](https://github.com/d3/d3-3.x-api-reference/blob/master/Treemap-Layout.md#round) the [treemap.round([round])](https://github.com/d3/d3-hierarchy/blob/master/README.md#treemap_round) method "sets whether or not the treemap layout will round to exact pixel boundaries. This can be nice to avoid antialiasing artifacts in SVG."
+Per [D3v3](https://github.com/d3/d3-3.x-api-reference/blob/master/Treemap-Layout.md#round) the [treemap.round([round])](https://github.com/d3/d3-hierarchy/blob/master/README.md#treemap_round) method takes a boolean as an argument and "sets whether or not the treemap layout will round to exact pixel boundaries. This can be nice to avoid antialiasing artifacts in SVG."
 
 ## Padding
 
