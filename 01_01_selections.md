@@ -141,9 +141,9 @@ In the example below, the 5 circle elements have radii between 5 and 25.  We se
 ## Selection Size and Elements
 The `d3.selection` type has a number of methods that allow us retrieve the size and elements in the selection.  Per the API these methods are:
 
-+ [d3.empty()](https://github.com/d3/d3-selection/blob/master/README.md#selection_empty) - returns true if the selection is empty
-+ [d3.size()](https://github.com/d3/d3-selection/blob/master/README.md#selection_size) - returns the number of elements that have been selected
-+ [d3.node()](https://github.com/d3/d3-selection/blob/master/README.md#selection_node) - returns the first non-null element
-+ [d3.nodes()](https://github.com/d3/d3-selection/blob/master/README.md#selection_nodes) - returns an array of the elements that have been selected
++ [selection.empty()](https://github.com/d3/d3-selection/blob/master/README.md#selection_empty) - returns true if the selection is empty
++ [selection.size()](https://github.com/d3/d3-selection/blob/master/README.md#selection_size) - returns the number of elements that have been selected
++ [selection.node()](https://github.com/d3/d3-selection/blob/master/README.md#selection_node) - returns the first non-null element
++ [selection.nodes()](https://github.com/d3/d3-selection/blob/master/README.md#selection_nodes) - returns an array of the elements that have been selected
 
 Note that these four methods **do not** return a selection object.
