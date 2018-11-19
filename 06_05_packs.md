@@ -189,7 +189,7 @@ d3.select("#demo3 g")
 
 [pack.radius([radius])](https://github.com/d3/d3-hierarchy#pack_radius) is used to set the radius accessor function.  The method takes a function as an argument and returns the layout.  By default, the radius is derived from the node's `value` property.
 
-In the example below we change the radius accessor function so that the radii are computed using `Math.random()`.
+In the example below we set the radius accessor function so that the radii are computed using `Math.random()`.  Click on the reset button to render the circles with a different set of radii.
 
 ```
 <script>
@@ -247,8 +247,87 @@ d3.select("#demo4 g")
 
 ## Packing an Array of Circles
 
-[d3.packSiblings(cirlces)](https://github.com/d3/d3-hierarchy#packSiblings) positions each of the circles in the given array in a circle-packing by setting `x` and `y` properties in each circle object.  Each of the circles in the array must have a property named `r` set to the value of its radius.
+[d3.packSiblings(cirlces)](https://github.com/d3/d3-hierarchy#packSiblings) positions takes an array of objects as an argument, each with an `r` property, and sets `x` and `y` properties in each object indicating the center of the circle.  *Note*: the array of objects that is passed to `packSiblings` need not be an array of svg circle elements.  It can simply be an array of objects with `r` properties as shown below.
+
+<pre>
+var circles = [{"r": 10},{"r": 20},{"r": 40}];
+</pre>
+
+Before calling `packSiblings` you may want to sort the objects according to `r` (in decreasing order) in order to get a dense packing.
+
+<pre>
+circles.sort((a,b) => b.r - a.r);
+</pre>
+
+```
+<script>
+var circles = [{"r": 10},
+               {"r": 10},
+               {"r": 10},
+               {"r": 20},
+               {"r": 20},
+               {"r": 20},
+               {"r": 40},
+               {"r": 40},
+               {"r": 40}];
+
+circles.sort((a,b) => b.r - a.r);
+
+d3.packSiblings(circles);
+
+d3.select("#demo5 g")
+  .selectAll('circle.node')
+  .data(circles)
+  .enter()
+  .append('circle')
+  .classed('node', true)
+  .attr('cx', d => d.x)
+  .attr('cy', d => d.y)
+  .attr('r', d => d.r);
+
+</script>
+
+<svg id="demo5" width=250 height=250>
+  <g  transform="translate(125,125)"></g>
+</svg>
+```
 
 ## Finding a Parent Circle
 
-[d3.packEnclose(circles)](https://github.com/d3/d3-hierarchy#packEnclose) computes the smallest circle that encloses the circles in the specified array.  Each circle in the array must have `x`, `y`, and `r` properties, specifying the cirlce's center and radius respectively.
+[d3.packEnclose(circles)](https://github.com/d3/d3-hierarchy#packEnclose) returns an object representing the smallest circle that encloses an array of objects representing circles.  Each object in the array must have `x`, `y`, and `r` properties, specifying the circle's center and radius respectively.  The object returned also has `x`, `y`, and `r` properties.
+
+```
+<script>
+var circles = [{"r": 10},
+               {"r": 10},
+               {"r": 10},
+               {"r": 20},
+               {"r": 20},
+               {"r": 20},
+               {"r": 40},
+               {"r": 40},
+               {"r": 40}];
+
+circles.sort((a,b) => b.r - a.r);
+
+d3.packSiblings(circles);
+
+var parent = d3.packEnclose(circles);
+circles.push(parent);
+
+d3.select("#demo6 g")
+  .selectAll('circle.node')
+  .data(circles)
+  .enter()
+  .append('circle')
+  .classed('node', true)
+  .attr('cx', d => d.x)
+  .attr('cy', d => d.y)
+  .attr('r', d => d.r);
+
+</script>
+
+<svg id="demo6" width=250 height=250>
+  <g  transform="translate(125,125)"></g>
+</svg>
+```
