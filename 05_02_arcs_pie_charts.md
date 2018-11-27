@@ -8,7 +8,7 @@
 
 # Arcs and Pie Charts
 
-In this tutorial we'll discuss how to compute data for circular and annular paths and how to use that data to draw pie charts.  D3 provides the following methods for computing the generators that we need.
+In this section we'll discuss how to compute data for circular and annular paths and how to use that data to draw pie charts.  D3 provides the following methods for computing the generators that we need.
 
 + [d3.arc()](https://github.com/d3/d3-shape#arcs) - returns an arc path generator
 + [d3.pie()](https://github.com/d3/d3-shape#pies) - returns an angle generator
