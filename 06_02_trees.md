@@ -674,7 +674,7 @@ var lineGen = d3.lineRadial()
   .radius(d => d.y);
 
 var linkGen =  d3.linkRadial()
-  .angle(d => d.x * Math.PI / 180 - 45)
+  .angle(d => d.x * Math.PI / 180)
   .radius(d => d.y);
 
 // draw links
