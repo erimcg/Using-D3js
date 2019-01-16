@@ -16,11 +16,12 @@ for (let arg of process.argv.slice(2)) {
 if (!file) throw new Error("No input file")
 
 let curFileTokens = /^(\d{2})_(\d{2})_(\w+)\.md$/.exec(file)
+let file_name = file.split(".")[0] + ".html"
 let curFile = {
   chapter: curFileTokens[1],
   section: curFileTokens[2],
   title: curFileTokens[3],
-  fileName: file
+  file_name: file_name
 }
 
 let {tokens, metadata} = transformTokens(require("./markdown").parse(fs.readFileSync(file, "utf8"), {}), {
@@ -41,7 +42,7 @@ let files = fs.readdirSync(__dirname + "/..")
         chapter: tokens[1],
         section: tokens[2],
         title: tokens[3],
-        fileName: file
+        file_name: file
       }
     }
     )
@@ -228,6 +229,7 @@ for(let i = 0; i < files.length; i++) {
 }
 
 if (curFile) {
+  metadata.file_name = curFile.file_name
   metadata.section = curFile.section
   metadata.chap_num = curFile.chapter
   if (prevFile) metadata.prev_link = `${prevFile.chapter}_${prevFile.section}_${prevFile.title}`
