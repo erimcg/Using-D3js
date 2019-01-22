@@ -217,24 +217,111 @@ var area = d3.area()
 
 <svg id="demo5" width="200" height="200"></svg>
 ```
-+ [area.context([context])](https://github.com/d3/d3-shape#area_context)
-+ [area.lineX0()](https://github.com/d3/d3-shape#area_lineX0)
-+ [area.lineY0()](https://github.com/d3/d3-shape#area_lineY0)
-+ [area.lineX1()](https://github.com/d3/d3-shape#area_lineX1)
-+ [area.lineY1()](https://github.com/d3/d3-shape#area_lineY1)
-
-
 
 ## Area Radials
 
-+ [d3.areaRadial()](https://github.com/d3/d3-shape#areaRadial)
-+ [areaRadial(data)](https://github.com/d3/d3-shape#_areaRadial)
-+ [areaRadial.angle([angle])](https://github.com/d3/d3-shape#areaRadial_angle)
-+ [areaRadial.startAngle([angle])](https://github.com/d3/d3-shape#areaRadial_startAngle)
-+ [areaRadial.endAngle([angle])](https://github.com/d3/d3-shape#areaRadial_endAngle)
-+ [areaRadial.radius([radius])](https://github.com/d3/d3-shape#areaRadial_radius)
-+ [areaRadial.innerRadius([radius])](https://github.com/d3/d3-shape#areaRadial_innerRadius)
-+ [areaRadial.outerRadius([radius])](https://github.com/d3/d3-shape#areaRadial_outerRadius)
+Area Radials work like Line Radials, but have some additional accessors that work like d3.arc().
+
+[d3.areaRadial()](https://github.com/d3/d3-shape#areaRadial) - returns a area radial generator for creating radial lines. 
+Area Radials work similarly to Line Radials, in that they convert an area into a radial by using the x and y to turn into an angle and radius.
+
+If you recall the accessors from d3.arc(), you will find Area Radials include many of the same accessors, but what we plug into them is what matters.
++ [areaRadial.angle([angle])](https://github.com/d3/d3-shape#areaRadial_angle) - Considered to be a radian (0 to 2π). Equivalent to the x() accessor from d3.area().
++ [areaRadial.startAngle([angle])](https://github.com/d3/d3-shape#areaRadial_startAngle) - Considered to be a radian (0 to 2π). Equivalent to the x0() accessor from d3.area().
++ [areaRadial.endAngle([angle])](https://github.com/d3/d3-shape#areaRadial_endAngle) - Considered to be a radian (0 to 2π). Equivalent to the x1() accessor from d3.area().
++ [areaRadial.radius([radius])](https://github.com/d3/d3-shape#areaRadial_radius) - Equivalent to the y() accessor from d3.area().
++ [areaRadial.innerRadius([radius])](https://github.com/d3/d3-shape#areaRadial_innerRadius) - Equivalent to the y0() accessor from d3.area().
++ [areaRadial.outerRadius([radius])](https://github.com/d3/d3-shape#areaRadial_outerRadius) - Equivalent to the y1() accessor from d3.area().
+
+We will make an area radial out of one of our previous examples. For this example the x's will turn into the angles and the y's will turn into the inner/outer radii.
+
+To start we will change our ranges to work with the angles and radii:
+<pre>
+var xScale = d3.scaleLinear().domain([0, 6]).range([0, 2 * Math.PI]);
+var yScale = d3.scaleLinear().domain([0,20]).range([90,30]);
+</pre>
+Next we will convert the area accessors into the new area radial accessors:
+<pre>
+.x()  => .angle()
+.y0() => .innerRadius()
+.y1() => .outerRadius()
+<br>
+Addition accessors not used in this example:
+.y()  => .radius()
+.x0() => .startAngle()
+.x1() => .endAngle()
+</pre>
+
+```
+<script>
+ var data = [
+    {x: 0, y: 0},
+    {x: 1, y: 3},
+    {x: 2, y: 12},
+    {x: 3, y: 8},
+    {x: 4, y: 17},
+    {x: 5, y: 15},
+    {x: 6, y: 20}];
+
+   var xScale = d3.scaleLinear().domain([0, 6]).range([0, 2 * Math.PI]);
+   var yScale = d3.scaleLinear().domain([0,20]).range([90,30]);
+
+   var areaRadial = d3.areaRadial()
+     .angle(d => xScale(d.x))
+     .innerRadius(d => yScale(d.y / 3))
+     .outerRadius(d => yScale(d.y))
+
+   d3.select("#demo6")
+    .select("g")
+    .append("path")
+    .attr("d", areaRadial(data))
+    .attr("fill", "red")
+    .attr("stroke", "black");
+</script>
+
+<svg id="demo6" width="200" height="200">
+<g transform="translate(100,100)"></g>
+</svg>
+```
+
+We can also use .curve() and .defined() with area radials exactly like we did for areas.
 + [areaRadial.defined([defined])](https://github.com/d3/d3-shape#areaRadial_defined)
 + [areaRadial.curve([curve])](https://github.com/d3/d3-shape#areaRadial_curve)
+
+```
+<script>
+ var data = [
+    {x: 0, y: 0},
+    {x: 1, y: 3},
+    {x: 2, y: 12},
+    {x: 3, y: 8},
+    {x: 4, y: 17},
+    {x: 5, y: 15},
+    {x: 6, y: 20}];
+
+   var xScale = d3.scaleLinear().domain([0, 6]).range([0, 2 * Math.PI]);
+   var yScale = d3.scaleLinear().domain([0,20]).range([90,30]);
+
+   var areaRadial = d3.areaRadial()
+     .angle(d => xScale(d.x))
+     .innerRadius(d => yScale(d.y / 3))
+     .outerRadius(d => yScale(d.y))
+     .curve(d3.curveBasis)
+     .defined((d,i) => (i != 4));
+
+   d3.select("#demo7")
+    .select("g")
+    .append("path")
+    .attr("d", areaRadial(data))
+    .attr("fill", "red")
+    .attr("stroke", "black");
+</script>
+
+<svg id="demo7" width="200" height="200">
+<g transform="translate(100,100)"></g>
+</svg>
+```
+
+
++ [area.context([context])](https://github.com/d3/d3-shape#area_context)
 + [areaRadial.context([context])](https://github.com/d3/d3-shape#areaRadial_context)
