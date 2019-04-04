@@ -727,8 +727,9 @@ Natural
 ## Step Curves 
 ### (The not so curvy curves)
 Step Curves produce a [step function](https://en.wikipedia.org/wiki/Step_function) consisting of horizontal and vertical lines.
+
 Step
-+ [d3.curveStep(context)](https://github.com/d3/d3-shape#curveStep) - the 'y' value changes at the midpoint between each pair of 'x' values
++ [d3.curveStep(context)](https://github.com/d3/d3-shape#curveStep) - the `y` value changes at the midpoint between each pair of `x` values
 ```
 <script>
  var data = [
@@ -769,7 +770,7 @@ Step
 <svg id="demo7" width="200" height="200"></svg>
 ```
 Step Before
-+ [d3.curveStepBefore(context)](https://github.com/d3/d3-shape#curveStepBefore) - the 'y' value changes at the first 'x' value of each pair of 'x' pairs
++ [d3.curveStepBefore(context)](https://github.com/d3/d3-shape#curveStepBefore) - the `y` value changes at the first `x` value of each pair of `x` values
 ```
 <script>
  var data = [
@@ -810,7 +811,7 @@ Step Before
 <svg id="demo7b" width="200" height="200"></svg>
 ```
 Step After
-+ [d3.curveStepAfter(context)](https://github.com/d3/d3-shape#curveStepAfter) - the 'y' value changes at the second 'x' value of each pair of 'x' pairs
++ [d3.curveStepAfter(context)](https://github.com/d3/d3-shape#curveStepAfter) - the `y` value changes at the second `x` value of each pair of `x` values
 ```
 <script>
  var data = [
