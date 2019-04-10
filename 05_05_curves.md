@@ -8,7 +8,7 @@
 
 # Curves
 
-As you may have seen in lines(link) and area(link) applying a curve will curve the line. 
+As you may have seen in [d3.lines()](/05_03_lines.html) and [d3.area()](/05_04_areas.html) applying a curve will curve the line.
 For most, if not all, examples we have gone through, we have used d3.curveBasis as the curve, but there are many more types provided by d3.
 
 Curves are not used on their own, but rather used with an accessor on lines and areas. 
@@ -17,14 +17,15 @@ Many curves have 3 forms: Normal, Closed, and Open.
 
 While each type of curve has different ways of dictating how it's different forms are computed, they follow a similar pattern: 
 + The Normal version touches the first and last point, and starts and ends on the first and last points
-+ The Closed version "connects" the first and last points underneath of the rest of the curve, but typically does not touch the first and last points.
-+ The Open version seems to not include the first and last points on it's curve
++ The Closed version "connects" the first and last points underneath of the rest of the curve, but typically does not actually touch the first and last points.
++ The Open version never touches the first and last point, but will stop around the second and second to last points instead.
 + Note: These are very simplified ways of explaining the forms based purely on appearances.
 
 ## Basis Curves
+The Basis Curves produce variants of a [cubic basis spline](https://en.wikipedia.org/wiki/B-spline).
+
+Basis
 + [d3.curveBasis(context)](https://github.com/d3/d3-shape#curveBasis)
-+ [d3.curveBasisClosed(context)](https://github.com/d3/d3-shape#curveBasisClosed)
-+ [d3.curveBasisOpen(context)](https://github.com/d3/d3-shape#curveBasisOpen)
 ```
 <script>
  var data = [
@@ -65,6 +66,7 @@ While each type of curve has different ways of dictating how it's different form
 <svg id="demo1" width="200" height="200"></svg>
 ```
 Basis Closed
++ [d3.curveBasisClosed(context)](https://github.com/d3/d3-shape#curveBasisClosed)
 ```
 <script>
  var data = [
@@ -105,6 +107,7 @@ Basis Closed
 <svg id="demo1c" width="200" height="200"></svg>
 ```
 Basis Open
++ [d3.curveBasisOpen(context)](https://github.com/d3/d3-shape#curveBasisOpen)
 ```
 <script>
  var data = [
@@ -146,10 +149,13 @@ Basis Open
 ```
 
 
-## Bundle Curves
-Not for use in d3.area, only d3.line.
+## Bundle Curve
+The Bundle Curve produce variants of a [cubic basis spline](https://en.wikipedia.org/wiki/B-spline), however the strength of the spline can be altered by changing the beta, which defaults to 0.85.
+
+Note: Not for use in d3.area, only d3.line. Also, no open or closed forms.
 + [d3.curveBundle(context)](https://github.com/d3/d3-shape#curveBundle)
-+ [bundle.beta(beta)](https://github.com/d3/d3-shape#curveBundle_beta)
++ [bundle.beta(beta)](https://github.com/d3/d3-shape#curveBundle_beta) - accesseor on d3.curveBundle(), takes a number 0 to 1, affects the strength of the spline
+    + Example: ... .curve(d3.curveBundle().beta(0.5))
 ```
 <script>
  var data = [
@@ -201,12 +207,12 @@ Not for use in d3.area, only d3.line.
 ```
 
 ## Cardinal Curves
-+ [d3.curveCardinal(context)](https://github.com/d3/d3-shape#curveCardinal)
-+ [d3.curveCardinalClosed(context)](https://github.com/d3/d3-shape#curveCardinalClosed)
-+ [d3.curveCardinalOpen(context)](https://github.com/d3/d3-shape#curveCardinalOpen)
-+ [cardinal.tension(tension)](https://github.com/d3/d3-shape#curveCardinal)
+The Cardinal Curves produce varients of a [cubic cardinal spline](https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Cardinal_spline). The spline's tension can be altered to affect the spline, which defaults to 0.
 
 Cardinal
++ [d3.curveCardinal(context)](https://github.com/d3/d3-shape#curveCardinal)
++ [cardinal.tension(tension)](https://github.com/d3/d3-shape#curveCardinal) - accesseor on d3.curveCardinal(), takes a number 0 to 1, affects the tension of the spline
+    + Example: ... .curve(d3.curveCardinal().tension(0.5))
 ```
 <script>
  var data = [
@@ -255,6 +261,7 @@ Cardinal
 <svg id="demo3" width="200" height="200"></svg>
 ```
 Cardinal Closed
++ [d3.curveCardinalClosed(context)](https://github.com/d3/d3-shape#curveCardinalClosed)
 ```
 <script>
  var data = [
@@ -303,6 +310,7 @@ Cardinal Closed
 <svg id="demo3c" width="200" height="200"></svg>
 ```
 Cardinal Open
++ [d3.curveCardinalOpen(context)](https://github.com/d3/d3-shape#curveCardinalOpen)
 ```
 <script>
  var data = [
@@ -352,12 +360,12 @@ Cardinal Open
 ```
 
 ## Catmull-Rom Curves
-+ [d3.curveCatmullRom(context)](https://github.com/d3/d3-shape#curveCatmullRom)
-+ [d3.curveCatmullRomClosed(context)](https://github.com/d3/d3-shape#curveCatmullRomClosed)
-+ [d3.curveCatmullRomOpen(context)](https://github.com/d3/d3-shape#curveCatmullRomOpen)
-+ [catmullRom.alpha(alpha)](https://github.com/d3/d3-shape#curveCatmullRom_alpha)
+The CatmullRom Curves produce varients of a [cubic Catmull-Rom spline, as proposed by Yuksel et al](https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Cardinal_spline). The spline's alpha can be altered to affect the spline, which defaults to 0.5.
 
 Catmull Rom
++ [d3.curveCatmullRom(context)](https://github.com/d3/d3-shape#curveCatmullRom)
++ [catmullRom.alpha(alpha)](https://github.com/d3/d3-shape#curveCatmullRom_alpha)  - accesseor on d3.curveCatmullRom(), takes a number 0 to 1, affects the alpha of the spline
+    + Example: ... .curve(d3.curveCatmullRom().alpha(0.5))
 ```
 <script>
  var data = [
@@ -406,6 +414,7 @@ Catmull Rom
 <svg id="demo4" width="200" height="200"></svg>
 ```
 Catmull Rom Closed
++ [d3.curveCatmullRomClosed(context)](https://github.com/d3/d3-shape#curveCatmullRomClosed)
 ```
 <script>
  var data = [
@@ -454,6 +463,7 @@ Catmull Rom Closed
 <svg id="demo4c" width="200" height="200"></svg>
 ```
 Catmull Rom Open
++ [d3.curveCatmullRomOpen(context)](https://github.com/d3/d3-shape#curveCatmullRomOpen)
 ```
 <script>
  var data = [
@@ -503,11 +513,10 @@ Catmull Rom Open
 ```
 
 ## Linear Curves
-+ [d3.curveLinear(context)](https://github.com/d3/d3-shape#curveLinear)
-+ [d3.curveLinearClosed(context)](https://github.com/d3/d3-shape#curveLinearClosed)
-+ There is no open form for this curve.
+A Linear Curve is the default curve applied if no other are set. They do not have an apparent curve in any way, instead they just make straight edges between each set of points. There is no open varient for Linear Curves.
 
 Linear
++ [d3.curveLinear(context)](https://github.com/d3/d3-shape#curveLinear)
 ```
 <script>
  var data = [
@@ -548,6 +557,7 @@ Linear
 <svg id="demo5" width="200" height="200"></svg>
 ```
 Linear Closed
++ [d3.curveLinearClosed(context)](https://github.com/d3/d3-shape#curveLinearClosed)
 ```
 <script>
  var data = [
@@ -589,11 +599,9 @@ Linear Closed
 ```
 
 ## Monotone and Natural Curves
-+ [d3.curveMonotoneX(context)](https://github.com/d3/d3-shape#curveMonotoneX)
-+ [d3.curveMonotoneY(context)](https://github.com/d3/d3-shape#curveMonotoneY)
-+ [d3.curveNatural(context)](https://github.com/d3/d3-shape#curveNatural)
 
 Monotone X
++ [d3.curveMonotoneX(context)](https://github.com/d3/d3-shape#curveMonotoneX) produces a cubic spline that preserves monotonicity in x, assuming monotonicity in y
 ```
 <script>
  var data = [
@@ -634,6 +642,7 @@ Monotone X
 <svg id="demo6x" width="200" height="200"></svg>
 ```
 Monotone Y
++ [d3.curveMonotoneY(context)](https://github.com/d3/d3-shape#curveMonotoneY) produces a cubic spline that preserves monotonicity in y, assuming monotonicity in x.
 ```
 <script>
  var data = [
@@ -674,6 +683,7 @@ Monotone Y
 <svg id="demo6y" width="200" height="200"></svg>
 ```
 Natural
++ [d3.curveNatural(context)](https://github.com/d3/d3-shape#curveNatural) produces a natural cubic spline with the second derivative of the spline set to zero at the endpoints
 ```
 <script>
  var data = [
@@ -716,11 +726,10 @@ Natural
 
 ## Step Curves 
 ### (The not so curvy curves)
-+ [d3.curveStep(context)](https://github.com/d3/d3-shape#curveStep)
-+ [d3.curveStepAfter(context)](https://github.com/d3/d3-shape#curveStepAfter)
-+ [d3.curveStepBefore(context)](https://github.com/d3/d3-shape#curveStepBefore)
+Step Curves produce a [step function](https://en.wikipedia.org/wiki/Step_function) consisting of horizontal and vertical lines.
 
 Step
++ [d3.curveStep(context)](https://github.com/d3/d3-shape#curveStep) - the `y` value changes at the midpoint between each pair of `x` values
 ```
 <script>
  var data = [
@@ -761,6 +770,7 @@ Step
 <svg id="demo7" width="200" height="200"></svg>
 ```
 Step Before
++ [d3.curveStepBefore(context)](https://github.com/d3/d3-shape#curveStepBefore) - the `y` value changes at the first `x` value of each pair of `x` values
 ```
 <script>
  var data = [
@@ -801,6 +811,7 @@ Step Before
 <svg id="demo7b" width="200" height="200"></svg>
 ```
 Step After
++ [d3.curveStepAfter(context)](https://github.com/d3/d3-shape#curveStepAfter) - the `y` value changes at the second `x` value of each pair of `x` values
 ```
 <script>
  var data = [
