@@ -1,8 +1,8 @@
 
-window.addEventListener("load", () => {
+/*window.addEventListener("load", () => {
   // If there's no ecmascript 5 support, don't try to initialize
   if (!Object.create || !window.JSON) return
-
+*/
   document.body.addEventListener("click", e => {
     for (let n = e.target; n; n = n.parentNode) {
       if (n.className === "c_ident") return
@@ -19,7 +19,7 @@ window.addEventListener("load", () => {
     for (let i = 0; i < pres.length; i++) {
       let pre = pres[i]
       if (!/^(text\/)?(javascript|html)$/.test(pre.getAttribute("data-language")) ||
-          chapNum == 1 && !/console\.log/.test(pre.textContent)) continue
+        chapNum == 1 && !/console\.log/.test(pre.textContent)) continue
       sandboxHint = elt("div", {"class": "sandboxhint"}, "edit & run code by clicking it")
       pre.insertBefore(sandboxHint, pre.firstChild)
       break
@@ -80,6 +80,7 @@ window.addEventListener("load", () => {
     })
 
     let pollingScroll = null
+
     function pollScroll() {
       if (document.activeElement != editor.getInputField()) return
       let rect = editor.getWrapperElement().getBoundingClientRect()
@@ -93,6 +94,7 @@ window.addEventListener("load", () => {
 
     wrap.style.marginLeft = wrap.style.marginRight = "0px"
     setTimeout(() => editor.refresh(), 600)
+
     if (e) {
       editor.setCursor(editor.coordsChar({left: e.clientX, top: e.clientY}, "client"))
       editor.focus()
@@ -134,10 +136,15 @@ window.addEventListener("load", () => {
         style: "background: white",
         handler: () => renderCode(data)},
       {type: "image",
-      src: "img/gray_reset_button.png",
-      title: "Reset (ctrl/cmd-esc)",
-      style: "background: white",
-      handler: () => resetCode(data)},
+        src: "img/gray_reset_button.png",
+        title: "Reset (ctrl/cmd-esc)",
+        style: "background: white",
+        handler: () => resetCode(data)},
+      {type: "image",
+        src: "img/gray_detach_button.png",
+        title: "Detach",
+        style: "background: white",
+        handler: () => detachEditor(data)},
       {type: "image",
         src: "img/gray_hide_button.png",
         title: "Hide",
@@ -200,9 +207,9 @@ window.addEventListener("load", () => {
 
   function hideEditor(data) {
     data.wrap.childNodes[2].firstChild.style.visibility = "hidden";
-    data.wrap.childNodes[2].childNodes[2].src = "img/gray_show_button.png";
-    data.wrap.childNodes[2].childNodes[2].addEventListener('click', () => showEditor(data));
-    data.wrap.childNodes[2].childNodes[2].title = "Show editor (ctrl-down)";
+    data.wrap.childNodes[2].childNodes[3].src = "img/gray_show_button.png";
+    data.wrap.childNodes[2].childNodes[3].addEventListener('click', () => showEditor(data));
+    data.wrap.childNodes[2].childNodes[3].title = "Show editor (ctrl-down)";
 
     data.wrap.firstChild.style.display = 'none';
     document.body.focus();
@@ -210,9 +217,9 @@ window.addEventListener("load", () => {
 
   function showEditor(data) {
     data.wrap.childNodes[2].firstChild.style.visibility = "visible";
-    data.wrap.childNodes[2].childNodes[2].src = "img/gray_hide_button.png";
-    data.wrap.childNodes[2].childNodes[2].addEventListener('click', () => hideEditor(data));
-    data.wrap.childNodes[2].childNodes[2].title = "Hide editor";
+    data.wrap.childNodes[2].childNodes[3].src = "img/gray_hide_button.png";
+    data.wrap.childNodes[2].childNodes[3].addEventListener('click', () => hideEditor(data));
+    data.wrap.childNodes[2].childNodes[3].title = "Hide editor";
 
     let scrollbars = data.wrap.firstChild.getElementsByClassName('CodeMirror-vscrollbar');
     for (let elm of scrollbars) {
@@ -224,13 +231,95 @@ window.addEventListener("load", () => {
     data.editor.focus();
   }
 
+  function detachEditor(data) {
+
+    let title = "Using D3.js";
+    let windowVariableName = "bla";
+
+    let width = data.wrap.offsetWidth;
+    let height = data.wrap.offsetHeight;
+
+    const windowCreationOptionsList = {
+      width: width + 100,
+      height: 1,
+      top: (window.innerHeight - width) / 2 + window.screenY,
+      left: (window.innerWidth - height) / 2 + window.screenX,
+      location: 'no',
+      title: title
+    };
+
+    //TODO: hide location bar
+
+    let windowCreationOptions = Object.keys(windowCreationOptionsList)
+      .map(
+        (key) => key + '=' + windowCreationOptionsList[key]
+      )
+      .join(',');
+
+
+    const popupWindow = window.open("modal_sandbox.html", title, windowCreationOptions);
+    if (!popupWindow) {
+      return null;
+    }
+
+    popupWindow.onload = function (event) {
+      loadSandbox(popupWindow, data);
+    }
+  }
+
+  function loadSandbox(popupWindow, data) {
+    let document = popupWindow.document;
+
+    document.body.firstChild.remove();
+
+    let article = document.createElement('article');
+    document.body.insertBefore(article, document.body.firstChild);
+
+    let node = data.orig.cloneNode(true);
+    node.style.display = "block";
+    article.appendChild(node);
+
+    // load scripts and styles at beginning of article
+
+    let children = window.document.body.firstChild.childNodes;
+    let len = children.length;
+    for (let i = 0; i < len; i++) {
+      let child = children[i];
+      if (child.nodeName === 'SCRIPT') {
+        let newNode = document.createElement('script');
+        if (child.hasAttribute('src')) {
+          newNode.src = child.src;
+        }
+        else {
+          newNode.innerHTML = child.innerHTML;
+        }
+        article.insertBefore(newNode, article.firstChild);
+      }
+      else if (child.nodeName === 'STYLE') {
+        let newNode = document.createElement('style');
+        newNode.innerHTML = child.innerHTML;
+        article.insertBefore(newNode, article.firstChild);
+      }
+    }
+
+    activateCode(node, null, "html", true);
+    let sandboxMenu = article.getElementsByClassName('sandbox-menu')[0];
+
+    sandboxMenu.childNodes[2].style.visibility = "hidden";
+    sandboxMenu.childNodes[3].style.visibility = "hidden";
+
+    popupWindow.resizeTo(article.offsetWidth + 100, article.offsetHeight + 100);
+
+    popupWindow.modal_sandbox_data = node.dataeditor;
+  }
+
   let sandboxSnippets = {}
   {
     let snippets = document.getElementsByClassName("snippet")
     for (let i = 0; i < snippets.length; i++) {
       let snippet = snippets[i]
       if (snippet.getAttribute("data-language") == "text/html" &&
-          snippet.getAttribute("data-sandbox"))
+        snippet.getAttribute("data-sandbox"))
         sandboxSnippets[snippet.getAttribute("data-sandbox")] = snippet
     }
   }
@@ -287,4 +376,4 @@ window.addEventListener("load", () => {
     let lang = pre.getAttribute("data-language")
     activateCode(pre, null, lang, cmVisible);
   }
-})
+//})

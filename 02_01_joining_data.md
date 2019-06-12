@@ -13,6 +13,10 @@
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
 
+<script>
+var homeless = [134278, 89503, 32190, 23548, 21112];
+</script>
+
 # Joining Data
 
 The d3.selection type has a number of methods that allow you to bind data to visual elements and get the data that is bound to visual elements.  Per the API these methods are:

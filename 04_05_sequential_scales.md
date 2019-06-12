@@ -7,8 +7,6 @@
 
 The [scaleSequential(interpolator)](https://github.com/d3/d3-scale/blob/master/README.md#sequential-scales) method maps a continuous domain to a continuous range defined by an interpolator function.  You can define your own interpolator function or use a built-in d3 interpolator function. For information about defining your own interpolator function, see the D3 [interpolate documentation](https://github.com/d3/d3-interpolate).
 
-An interpolator is a ...
-
 A sequential scale is particularly useful for mapping a continuous interval of numeric values to a series of colors. Below, we describe how to use `scaleSequential` and provide an inventory of the various interpolator functions provided by D3.
 
 ## Defining a Sequential Scale

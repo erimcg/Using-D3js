@@ -72,8 +72,6 @@ The `selection` type has two methods that allow you to select zero or more desce
 + [selection.select(selector)](https://github.com/d3/d3-selection/blob/master/README.md#selection_select) - select zero or one descendant for each item in the selection
 + [selection.selectAll(selector)](https://github.com/d3/d3-selection/blob/master/README.md#selection_selectAll) - select zero or more descendants for each item in the selection
 
-TODO: talk about groups here.
-
 The SVG element below uses &lt;g&gt; elements to group the circles in each row.  In order to get all of the circles that are decendents of the first &lt;g&gt; element we chain calls to `selection.select` and `selection.selectAll`.  We can then modify the attributes of the new selection.
 
 
