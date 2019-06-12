@@ -3,7 +3,7 @@
 <script src="https://d3js.org/d3.v4.min.js"></script>
 
 <style>
-    svg { background-color: lightblue; }
+    svg { background-color: white; }
 </style>
 
 # Areas and Area Radials

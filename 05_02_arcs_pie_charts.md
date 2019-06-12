@@ -3,7 +3,7 @@
 <script src="https://d3js.org/d3.v4.min.js"></script>
 
 <style>
-    svg { background-color: lightblue; }
+    svg { background-color: white; }
 </style>
 
 # Arcs and Pie Charts
@@ -669,4 +669,172 @@ We then simply fill the path element, we use the `value` property of the element
 </script>
 
 <svg id="demo11" width="200" height="200"></svg>
+```
+
+## d3.pointRadial()
+The [d3.pointRadial(angle, radius)](https://github.com/d3/d3-shape#pointRadial) function returns an array that contains `x` and `y` coordinates.
+The coordinates represent the point on the circle at `angle` with a radius set by `radius`. For the `angle`, 0 is located at the top (12 o'clock) and the angle progresses clockwise.
+
+d3.pointRadial(a, r) returns an array with two elements. The `x` position is the first element or `d3.pointRadial(angle, radius)[0]` and the `y` position is `d3.pointRadial(angle, radius)[1]`.
+
+Examples of different angles and radii:
+```
+<script>
+    //Visual Illistration of Angles
+    var pointRadialArr = [8];
+    var textArr = [
+        {text: "0", x: "", y: ""},
+        {text: "π/4", x: "", y: ""},
+        {text: "π/2", x: "", y: ""},
+        {text: "3π/4", x: "", y: ""},
+        {text: "π", x: "", y: ""},
+        {text: "5π/4", x: "", y: ""},
+        {text: "3π/2", x: "", y: ""},
+        {text: "7π/4", x: "", y: ""}];
+
+    for(let i = 0; i < 8; i += 1){
+        pointRadialArr[i] = d3.pointRadial( (i / 4) * Math.PI, 60);
+        textArr[i].x = d3.pointRadial( (i / 4) * Math.PI, 80)[0];
+        textArr[i].y = d3.pointRadial( (i / 4) * Math.PI, 80)[1];
+    }
+    d3.select("#demoPointRadialA") // adds the grey circle
+    	.append("circle")
+        .attr("cx", 100)
+        .attr("cy", 100)
+        .attr("r", 60)
+        .attr("fill", "none")
+        .attr("stroke", "grey")
+        .attr("stroke-width", "1.5");
+
+    d3.select("#demoPointRadialA") // adds the dots
+    	.selectAll("newCircle")
+        .data(pointRadialArr)
+        .enter()
+        .append("circle")
+        .attr("cx", d => d[0])
+        .attr("cy", d => d[1])
+        .attr("r", 2.5)
+        .attr("transform", "translate(100,100)");
+
+    d3.select("#demoPointRadialA") //adds the tags
+        .selectAll("text")
+        .data(textArr)
+        .enter()
+        .append("text")
+        .text(d => d.text)
+        .attr("x", d => d.x)
+        .attr("y", d=> d.y)
+        .attr("font-size", "15px")
+        .attr("text-anchor", "middle")
+        .attr("transform", "translate(100,100)");
+
+    //Visual Illistration of different Radii
+    var pointRadialArr = [4];
+        var textArr = [4];
+        for(let i = 0; i < 4; i += 1){
+            pointRadialArr[i] = d3.pointRadial( (i / 2) * Math.PI, i * 20 + 20);
+            textArr[i] = {text: "", x: "", y: ""}
+            textArr[i].text = i  * 20 + 20;
+            textArr[i].x = d3.pointRadial( (i / 2) * Math.PI, i * 20 + 30)[0];
+            textArr[i].y = d3.pointRadial( (i / 2) * Math.PI, i * 20 + 30)[1];
+        }
+        d3.select("#demoPointRadialR") // adds the grey circles
+            .selectAll("circle")
+            .data(textArr)
+            .enter()
+        	.append("circle")
+            .attr("cx", 100)
+            .attr("cy", 100)
+            .attr("r", d => d.text)
+            .attr("fill", "none")
+            .attr("stroke", "grey")
+            .attr("stroke-width", "1.5");
+
+        d3.select("#demoPointRadialR") // adds the dots
+        	.selectAll("newCircle")
+            .data(pointRadialArr)
+            .enter()
+            .append("circle")
+            .attr("cx", d => d[0])
+            .attr("cy", d => d[1])
+            .attr("r", 2.5)
+            .attr("transform", "translate(100,100)");
+
+        d3.select("#demoPointRadialR") //adds the tags
+            .selectAll("text")
+            .data(textArr)
+            .enter()
+            .append("text")
+            .text(d => d.text)
+            .attr("x", d => d.x)
+            .attr("y", d=> d.y)
+            .attr("font-size", "15px")
+            .attr("text-anchor", "middle")
+            .attr("transform", "translate(100,100)");
+</script>
+
+<svg id="demoPointRadialA" width="200" height="200"></svg>
+<svg id="demoPointRadialR" width="200" height="200"></svg>
+```
+
+We can append some `text` elements to our SVG to label our pie graph with the names of the slices. We will set `x` and `y` attributes to point radials with an `angle` of the data's startAngle and endAngle and a `radius` of our inner and outer radii:
+```
+<script>
+  d3.select("#demoPointRadialLabel")
+    .append("g")
+    .attr("transform", "translate(100,100)");
+
+  var input = [
+      {name: "a", size: "1"},
+      {name: "b", size: "1"},
+      {name: "c", size: "1"},
+      {name: "d", size: "1"},
+      {name: "e", size: "4"},
+      {name: "f", size: "2"},
+      {name: "g", size: "2"},
+      {name: "h", size: "4"}
+  ];
+
+  var angleGen = d3.pie()
+        .startAngle(Math.PI / 4)
+        .endAngle(7 * Math.PI / 4)
+        .padAngle(.05)
+        .value((d) => d.size)
+        .sortValues((a,b) => a < b ? 1 : -1);;
+
+  var data = angleGen(input);
+
+  var arcGen = d3.arc()
+    .innerRadius(50)
+    .outerRadius(90);
+
+  var colorScale = d3.scaleSequential(d3.interpolate("purple", "orange"))
+    .domain([1,4]);
+
+  d3.select("#demoPointRadialLabel g")
+    .selectAll("path")
+    .data(data)
+    .enter()
+    .append("path")
+    .attr("d", arcGen)
+    .attr("fill", (d) => colorScale(d.value))
+    .attr("stroke", "gray")
+    .attr("stroke-width", 1);
+
+  d3.select("#demoPointRadialLabel")
+    .selectAll("newText")
+    .data(data)
+    .enter()
+    .append("text")
+    .attr("x", d => d3.pointRadial((d.startAngle + d.endAngle)/2 , (50+90)/2)[0])
+    .attr("y", d => d3.pointRadial((d.startAngle + d.endAngle)/2 , (50+90)/2)[1])
+    .attr("text-anchor", "middle")
+    .text(d => d.data.name)
+    .attr("font-size", "15px")
+    .attr("fill", "white")
+    .attr("transform","translate(100,100)");
+console.log(data);
+</script>
+
+<svg id="demoPointRadialLabel" width="200" height="200"></svg>
 ```
