@@ -1,6 +1,6 @@
 {{meta {docid: arcs_pie_charts}}}
 
-<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
 
 <style>
     svg { background-color: white; }
@@ -53,11 +53,11 @@
 
 ## Built-in Symbols
 
-D3 comes with 7 symbols built-in. To use them, assign them in the `.type(symbol)` method on the symbol generator such as
+D3 comes with 7 symbols built-in. To use them, assign them in the `.type(symbol)` method on the symbol generator such as:
 <pre>
 var square = d3.symbol().type(d3.symbolSquare).size(x);
 </pre>
-Make sure to remeber that the `.size()` is the <i>area</i> of the shape and the dimensions will change differently based on the shape.
+Make sure to remember that the `.size()` is the <i>area</i> of the shape and the dimensions will change differently based on the shape.
 
 + [d3.symbols](https://github.com/d3/d3-shape#symbols)
 + [d3.symbolCircle](https://github.com/d3/d3-shape#symbolCircle)
@@ -130,8 +130,8 @@ Inside of the implementation use [CanvasPathMethods](https://www.w3.org/TR/2dcon
 For example a definition of a custom square symbol:
 <pre>
     var customSymbolSquare = {
-        draw: function(context, size)/2{
-            let s = Math.sqrt(size);
+        draw: function(context, size){
+            let s = Math.sqrt(size)/2;
             context.moveTo(s,s);
             context.lineTo(s,-s);
             context.lineTo(-s,-s);
@@ -172,7 +172,7 @@ Examples of custom symbols (square, right triangle, and semi circle):
         .attr("d", customSqr)
         .attr("transform", "translate(50,50)");
 
-    //Custom Right Triangle, may not be accurately centered at the centroid
+    //Custom Right Triangle, may not be accurately centered at the centroid of the triangle
     var customShapeTri = {
         draw: function(context, size) {
           let s = Math.sqrt(size/4);
