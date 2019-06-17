@@ -3,8 +3,10 @@
 <script src="https://d3js.org/d3.v5.min.js"></script>
 
 <style>
-    svg { background-color: white; }
+    svg { background-color: white; display: inline-block;}
+    .sandbox-output { text-align: center;}
 </style>
+
 # Symbols
 + [d3.symbol](https://github.com/d3/d3-shape#symbol)
 + [symbol(arguments...)](https://github.com/d3/d3-shape#_symbol)

@@ -3,7 +3,8 @@
 <script src="https://d3js.org/d3.v5.min.js"></script>
 
 <style>
-    svg { background-color: white; }
+    svg { background-color: white; display: inline-block;}
+    .sandbox-output { text-align: center;}
 </style>
 
 # Lines and Radial Lines

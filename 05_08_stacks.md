@@ -4,7 +4,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
 
 <style>
-    svg { background-color: white; }
+    svg { background-color: white; display: inline-block;}
+    .sandbox-output { text-align: center;}
 </style>
 
 # Stacks
