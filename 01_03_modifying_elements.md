@@ -1,3 +1,4 @@
+
 {{meta {docid: modifying_elements}}}
 
 <style>
@@ -39,11 +40,14 @@
         background-color: pink;
     }
 </style>
-<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
 
-# Modifying Elements
+
+# Modifying Elements in Selections
 
 Once we have a `d3.selection` object that contains zero or more elements, we can modify the elements in the selection in unison by calling the `d3.selection` methods shown below.
+
++ [selection.each(function)](https://github.com/d3/d3-selection/blob/master/README.md#selection_each) - call a function for each element in the selection
 
 + [selection.attr(name[, value])](https://github.com/d3/d3-selection/blob/master/README.md#selection_attr) - set, remove, or get an attribute
 + [selection.style(name[, value[, priority]])](https://github.com/d3/d3-selection/blob/master/README.md#selection_style) - set, remove, or get a style property
@@ -56,23 +60,41 @@ Once we have a `d3.selection` object that contains zero or more elements, we can
 
 As you can see, each of the methods above can be used to set, remove, or get a characteristic (e.g. attribute, class, inner HTML) of an element. Since the API is similar in many cases, we'll look at the first three methods together, then `selection.classed`, and finally the last two methods.
 
-## Chaining Method Calls
+## Selection.each
 
-Many of the methods above return a `d3.selection` object.  Since we call these methods on a `selection` object and they also return a `selection` object, we can *chain* multiple `selection` method calls together in a single statement.  So, rather than writing something like this:
-
-<pre>
-let sel = d3.selectAll("circle");
-sel.attr("r", "30");
-sel.attr("fill", "pink");
-</pre>
-
-We can, instead, chain the method calls together and write an equivalent statement like the one below.
+The `selection.each` method allows us to call a function for each element in a selection.
+ The argument to `each` is a function and as with `selection.filter`, we can pass in a named function, unnamed function, a lambda expression, or specify the function inline. 
+ 
+When `each` is executed, the function that is passed to it is executed once for each element in the selection and each time is passed `d` (data from a data join), `i` (index), and `nodes` (an array of elements in the current group.)  `nodes[i]` is used to retrieve the current element in the selection for which the function is being called.
+ 
+In the example below, the lambda expression is called for each element in the selection and each time checks to see if the index of the element is even, and if so, sets it's fill color to pink.
 
 <pre>
-let sel = d3.selectAll("circle")
-            .attr("r", "30")
-            .attr("fill", "pink");
+d3.selectAll("#eachSVG circle").each((d,i,nodes) => {
+    if (i % 2 == 0) {
+        nodes[i].setAttribute("fill", "pink");
+    }});
 </pre>
+
+```
+<script>
+    function applyEach(){
+        d3.selectAll("#eachSVG circle").each((d,i,nodes) => {
+            if (i % 2 == 0) {
+                nodes[i].setAttribute("fill", "pink");
+            }});
+    }
+</script>
+
+<svg id="eachSVG" width="300" height="60">
+    <circle r="20" cx="30" cy="30" fill="lightblue" />
+    <circle r="20" cx="80" cy="30" fill="lightblue" />
+    <circle r="20" cx="130" cy="30" fill="lightblue" />
+    <circle r="20" cx="180" cy="30" fill="lightblue" />
+</svg>
+
+<button id="eachButton" onclick="applyEach()">Apply Each</button>
+```
 
 ## Modifying Attributes, Styles, and Properties
 

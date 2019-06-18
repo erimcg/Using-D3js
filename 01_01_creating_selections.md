@@ -17,9 +17,9 @@
   }
 </style>
 
-<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
 
-# Selections
+# Creating Selections
 
 As we'll soon see, more often than not, when we want to change a attribute or property of an element, we'll want to do the same for a whole set of elements in the DOM.  Sometimes we can accomplish this by calling `getElementsByClassName` or `getElementsByTagName` and then use a for-loops to iterate over the selected elements. Bostock has engineered a smarter way: [Selections](https://github.com/d3/d3-selection/blob/master/README.md#selection).
 
@@ -72,7 +72,7 @@ The `selection` type has two methods that allow you to select zero or more desce
 + [selection.select(selector)](https://github.com/d3/d3-selection/blob/master/README.md#selection_select) - select zero or one descendant for each item in the selection
 + [selection.selectAll(selector)](https://github.com/d3/d3-selection/blob/master/README.md#selection_selectAll) - select zero or more descendants for each item in the selection
 
-The SVG element below uses &lt;g&gt; elements to group the circles in each row.  In order to get all of the circles that are decendents of the first &lt;g&gt; element we chain calls to `selection.select` and `selection.selectAll`.  We can then modify the attributes of the new selection.
+Consider the SVG in the example below. The SVG element uses &lt;g&gt; tags to group circle elements into rows.  In order to get all of the circles that are descendents of the first g element we chain calls to `selection.select` (to get the first g element) and `selection.selectAll` (to get all of the circle elements that are children of the selected g element).  Once we have a selection containing the elements we want to modify, we can modify the attributes of the elements in the selection using the *attr* method (we discuss the attr method in the next section).
 
 
 <pre>
@@ -108,12 +108,11 @@ d3.select("g")
 <button id="nestedSelectButton" onclick="nestedSelect()">Add Stroke</button>
 ```
 
-
 ## Filtering Selections
 
 The [selection.filter(filter)](https://github.com/d3/d3-selection/blob/master/README.md#selection_filter) method takes a filter as an argument and returns a selection containing a subset of the objects in the selection on which it is called.  The *filter* argument can be either a selection string as discussed above or a function.  If the filter is a selection string, the method returns the elements in the selection that match the selection string.
 
-If the filter is a function, the function is called for each element in the selection, in order.  When called for an given element, it is passed three arguments:  the datum joined to the element **(d)**, an integer specifying the index of the element in the current group of elements that the element belong to, and the group itself.  The elements for which the function returns true are retained in the selection and the others are removed.
+If the filter is a function, the function is called for each element in the selection, in order.  The elements for which the function returns true are retained in the selection and the others are removed.  When the function is called for an element, the function is passed three arguments (d, i, nodes):  the datum joined to the element (discussed in the next chapter), an integer specifying the group index of the element, and the group itself.  As you can see in the example code, the filter method uses *nodes[i]* to access the element in the selection that is being processed.
 
 In the example below, the 5 circle elements have radii between 5 and 25.  We select all of the circle elements, filter the selection down to only those with radii greater than or equal to 20, then remove the elements left in the selection.
 
@@ -135,13 +134,3 @@ In the example below, the 5 circle elements have radii between 5 and 25.  We se
   <circle cx="350" cy="50" r="25" fill="pink" />
 </svg>
 ```
-
-## Selection Size and Elements
-The `d3.selection` type has a number of methods that allow us retrieve the size and elements in the selection.  Per the API these methods are:
-
-+ [selection.empty()](https://github.com/d3/d3-selection/blob/master/README.md#selection_empty) - returns true if the selection is empty
-+ [selection.size()](https://github.com/d3/d3-selection/blob/master/README.md#selection_size) - returns the number of elements that have been selected
-+ [selection.node()](https://github.com/d3/d3-selection/blob/master/README.md#selection_node) - returns the first non-null element
-+ [selection.nodes()](https://github.com/d3/d3-selection/blob/master/README.md#selection_nodes) - returns an array of the elements that have been selected
-
-Note that these four methods **do not** return a selection object.
