@@ -8,6 +8,53 @@
     .sandbox-output { text-align: center;}
 </style>
 
+<script>
+//This is the function that adds the axis to all of the stacks
+function addAxis(svgSel, d, xscale, yscale, firstStack){
+	let dates, values;
+	
+	if(d){
+      dates = d.map( (d) => d.month );
+      if(firstStack)
+        values = d.map( (d) => {
+            let sum = 0;
+            for(let [key, value] of Object.entries(d)){ sum += key != "month" ? value : 0; }
+            return sum;
+         });
+      else 
+      	values = d.map( (d) => {
+            let sum = 0;
+            for(let [key, value] of Object.entries(d.fruitSales)){ sum += key != "month" ? value : 0; }
+            return sum;
+         });
+      values.push(0);
+    }
+    else{
+    	dates = [0,0];
+        values = [0,0];
+    }
+    if(xscale){
+        xscale.domain([dates[0], dates[dates.length - 1]]);
+        // Add xAxis
+        let xAxis = d3.axisBottom(xscale)
+            .tickValues(dates.filter((date, i, arr) => i % parseInt(arr.length/4) == 0 ));
+        svgSel.append("g")
+            .attr("transform", "translate(0, 275)")
+            .call(xAxis);
+    }
+    if(yscale){
+        yDomain = d3.extent(values);
+        yscale.domain(yDomain);
+        // Add yAxis
+        let yAxis = d3.axisLeft(yscale)
+            .ticks(4);
+        svgSel.append("g")
+            .attr("transform", "translate(50, 0)")
+            .call(yAxis);
+    }
+}
+</script>
+
 # Stacks
 
 + [Stacks](https://github.com/d3/d3-shape#stacks)
@@ -34,51 +81,34 @@ Uaing Rects
     var xFruitScale = d3.scaleOrdinal()
             .domain(["apples", "bananas", "cherries", "dates"])
             .range(["0","1","2","3"]);
-    var xScale = d3.scaleLinear().domain([0,3]).range([25,275]);
-    var yScale = d3.scaleLinear().domain([0,7500]).range([275,25]);
+    var xScale = d3.scaleTime().range([70,250]);
+        var yScale = d3.scaleLinear().range([275,25]);
     var colorScale = d3.scaleOrdinal()
             .domain(["apples", "bananas", "cherries", "dates"])
             .range(["red", "yellow", "pink", "brown"]);
+            
+    addAxis(d3.select("#demo1"), data, xScale, yScale, true);
+    addAxis(d3.select("#demo1"), null, d3.scaleLinear().range([50,275]), null);
 
 	// Create a g element for each series
-    var g = d3.select('g')
+    var g = d3.select("#demo1")
+        .select('g')
         .selectAll('g.series')
         .data(stackedSeries)
-        .enter()
-        .append('g')
+        .join('g')
         .classed('series', true)
-        .style('fill', function(d) {
-            return colorScale(d.key);
-        });
+        .style('fill', (d) => colorScale(d.key));
 
     // For each series create a rect element for each day
     g.selectAll('rect')
-        .data(function(d) {
-            return d;
-        })
-        .enter()
-        .append('rect')
+        .data((d) => d)
+        .join('rect')
         .attr('width', 39)
-        .attr('y', function(d) {
-            return yScale(d[1]);
-        })
-        .attr('x', function(d, i) {
-            return i * 60 + 40;
-        })
-        .attr('height', function(d) {
-            return yScale(d[0]) -  yScale(d[1]);
-        });
+        .attr('y', (d) => yScale(d[1]))
+        .attr('x', (d, i) => i * 60 + 50)
+        .attr('height', (d) => yScale(d[0]) -  yScale(d[1]));
 
-    /*for(var i = 0; i < series.length; i += 1){
-    	//for(var n = 0; n < series[i].length; n += 1)
-          console.log(series[i]);
-          d3.select("#demo1")
-              .append("path")
-              .attr("d", area(series[i]))
-              .attr("stroke", "red")
-              .attr("fill", colorScale(series[i].key));
-        //}
-    }*/
+    
 </script>
 
 <svg id="demo1" width="300" height="300">
@@ -94,21 +124,25 @@ Using areas
       {month: new Date(2015, 1, 1), apples: 1600, bananas: 1440, cherries: 960, dates: 400},
       {month: new Date(2015, 2, 1), apples:  640, bananas:  960, cherries: 640, dates: 400},
       {month: new Date(2015, 3, 1), apples:  320, bananas:  480, cherries: 640, dates: 400},
-      {month: new Date(2015, 0, 1), apples:  400, bananas: 1080, cherries: 640, dates: 400},
-      {month: new Date(2015, 1, 1), apples: 1000, bananas: 2500, cherries: 860, dates: 400},
-      {month: new Date(2015, 2, 1), apples: 1500, bananas: 1250, cherries: 960, dates: 400},
-      {month: new Date(2015, 3, 1), apples: 1000, bananas:  750, cherries: 1060, dates: 400}
+      {month: new Date(2015, 4, 1), apples:  400, bananas: 1080, cherries: 640, dates: 400},
+      {month: new Date(2015, 5, 1), apples: 1000, bananas: 2500, cherries: 860, dates: 400},
+      {month: new Date(2015, 6, 1), apples: 1500, bananas: 1250, cherries: 960, dates: 400},
+      {month: new Date(2015, 7, 1), apples: 1000, bananas:  750, cherries: 1060, dates: 400}
     ];
-
+    
     var stack = d3.stack()
         .keys(["apples", "bananas", "cherries", "dates"])
-        .order(d3.stackOrderInsideOut)
-        .offset(d3.stackOffsetWiggle);
+        .order(d3.stackOrderNone)
+        .offset(d3.stackOffsetNone);
 
     var stackedSeries = stack(data);
 
-    var xScale = d3.scaleLinear().domain([0,7]).range([25,275]);
-    var yScale = d3.scaleLinear().domain([0,7500]).range([275,25]);
+    var xScale = d3.scaleTime().range([50,275]);
+    var yScale = d3.scaleLinear().range([275,25]);
+    
+    addAxis(d3.select("#demo2"), data, xScale, yScale, true);
+        
+    
     var colorScale = d3.scaleOrdinal()
             .domain(["apples", "bananas", "cherries", "dates"])
             .range(["red", "yellow", "pink", "brown"]);
@@ -116,7 +150,7 @@ Using areas
         .scale(colorScale);
 
     var area = d3.area()
-    	.x((d, i) => xScale(i))
+    	.x((d) => xScale(d.data.month) )
         .y0(d => yScale(d[0]))
         .y1(d => yScale(d[1]))
         .curve(d3.curveBasis);
@@ -124,8 +158,7 @@ Using areas
     d3.select("#demo2")
     	.selectAll('.areas')
         .data(stackedSeries)
-        .enter()
-        .append('path')
+        .join('path')
         .attr('d', (d) => area(d))
         .attr("fill", d => colorScale(d.key));
 
@@ -148,10 +181,10 @@ Using areas with .value()
       {month: new Date(2015, 1, 1), fruitSales: {apples: 1600, bananas: 1440, cherries: 960,  dates: 400, oranges: 2000, grapes: 250}},
       {month: new Date(2015, 2, 1), fruitSales: {apples:  640, bananas:  960, cherries: 640,  dates: 400, oranges: 1500, grapes: 300}},
       {month: new Date(2015, 3, 1), fruitSales: {apples:  320, bananas:  480, cherries: 640,  dates: 400, oranges: 1000, grapes: 200}},
-      {month: new Date(2015, 0, 1), fruitSales: {apples:  400, bananas: 1080, cherries: 640,  dates: 400, oranges: 1150, grapes: 450}},
-      {month: new Date(2015, 1, 1), fruitSales: {apples: 1000, bananas: 2500, cherries: 860,  dates: 400, oranges: 2250, grapes: 500}},
-      {month: new Date(2015, 2, 1), fruitSales: {apples: 1500, bananas: 1250, cherries: 960,  dates: 400, oranges: 2000, grapes: 150}},
-      {month: new Date(2015, 3, 1), fruitSales: {apples: 1000, bananas:  750, cherries: 1060, dates: 400, oranges: 2100, grapes: 100}}
+      {month: new Date(2015, 4, 1), fruitSales: {apples:  400, bananas: 1080, cherries: 640,  dates: 400, oranges: 1150, grapes: 450}},
+      {month: new Date(2015, 5, 1), fruitSales: {apples: 1000, bananas: 2500, cherries: 860,  dates: 400, oranges: 2250, grapes: 500}},
+      {month: new Date(2015, 6, 1), fruitSales: {apples: 1500, bananas: 1250, cherries: 960,  dates: 400, oranges: 2000, grapes: 150}},
+      {month: new Date(2015, 7, 1), fruitSales: {apples: 1000, bananas:  750, cherries: 1060, dates: 400, oranges: 2100, grapes: 100}}
     ];
 
     var stack = d3.stack()
@@ -162,25 +195,28 @@ Using areas with .value()
 
     var stackedSeries = stack(data);
 
-    var xScale = d3.scaleLinear().domain([0,7]).range([25,275]);
-    var yScale = d3.scaleLinear().domain([0,10000]).range([275,25]);
+    var xScale = d3.scaleTime().range([50,275]);
+    var yScale = d3.scaleLinear().range([275,25]);
     var colorScale = d3.scaleOrdinal()
             .domain(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
             .range(["red", "yellow", "pink", "brown", "orange", "purple"]);
     var legend = d3.legendColor()
         .scale(colorScale);
 
-    var area = d3.area()
-    	.x((d, i) => xScale(i))
-        .y0(d => yScale(d[0]))
-        .y1(d => yScale(d[1]))
-        .curve(d3.curveBasis);
+    addAxis(d3.select("#demo3"), data, xScale, yScale);
 
+    var area = d3.area()
+    	.x((d) => xScale(d.data.month))
+        .y0((d) => yScale(d[0]))
+        .y1((d) => yScale(d[1]))
+        .curve(d3.curveBasis);
+	
+    //console.stringify(stackedSeries);
+    
     d3.select("#demo3")
     	.selectAll('.areas')
         .data(stackedSeries)
-        .enter()
-        .append('path')
+        .join('path')
         .attr('d', (d) => area(d))
         .attr("fill", d => colorScale(d.key));
 
@@ -220,13 +256,11 @@ By setting the `.order([order])` accessor of a stack we can change where each se
 
 
 
-    var xScale = d3.scaleLinear().domain([0,7]).range([25,275]);
+    var xScale = d3.scaleLinear().domain([0,7]).range([50,275]);
     var yScale = d3.scaleLinear().domain([0,10000]).range([275,25]);
     var colorScale = d3.scaleOrdinal()
         .domain(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
         .range(["red", "yellow", "pink", "brown", "orange", "purple"]);
-    var legend = d3.legendColor()
-        .scale(colorScale);
 
     var stack1 = d3.stack()
             .keys(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
@@ -251,28 +285,20 @@ By setting the `.order([order])` accessor of a stack we can change where each se
     d3.select("#demo6n")
         .selectAll('.areas')
         .data(stackedSeries1)
-        .enter()
-        .append('path')
+        .join('path')
         .attr('d', (d) => area(d))
         .attr("fill", d => colorScale(d.key));
 
     d3.select("#demo6r")
         .selectAll('.areas')
         .data(stackedSeries2)
-        .enter()
-        .append('path')
+        .join('path')
         .attr('d', (d) => area(d))
         .attr("fill", d => colorScale(d.key));
-
-    d3.select("#demo6Legend")
-        .append("g")
-        .attr("transform", "translate(10,100)")
-        .call(legend);
 </script>
 
 <svg id="demo6n" width="300" height="300"></svg>
 <svg id="demo6r" width="300" height="300"></svg>
-<svg id="demo6Legend" width="100" height="300"></svg>
 ```
 
 + [d3.stackOrderAscending(series)]()
@@ -290,14 +316,12 @@ By setting the `.order([order])` accessor of a stack we can change where each se
             {month: new Date(2015, 3, 1), fruitSales: {apples: 1000, bananas:  750, cherries: 1060, dates: 400, oranges: 2100, grapes: 100}}
         ];
 
-        var xScale = d3.scaleLinear().domain([0,7]).range([25,275]);
+        var xScale = d3.scaleLinear().domain([0,7]).range([50,275]);
         var yScale = d3.scaleLinear().domain([0,10000]).range([275,25]);
         var colorScale = d3.scaleOrdinal()
             .domain(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
             .range(["red", "yellow", "pink", "brown", "orange", "purple"]);
-        var legend = d3.legendColor()
-            .scale(colorScale);
-
+            
         var stack1 = d3.stack()
                 .keys(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
                 .value((d, key) => d.fruitSales[key])
@@ -321,28 +345,20 @@ By setting the `.order([order])` accessor of a stack we can change where each se
         d3.select("#demo4a")
             .selectAll('.areas')
             .data(stackedSeries1)
-            .enter()
-            .append('path')
+            .join('path')
             .attr('d', (d) => area(d))
             .attr("fill", d => colorScale(d.key));
 
         d3.select("#demo4d")
             .selectAll('.areas')
             .data(stackedSeries2)
-            .enter()
-            .append('path')
+            .join('path')
             .attr('d', (d) => area(d))
             .attr("fill", d => colorScale(d.key));
-
-        d3.select("#demo4Legend")
-            .append("g")
-            .attr("transform", "translate(10,100)")
-            .call(legend);
    </script>
 
    <svg id="demo4a" width="300" height="300"></svg>
    <svg id="demo4d" width="300" height="300"></svg>
-   <svg id="demo4Legend" width="100" height="300"></svg>
 ```
 
 
@@ -377,13 +393,11 @@ By setting the `.order([order])` accessor of a stack we can change where each se
 
 
 
-    var xScale = d3.scaleLinear().domain([0,data.length-1]).range([25,275]);
-    var yScale = d3.scaleLinear().domain([0,7500]).range([275,25]);
+    var xScale = d3.scaleLinear().domain([0,data.length-1]).range([10,290]);
+    var yScale = d3.scaleLinear().domain([0,3000]).range([175,25]);
     var colorScale = d3.scaleOrdinal()
         .domain(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
         .range(["red", "yellow", "pink", "brown", "orange", "purple"]);
-    var legend = d3.legendColor()
-        .scale(colorScale);
 
     var stack1 = d3.stack()
             .keys(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
@@ -406,36 +420,28 @@ By setting the `.order([order])` accessor of a stack we can change where each se
         .curve(d3.curveBasis);
     var area2 = d3.area()
         .x((d, i) => xScale(i))
-        .y0(d => yScale(d[0] + 7500/2))
-        .y1(d => yScale(d[1] + 7500/2))
+        .y0(d => yScale(d[0] + 2500/2))
+        .y1(d => yScale(d[1] + 2500/2))
         .curve(d3.curveBasis);
 
     d3.select("#demo5a")
         .selectAll('.areas')
         .data(stackedSeries1)
-        .enter()
-        .append('path')
+        .join('path')
         .attr('d', (d) => area1(d))
         .attr("fill", d => colorScale(d.key));
 
     d3.select("#demo5i")
         .selectAll('.areas')
         .data(stackedSeries2)
-        .enter()
-        .append('path')
+        .join('path')
         .attr('d', (d) => area2(d))
         .attr("fill", d => colorScale(d.key));
-
-    d3.select("#demo5Legend")
-        .append("g")
-        .attr("transform", "translate(10,100)")
-        .call(legend);
 </script>
 
 
-<svg id="demo5a" class="svgClass" width="300" height="300"></svg>
-<svg id="demo5i" class="svgClass" width="300" height="300"></svg>
-<svg id="demo5Legend" width="100" height="300"></svg>
+<svg id="demo5a" class="svgClass" width="300" height="200"></svg>
+<svg id="demo5i" class="svgClass" width="300" height="200"></svg>
 ```
 
 
@@ -448,3 +454,54 @@ By setting the `.order([order])` accessor of a stack we can change where each se
 + [d3.stackOffsetNone(series, order)]()
 + [d3.stackOffsetSilhouette(series, order)]()
 + [d3.stackOffsetWiggle(series, order)]()
+
+
+```
+<script>
+//This is the function that adds the axis to all of the stacks
+
+function addAxis(svgSel, d, xscale, yscale, firstStack){
+	let dates, values;
+	
+	if(d){
+      dates = d.map( (d) => d.month );
+      if(firstStack)
+        values = d.map( (d) => {
+            let sum = 0;
+            for(let [key, value] of Object.entries(d)){ sum += key != "month" ? value : 0; }
+            return sum;
+         });
+      else 
+      	values = d.map( (d) => {
+            let sum = 0;
+            for(let [key, value] of Object.entries(d.fruitSales)){ sum += key != "month" ? value : 0; }
+            return sum;
+         });
+      values.push(0);
+    }
+    else{
+    	dates = [0,0];
+        values = [0,0];
+    }
+    if(xscale){
+        xscale.domain([dates[0], dates[dates.length - 1]]);
+        // Add xAxis
+        let xAxis = d3.axisBottom(xscale)
+            .tickValues(dates.filter((date, i, arr) => i % parseInt(arr.length/4) == 0 ));
+        svgSel.append("g")
+            .attr("transform", "translate(0, 275)")
+            .call(xAxis);
+    }
+    if(yscale){
+        yDomain = d3.extent(values);
+        yscale.domain(yDomain);
+        // Add yAxis
+        let yAxis = d3.axisLeft(yscale)
+            .ticks(4);
+        svgSel.append("g")
+            .attr("transform", "translate(50, 0)")
+            .call(yAxis);
+    }
+}
+</script>
+```
