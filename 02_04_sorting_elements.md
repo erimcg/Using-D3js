@@ -149,3 +149,9 @@ When the button is pressed, the rectangles and labels are selected, sorted in as
 
 <button onclick="sortData()">Sort</button>
 ```
+
+## Selection.order
+
+## Selection.raise
+
+## Selection.lower

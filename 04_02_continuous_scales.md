@@ -208,9 +208,25 @@ var cScale = d3.scaleLinear()
 <svg id="homeless2" width="600" height="100" ></svg>
 
 <script>
+  var data = [
+      {"state": "California","population": 134278 },
+      {"state": "Florida",   "population": 32190 },
+      {"state": "Washington","population": 21112 },
+      {"state": "New York","population": 89503 },
+      {"state": "Texas","population": 23548 }
+  ];
+  
   var cScale = d3.scaleLinear()
       .domain([0,140000])
       .range(["yellow", "red"]);
+      
+  var xScale = d3.scaleLinear()
+      .domain([0,4])
+      .range([50,550]);
+      
+  var rScale = d3.scaleLinear()
+      .domain([0,140000])
+      .range([1,30]);
 
   var u = d3.select("#homeless2")
       .selectAll("circle")

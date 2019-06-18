@@ -250,7 +250,7 @@ The angle generator uses the input data to compute the angles necessary to repre
 + startAngle - start angle of the arc
 + value - value used to compute angles
 
-<img class="alignnone wp-image-4454 size-full" src="http://www.n0code.net/wp/csci240/wp-content/uploads/sites/2/2018/04/Screen-Shot-2018-04-11-at-10.22.33-AM.png" alt="" width="679" height="288" />
+<img src="img/screenshots/angle_gen_data.png" alt="" width="679" height="288" />
 
 Note that the `value` property contains the value that was used to compute the start and end angles.  The `data` field may contain an object - not just a numeric value (see `pie.value` below).
 
@@ -328,7 +328,7 @@ var data = angleGen(input);
 
 The angle generator returns a new array of objects, one for each element in the original data array, just as in the previous example.  Note how the data field contains the original data object and the value field holds the value that was used to compute the angles.
 
-<img class="alignnone wp-image-4451 size-full" src="http://www.n0code.net/wp/csci240/wp-content/uploads/sites/2/2018/04/Screen-Shot-2018-04-11-at-9.59.15-AM.png" alt="" width="689" height="287" />
+<img src="img/screenshots/angle_gen_data2.png" alt="" width="689" height="287" />
 
 Then, like before, we create an arc generator and append path elements with joined data to the svg.
 
