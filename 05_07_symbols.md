@@ -1,16 +1,57 @@
 {{meta {docid: arcs_pie_charts}}}
 
-<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
 
 <style>
-    svg { background-color: white; }
+    svg { background-color: white; display: inline-block;}
+    .sandbox-output{ text-align: center;}
 </style>
+
 # Symbols
+
+Thus far in most of our examples, when we have nodes that need to be put onto an svg, we append a `circle`. 
+However, changing the shape of our nodes can supply us with more ways to represent our data.
+
+For the times we want to use more shapes, we can use `symbols` instead of `circles`.
+`Symbols`, like many of the other shapes in this chapter, are passed into the `d` attribute of a `path` on an svg. 
+
 + [d3.symbol](https://github.com/d3/d3-shape#symbol)
-+ [symbol(arguments...)](https://github.com/d3/d3-shape#_symbol)
-+ [symbol.type([type])](https://github.com/d3/d3-shape#symbol_type)
-+ [symbol.size([size])](https://github.com/d3/d3-shape#symbol_size)
-+ [symbol.context([context])](https://github.com/d3/d3-shape#symbol_context)
+
+<pre>
+d3.select("#demoBasic")
+    .append("path")
+    .attr("d", d3.symbol())
+    .attr("transform", "translate(25,25)");
+</pre>
+
+As you may have noticed, we had to apply a `transform / translate` on our symbol. 
+This is because all symbols are rooted at (0,0) so in order to get them to the correct place, we must translate them.
+
+```
+<script>
+d3.select("#demoBasic")
+    .append("path")
+    .attr("d", d3.symbol())
+    .attr("transform", "translate(25,25)");
+</script>
+
+<svg id="demoBasic" height="50" width="50"></svg>
+```
+
+### `.size()`
+
+The `.size([size])` method can be used to change how big the symbol is. 
+
+It is important to note that size is the <i>square pixels or area</i> of the symbol you are making.
+Each symbol has its own mathematical way of determining its path based on the size we provide.
+
+If not set, the default `size` is `64`
+
+<pre>
+var symbol = d3.symbol().size(100);
+</pre>
+
++ [symbol.size([size])](https://github.com/d3/d3-shape#symbol_size) - takes a number, sets the size in <i>square pixels or the area</i>
 
 ```
 <script>
@@ -53,20 +94,26 @@
 
 ## Built-in Symbols
 
-D3 comes with 7 symbols built-in. To use them, assign them in the `.type(symbol)` method on the symbol generator such as
+D3 comes with 7 symbols built-in. To use them, assign them in the `.type(symbol)` method on the symbol generator:
+
 <pre>
 var square = d3.symbol().type(d3.symbolSquare).size(x);
 </pre>
-Make sure to remeber that the `.size()` is the <i>area</i> of the shape and the dimensions will change differently based on the shape.
 
-+ [d3.symbols](https://github.com/d3/d3-shape#symbols)
-+ [d3.symbolCircle](https://github.com/d3/d3-shape#symbolCircle)
-+ [d3.symbolCross](https://github.com/d3/d3-shape#symbolCross)
-+ [d3.symbolDiamond](https://github.com/d3/d3-shape#symbolDiamond)
-+ [d3.symbolSquare](https://github.com/d3/d3-shape#symbolSquare)
-+ [d3.symbolStar](https://github.com/d3/d3-shape#symbolStar)
-+ [d3.symbolTriangle](https://github.com/d3/d3-shape#symbolTriangle)
-+ [d3.symbolWye](https://github.com/d3/d3-shape#symbolWye)
++ [symbol.type([type])](https://github.com/d3/d3-shape#symbol_type) - Takes a symbol type, sets the generators symbol that it will generate.
+
+The default symbol, if not set, is `d3.symbolCircle`.
+
+Make sure to remember that the `.size()` is the <i>square pixels or area</i> of the shape and the dimensions will change differently based on the shape.
+
++ [d3.symbols](https://github.com/d3/d3-shape#symbols) - An array of all the built-in symbols, useful for setting up scales
++ [d3.symbolCircle](https://github.com/d3/d3-shape#symbolCircle) - A normal circle, default symbol
++ [d3.symbolCross](https://github.com/d3/d3-shape#symbolCross) - A cross or plus
++ [d3.symbolDiamond](https://github.com/d3/d3-shape#symbolDiamond) - A diamond
++ [d3.symbolSquare](https://github.com/d3/d3-shape#symbolSquare) - A square
++ [d3.symbolStar](https://github.com/d3/d3-shape#symbolStar) - A 5 point star
++ [d3.symbolTriangle](https://github.com/d3/d3-shape#symbolTriangle) - An equilateral triangle
++ [d3.symbolWye](https://github.com/d3/d3-shape#symbolWye) - A wye or Latin Y
 
 ```
 <script>
@@ -129,9 +176,10 @@ D3 allows the creation of new symbols to use. To create a new symbol create a ne
 Inside of the implementation use [CanvasPathMethods](https://www.w3.org/TR/2dcontext/#canvaspathmethods) on the context to devise a new shape.
 For example a definition of a custom square symbol:
 <pre>
-    var customSymbolSquare = {
-        draw: function(context, size)/2{
-            let s = Math.sqrt(size);
+    // Demonstration only, use d3.symbolSquare if a square is needed
+    var customSymbolSquare = { 
+        draw: function(context, size){
+            let s = Math.sqrt(size)/2;
             context.moveTo(s,s);
             context.lineTo(s,-s);
             context.lineTo(-s,-s);
@@ -172,7 +220,7 @@ Examples of custom symbols (square, right triangle, and semi circle):
         .attr("d", customSqr)
         .attr("transform", "translate(50,50)");
 
-    //Custom Right Triangle, may not be accurately centered at the centroid
+    //Custom Right Triangle, may not be accurately centered at the centroid of the triangle
     var customShapeTri = {
         draw: function(context, size) {
           let s = Math.sqrt(size/4);
@@ -210,7 +258,7 @@ Examples of custom symbols (square, right triangle, and semi circle):
 <svg id="demoCustomCircle" width="100" height="100"></svg>
 ```
 
-
++ [symbol.context([context])](https://github.com/d3/d3-shape#symbol_context)
 
 
 

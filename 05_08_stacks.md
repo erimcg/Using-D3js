@@ -4,7 +4,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
 
 <style>
-    svg { background-color: white; }
+    svg { background-color: white; display: inline-block;}
+    .sandbox-output { text-align: center;}
 </style>
 
 # Stacks
@@ -350,28 +351,28 @@ By setting the `.order([order])` accessor of a stack we can change where each se
 ```
 <script>
     var data = [
-   		{month: new Date(2014, 10, 1), fruitSales: {apples: 100, bananas: 100, cherries: 100,  dates: 100, oranges: 100, grapes: 100}},
-    	{month: new Date(2014, 11, 1), fruitSales: {apples: 100, bananas: 100, cherries: 100,  dates: 100, oranges: 100, grapes: 100}},
-        {month: new Date(2015, 0, 1), fruitSales: {apples: 1000, bananas: 100, cherries: 100,  dates: 100, oranges: 100, grapes: 100}},
-        {month: new Date(2015, 1, 1), fruitSales: {apples: 2500, bananas: 100, cherries: 100,  dates: 100, oranges: 100, grapes: 100}},
-        {month: new Date(2015, 2, 1), fruitSales: {apples: 1000, bananas: 100, cherries: 100,  dates: 100, oranges: 100, grapes: 100}},
-        {month: new Date(2015, 3, 1), fruitSales: {apples: 100, bananas: 1000, cherries: 100,  dates: 100, oranges: 100, grapes: 100}},
-        {month: new Date(2015, 4, 1), fruitSales: {apples: 100, bananas: 2500, cherries: 100,  dates: 100, oranges: 100, grapes: 100}},
-        {month: new Date(2015, 5, 1), fruitSales: {apples: 100, bananas: 1000, cherries: 100,  dates: 100, oranges: 100, grapes: 100}},
-        {month: new Date(2015, 6, 1), fruitSales: {apples: 100, bananas: 100, cherries: 1000,  dates: 100, oranges: 100, grapes: 100}},
-        {month: new Date(2015, 7, 1), fruitSales: {apples: 100, bananas: 100, cherries: 2500,  dates: 100, oranges: 100, grapes: 100}},
-        {month: new Date(2015, 8, 1), fruitSales: {apples: 100, bananas: 100, cherries: 1000,  dates: 100, oranges: 100, grapes: 100}},
-        {month: new Date(2015, 9, 1), fruitSales: {apples: 100, bananas: 100, cherries: 100,  dates: 1000, oranges: 100, grapes: 100}},
-        {month: new Date(2015, 10, 1), fruitSales: {apples: 100, bananas: 100, cherries: 100,  dates: 2500, oranges: 100, grapes: 100}},
-        {month: new Date(2015, 11, 1), fruitSales: {apples: 100, bananas: 100, cherries: 100,  dates: 1000, oranges: 100, grapes: 100}},
-        {month: new Date(2016, 0, 1), fruitSales: {apples: 100, bananas: 100, cherries: 100,  dates: 100, oranges: 1000, grapes: 100}},
-        {month: new Date(2016, 1, 1), fruitSales: {apples: 100, bananas: 100, cherries: 100,  dates: 100, oranges: 2500, grapes: 100}},
-        {month: new Date(2016, 2, 1), fruitSales: {apples: 100, bananas: 100, cherries: 100,  dates: 100, oranges: 1000, grapes: 100}},
-        {month: new Date(2016, 3, 1), fruitSales: {apples: 100, bananas: 100, cherries: 100,  dates: 100, oranges: 100, grapes: 1000}},
-        {month: new Date(2016, 4, 1), fruitSales: {apples: 100, bananas: 100, cherries: 100,  dates: 100, oranges: 100, grapes: 2500}},
-        {month: new Date(2016, 5, 1), fruitSales: {apples: 100, bananas: 100, cherries: 100,  dates: 100, oranges: 100, grapes: 1000}},
-        {month: new Date(2016, 6, 1), fruitSales: {apples: 100, bananas: 100, cherries: 100,  dates: 100, oranges: 100, grapes: 100}},
-        {month: new Date(2016, 7, 1), fruitSales: {apples: 100, bananas: 100, cherries: 100,  dates: 100, oranges: 100, grapes: 100}}
+   		{month: new Date(2014, 10, 1), fruitSales: {apples: 100,    bananas: 100,   cherries: 100,  dates: 100, oranges: 100,   grapes: 100}},
+    	{month: new Date(2014, 11, 1), fruitSales: {apples: 100,    bananas: 100,   cherries: 100,  dates: 100, oranges: 100,   grapes: 100}},
+        {month: new Date(2015, 0, 1),  fruitSales: {apples: 1000,   bananas: 100,   cherries: 100,  dates: 100, oranges: 100,   grapes: 100}},
+        {month: new Date(2015, 1, 1),  fruitSales: {apples: 2500,   bananas: 100,   cherries: 100,  dates: 100, oranges: 100,   grapes: 100}},
+        {month: new Date(2015, 2, 1),  fruitSales: {apples: 1000,   bananas: 100,   cherries: 100,  dates: 100, oranges: 100,   grapes: 100}},
+        {month: new Date(2015, 3, 1),  fruitSales: {apples: 100,    bananas: 1000,  cherries: 100,  dates: 100, oranges: 100,   grapes: 100}},
+        {month: new Date(2015, 4, 1),  fruitSales: {apples: 100,    bananas: 2500,  cherries: 100,  dates: 100, oranges: 100,   grapes: 100}},
+        {month: new Date(2015, 5, 1),  fruitSales: {apples: 100,    bananas: 1000,  cherries: 100,  dates: 100, oranges: 100,   grapes: 100}},
+        {month: new Date(2015, 6, 1),  fruitSales: {apples: 100,    bananas: 100,   cherries: 1000, dates: 100, oranges: 100,   grapes: 100}},
+        {month: new Date(2015, 7, 1),  fruitSales: {apples: 100,    bananas: 100,   cherries: 2500, dates: 100, oranges: 100,   grapes: 100}},
+        {month: new Date(2015, 8, 1),  fruitSales: {apples: 100,    bananas: 100,   cherries: 1000, dates: 100, oranges: 100,   grapes: 100}},
+        {month: new Date(2015, 9, 1),  fruitSales: {apples: 100,    bananas: 100,   cherries: 100,  dates: 1000,oranges: 100,   grapes: 100}},
+        {month: new Date(2015, 10, 1), fruitSales: {apples: 100,    bananas: 100,   cherries: 100,  dates: 2500,oranges: 100,   grapes: 100}},
+        {month: new Date(2015, 11, 1), fruitSales: {apples: 100,    bananas: 100,   cherries: 100,  dates: 1000,oranges: 100,   grapes: 100}},
+        {month: new Date(2016, 0, 1),  fruitSales: {apples: 100,    bananas: 100,   cherries: 100,  dates: 100, oranges: 1000,  grapes: 100}},
+        {month: new Date(2016, 1, 1),  fruitSales: {apples: 100,    bananas: 100,   cherries: 100,  dates: 100, oranges: 2500,  grapes: 100}},
+        {month: new Date(2016, 2, 1),  fruitSales: {apples: 100,    bananas: 100,   cherries: 100,  dates: 100, oranges: 1000,  grapes: 100}},
+        {month: new Date(2016, 3, 1),  fruitSales: {apples: 100,    bananas: 100,   cherries: 100,  dates: 100, oranges: 100,   grapes: 1000}},
+        {month: new Date(2016, 4, 1),  fruitSales: {apples: 100,    bananas: 100,   cherries: 100,  dates: 100, oranges: 100,   grapes: 2500}},
+        {month: new Date(2016, 5, 1),  fruitSales: {apples: 100,    bananas: 100,   cherries: 100,  dates: 100, oranges: 100,   grapes: 1000}},
+        {month: new Date(2016, 6, 1),  fruitSales: {apples: 100,    bananas: 100,   cherries: 100,  dates: 100, oranges: 100,   grapes: 100}},
+        {month: new Date(2016, 7, 1),  fruitSales: {apples: 100,    bananas: 100,   cherries: 100,  dates: 100, oranges: 100,   grapes: 100}}
     ];
 
 
@@ -431,9 +432,6 @@ By setting the `.order([order])` accessor of a stack we can change where each se
         .call(legend);
 </script>
 
-<style>
- 	.svgClass { background-color: lightblue; !important}
-</style>
 
 <svg id="demo5a" class="svgClass" width="300" height="300"></svg>
 <svg id="demo5i" class="svgClass" width="300" height="300"></svg>

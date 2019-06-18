@@ -1,0 +1,3 @@
+- None of the links in any of the layouts are used correctly, currently lines are being drawn when paths with a .attr("d", d3.linkDirection()) could be used.
+
+- When using a popped out window, if the page that the window was popped out from is reloaded or changed, the popup window ceases to function in any capacity
