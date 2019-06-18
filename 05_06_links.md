@@ -353,8 +353,21 @@ var linkGen = d3.linkVertical()
           .join("text")
           .attr("font-size", "10px")
           .attr("text-anchor", "middle")
-          .attr("x", d => xScale(d.position[0]))
-          .attr("y", d => yScale(d.position[1]) + 15 )
+          .attr("x", function(d) { 
+                if(d.position[1] == 2 || d.position[1] == 0)
+                    return xScale(d.position[0]);
+                var xOffset = xScale(d.position[0]);
+                if(xOffset > 100)
+                    return xScale(d.position[0]) +25;
+                return xScale(d.position[0]) -25;
+                })
+          .attr("y", function(d) { 
+                if(d.position[1] == 2)
+                    return yScale(d.position[1]) + 15;
+                if(d.position[1] == 1)
+                    return yScale(d.position[1])
+                return yScale(d.position[1]) - 10
+                })
           .text(d => d.id);
 </script>
 
@@ -458,6 +471,8 @@ Since we flipped the `x` and `y` positions in our link generator we will need to
 
 D3 also provides a circular link generator, `d3.linkRadial()`. Just as with `d3.linkHorizontal()`, `d3.linkRadial()` can be easily converted from an existing `d3.linkVertical()` graph.
 
++ [d3.linkRadial()](https://github.com/d3/d3-shape#linkRadial)
+
 To convert a `d3.linkVertical()` into a `d3.linkRadial()` all we need to do is change our `x` position to become an `angle` and our `y` position will become the `radius`. We will also need to change our scales to reflect angles and radii.
 Note that for this example the data set is expanded again.
 <pre>
@@ -471,15 +486,17 @@ var link = d3.linkRadial()
     .radius( d => yScale(d[1]));
 </pre>
 
++ [linkRadial.angle([angle])](https://github.com/d3/d3-shape#linkRadial_angle)
++ [linkRadial.radius([radius])](https://github.com/d3/d3-shape#linkRadial_radius) 
+
 Our `circle` and `text` nodes will no longer be at the right point without changing their coordinates as well, so we will use `d3.pointRadial`s to place them into the right spot.
 <pre>
-<i>circleSelection</i> | <i>textSelection</i>
+<i>circleSelection</i>
     .attr("cx", d => d3.pointRadial(xScale(d.position[0]), yScale(d.position[1]) )[0] )
     .attr("cy", d => d3.pointRadial(xScale(d.position[0]), yScale(d.position[1]) )[1] )
 </pre>
-+ [d3.linkRadial()](https://github.com/d3/d3-shape#linkRadial)
-+ [linkRadial.angle([angle])](https://github.com/d3/d3-shape#linkRadial_angle)
-+ [linkRadial.radius([radius])](https://github.com/d3/d3-shape#linkRadial_radius)    
+
+   
     
 ```
 <script>
@@ -498,9 +515,11 @@ Our `circle` and `text` nodes will no longer be at the right point without chang
         {id: "Cluster",	 position: [6, 2], parentPosition: [6, 1]},
         {id: "Partition",position: [7, 2], parentPosition: [6, 1]}];
 
-   var xScale = d3.scaleLinear().domain([0, 8]).range([0, Math.PI * 2]);
-   var yScale = d3.scaleLinear().domain([0,2]).range([0, 133]);
+    // Updated scales
+    var xScale = d3.scaleLinear().domain([0, 8]).range([0, Math.PI * 2]);
+    var yScale = d3.scaleLinear().domain([0,2]).range([0, 133]);
 
+    //Adding circles
     d3.select("#demoRadial")
         .selectAll("circle")
         .data(nodeData)
@@ -510,12 +529,14 @@ Our `circle` and `text` nodes will no longer be at the right point without chang
         .classed("circle", true)
         .attr("transform", "translate(175,175)");
 
+    //New radial link generator
     var link = d3.linkRadial()
         .source(d => d.position)
         .target(d => d.parentPosition)
         .angle( d => xScale(d[0]))
         .radius( d => yScale(d[1]));
 
+    //Adding the link paths 
 	d3.select("#demoRadial")
         .selectAll("path")
         .data(nodeData)
@@ -524,6 +545,7 @@ Our `circle` and `text` nodes will no longer be at the right point without chang
         .classed("link", true)
         .attr("transform", "translate(175,175)");
 
+    // Adding text nodes, the x and y have special functions to get them in a place where they do not overlap the links
     d3.select("#demoRadial")
         .selectAll("text")
         .data(nodeData)
