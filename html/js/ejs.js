@@ -179,30 +179,34 @@
     return node
   }
 
-function stringify(text) {
-  oldConsoleLog(text);
+  function stringify(text) {
+    oldConsoleLog(text);
 
-  let pre = document.createElement('pre');
-  let textNode = document.createTextNode(JSON.stringify(text, null, "  "));
-  console.output.appendChild(pre);
-}
+    let pre = document.createElement('pre');
+    let textNode = document.createTextNode(JSON.stringify(text, null, "  "));
+    pre.appendChild(textNode);
+    pre.style.textAlign = "left";
+    console.output.appendChild(pre);
+  }
 
-function log(text) {
-  oldConsoleLog(text);
+  function log(text) {
+    oldConsoleLog(text);
 
-  let pre = document.createElement('pre');
-  let textNode = document.createTextNode(text);
-  pre.appendChild(textNode);
-  console.output.appendChild(pre);
-}
+    let pre = document.createElement('pre');
+    let textNode = document.createTextNode(text);
+    pre.appendChild(textNode);
+    pre.style.textAlign = "left";
+    console.output.appendChild(pre);
+  }
 
-function error(text) {
-  let pre = document.createElement('pre');
-  let textNode = document.createTextNode(text);
-  pre.appendChild(textNode);
-  pre.style.color = "red";
-  console.output.appendChild(pre);
-}
+  function error(text) {
+    let pre = document.createElement('pre');
+    let textNode = document.createTextNode(text);
+    pre.appendChild(textNode);
+    pre.style.color = "red";
+    pre.style.textAlign = "left";
+    console.output.appendChild(pre);
+  }
 
   window.onerror = function (errorMsg, url, lineNumber) {
     error(lineNumber + ": " + errorMsg);
