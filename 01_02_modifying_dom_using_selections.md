@@ -1,43 +1,52 @@
-{{meta {docid: adding_removing_elements}}}
+
+{{meta {docid: applying_functions}}}
 
 <style>
-
-.box {
-    display: inline-block;
-    vertical-align: middle;
-    width: 50px;
-    height: 50px;
-    text-align: center;
-    line-height: 50px;
-    margin: 0 15px 0 15px;
-    border: 0;
-    padding: 0;
-    background-color: lightblue;
-}
-.blue-box {
-    background-color: lightblue;
-}
-.pink-box {
-    background-color: pink;
-}
-.aqua-box {
-    background-color: aquamarine;
-}
-
-button{
-    display: inline;
-    vertical-align: middle;
-}
-svg {
-    display: inline-block;
-    vertical-align: middle;
-}
+    button{
+        display: inline;
+        vertical-align: middle;
+    }
+    svg {
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .lightblue {
+        fill: lightblue;
+    }
+    .pink {
+        fill: pink;
+    }
+    #pink {
+        fill: pink;
+    }
+    .box {
+        display: inline-block;
+        vertical-align: middle;
+        width: 50px;
+        height: 50px;
+        text-align: center;
+        line-height: 50px;
+        margin: 15px;
+        border: 0;
+        padding: 0;
+    }
+    .circle {
+        border-radius: 25px;
+    }
+    .blue-box {
+        background-color: lightblue;
+    }
+    .pink-box {
+        background-color: pink;
+    }
 </style>
+<script src="https://d3js.org/d3.v5.min.js"></script>
 
-<script src="https://d3js.org/d3.v4.min.js"></script>
+# Modifying Selections
 
+The d3.selection type has a method named `selection.call` method that is used to execute a function on an arbitrary selection.
 
-# Adding and Removing Elements
++ [selection.call(function[, arguments...])](https://github.com/d3/d3-selection/blob/master/README.md#selection_call) - call a function that takes this selection as an argument
 
 The d3.selection type has a number of methods that allow us to add and remove elements from the DOM based on the elements that have been selected.  Per the API, these methods are:
 
@@ -45,6 +54,52 @@ The d3.selection type has a number of methods that allow us to add and remove el
 + [selection.insert(type[, selector])](https://github.com/d3/d3-selection/blob/master/README.md#selection_insert) - create, insert and select new elements
 + [selection.clone([deep])](https://github.com/d3/d3-selection/blob/master/README.md#selection_clone) - insert clones of selected elements
 + [selection.remove()](https://github.com/d3/d3-selection/blob/master/README.md#selection_remove) - remove elements from the document
+
+## Selection.call
+
+When the `selection.call` method is called, at least one argument must be passed to it.  That argument must be a function, and the function, lets call it `foo`, must have at least one parameter, namely a reference to a selection.
+
+When `selection.call` is executed, `foo` is executed once, passing to it a reference to the selection on which `call` was called.
+ 
+If `foo` has *k* additional parameters, *k* additional arguments must be passed to `selection.call`.  When `foo` is executed, the values passed to `call` are passed to `foo`.
+
+As an example, suppose we have a function named `setAttr` that takes a selection, an attribute name, and an attribute value as arguments, and sets the attribute for each circle element in the selection.
+
+<pre>
+function setAttr(selection, attr, value) {
+    selection.selectAll("circle").attr(attr, value);
+}
+</pre>
+
+Suppose also that we have an SVG element with an `id` attribute set to `callSVG`.  Then we can select the SVG element using `select` and call the `call` function on it.  If we pass to `call`, `setAttr` along with the strings `"fill"` and `"pink"`, then when `call` is executed, `setAttr` will be executed.  When `setAttr` is executed the selection along with the strings `"fill"`, and `"pink"` will be passed to `setAttr`.
+
+<pre>
+d3.select("#callSVG").call(setAttr, "fill", "pink");
+</pre>
+
+As you can see in the demo, this results in all of the circles in the selection having their fill attributes set to pink.
+
+```
+<script>
+    function setAttr(selection, attr, value) {
+        selection.selectAll("circle").attr(attr, value);
+    }
+
+    function applyCall(){
+        d3.select("#callSVG").call(setAttr, "fill", "pink");
+    }
+</script>
+
+<svg id="callSVG" width="300" height="60">
+    <circle r="20" cx="30" cy="30" fill="lightblue" />
+    <circle r="20" cx="80" cy="30" fill="lightblue" />
+    <circle r="20" cx="130" cy="30" fill="lightblue" />
+    <circle r="20" cx="180" cy="30" fill="lightblue" />
+</svg>
+
+<button id="callButton" onclick="applyCall()">Apply Call</button>
+```
+
 
 ## Selection.append
 

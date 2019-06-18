@@ -179,10 +179,45 @@
     return node
   }
 
+function stringify(text) {
+  oldConsoleLog(text);
+
+  let pre = document.createElement('pre');
+  let textNode = document.createTextNode(JSON.stringify(text, null, "  "));
+  console.output.appendChild(pre);
+}
+
+function log(text) {
+  oldConsoleLog(text);
+
+  let pre = document.createElement('pre');
+  let textNode = document.createTextNode(text);
+  pre.appendChild(textNode);
+  console.output.appendChild(pre);
+}
+
+function error(text) {
+  let pre = document.createElement('pre');
+  let textNode = document.createTextNode(text);
+  pre.appendChild(textNode);
+  pre.style.color = "red";
+  console.output.appendChild(pre);
+}
+
+  window.onerror = function (errorMsg, url, lineNumber) {
+    error(lineNumber + ": " + errorMsg);
+  }
+
+  var oldConsoleLog = window.console.log;
+  window.console.log = log;
+  window.console.error = log;
+  window.console.stringify = stringify;
+
   function renderCode(data, onload) {
     data.output.clear()
     let val = data.editor.getValue()
     getSandbox(data.sandbox, data.isHTML, box => {
+      console.output = data.output.div;  // rem
       if (data.isHTML)
         box.setHTML(val, data.output, () => {
           if (data.orig.getAttribute("data-focus")) {
