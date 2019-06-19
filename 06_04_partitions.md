@@ -10,6 +10,8 @@ rect {
 }
 </style>
 
+
+
 # Partition Layouts
 
 The partition layout represents nodes in a hierarchy model as rectangles with rectangles for child nodes positioned adjacent to the rectangles for their parents' and the length of a rectangle being proportional to the value of the node's `value` property.
@@ -147,11 +149,11 @@ var data = {"name": "A", "children": [
                 {"name": "O"}
             ]};
 
-let root = d3.hierarchy(data)
+var root = d3.hierarchy(data)
   .sort((a,b) => b.height - a.height || a.data.name.localeCompare(b.data.name))
   .count();
 
-let partition = d3.partition()
+var partition = d3.partition()
   .size([210,210])
   .padding(10);
 

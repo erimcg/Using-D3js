@@ -1,3 +1,0 @@
-- When using a popped out window, if the page that the window was popped out from is reloaded or changed, the popup window ceases to function in any capacity
-
-- Images in arcs_pie_charts have a source in n0code.net

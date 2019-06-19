@@ -19,23 +19,25 @@
 
 <script src="https://d3js.org/d3.v5.min.js"></script>
 
-# Creating Selections
 
-As we'll soon see, more often than not, when we want to change a attribute or property of an element, we'll want to do the same for a whole set of elements in the DOM.  Sometimes we can accomplish this by calling `getElementsByClassName` or `getElementsByTagName` and then use a for-loops to iterate over the selected elements. Bostock has engineered a smarter way: [Selections](https://github.com/d3/d3-selection/blob/master/README.md#selection).
 
-The tutorial [How Selections Work](https://bost.ocks.org/mike/selection/) written by Bostock describes in depth how the d3.selection object works.  It is highly recommended that you read this tutorial after you've read this one.
+# Creating Selection
 
-The D3 API has 3 methods that can be used to select elements from the DOM.  These are:
+As we'll soon see, more often than not, when we want to modify an element, we'll want to do the same for a set of elements in the DOM.  Sometimes we can accomplish this by retrieving a set of elements using `getElementsByClassName` or `getElementsByTagName` and then use a for-loop to iterate over the selected elements. D3.js has an easier and more versatile way: [Selections](https://github.com/d3/d3-selection/blob/master/README.md#selection).
+
+The D3 API has 3 methods that can be used to select sets of elements from the DOM.  These are:
+
 + [d3.select(selector)](https://github.com/d3/d3-selection/blob/master/README.md#select) - select a single element from the document
 + [d3.selectAll(selector)](https://github.com/d3/d3-selection/blob/master/README.md#selectAll) - select multiple elements from the document
 + [d3.selection()](https://github.com/d3/d3-selection/blob/master/README.md#selection) - select the root element in the document
 
-Each returns zero or more elements from the DOM in a [d3.selection](https://github.com/d3/d3-selection/blob/master/README.md#selection) object.  The `d3.selection` type is a subclass of `array` and contains methods that when called effect all of the elements contained in the `selection` object.
+Each one of the methods above return a [d3.selection](https://github.com/d3/d3-selection/blob/master/README.md#selection) object containing zero or more element nodes from the DOM.  Once we have a `selection` object we can call the various selection methods to manipulate the DOM as we'll see in the next section.
 
-[d3.select(selector)](https://github.com/d3/d3-selection/blob/master/README.md#select) returns a `selection` containing zero or one element or node. A `selector` arguement can be either an string that holds any valid CSS selector or a reference to a node.  If the `selector` is a string, it returns a `selection` containing the *first* element found in the DOM that satisfies the CSS selector criteria.  If no element is found then it returns an empty `selection`.  If the selector is a reference to a node then it returns a `section` object containing that single node.
-
+[d3.select(selector)](https://github.com/d3/d3-selection/blob/master/README.md#select) returns a `selection` containing zero or one element or node. The `selector` argument can be either an string that holds any valid CSS selector or a reference to a node.  If the `selector` is a string, it returns a `selection` containing the *first* element found in the DOM that meets the CSS selector criteria.  If no element is found then it returns an empty `selection`.  If the selector is a reference to a node (e.g. this) then it returns a `section` object containing that node.
 
 [d3.selectAll(selector)](https://github.com/d3/d3-selection/blob/master/README.md#selectAll) returns a `selection` of zero or more elements or nodes. The method takes as an argument a string that holds a CSS selector, an array of nodes, or a pseudo-array like a `NodeList`.  If the argument is a string, the method returns a selection containing all of the elements that match the CSS selector defined by the string.  If no elements match, the `selection` object that is returned is empty.  If the selector contains references to nodes then the method returns a selection that contains the nodes.
+
+[d3.selection()](https://github.com/d3/d3-selection/blob/master/README.md#selection) is used to retrieve a `selection` object that only contains the root document element (i.e. [document.documentElement](https://developer.mozilla.org/en-US/docs/Web/API/Document/documentElement)) of the web page.  This method can can also be used to test for the `selection` type using `instanceof d3.selection`.
 
 To illustrate various ways that we can use these methods, lets suppose we have 5 circles rendered in an svg as shown below.
 
@@ -64,10 +66,28 @@ In the first statement we set `firstBlueCircle` equal to the `selection` object 
 
 Remember that each of the select methods discussed above return a `selection` object, not a Node object or a set of Node objects.  Also, *any* valid CSS selector can be passed to `select` and `selectAll`.
 
-[d3.selection()](https://github.com/d3/d3-selection/blob/master/README.md#selection) is used to retrieve a `selection` object that contains only the root document element (i.e. [document.documentElement](https://developer.mozilla.org/en-US/docs/Web/API/Document/documentElement)) of the web page.
+## Chaining Method Calls
+
+The `d3.selection` type has many methods that return a new selection object.  As such, we can *chain* multiple `selection` method calls together in a single statement.  
+
+In the example below, `selectAll` and `attr` return `selection` objects, so rather than writing code to set the *r* and *fill* properties of a set of *circle* elements like this:
+
+<pre>
+let sel = d3.selectAll("circle");
+sel.attr("r", "30");
+sel.attr("fill", "pink");
+</pre>
+
+We can, instead, chain the method calls together and write an equivalent statement like the one below.
+
+<pre>
+  d3.selectAll("circle")
+    .attr("r", "30")
+    .attr("fill", "pink");
+</pre>
 
 ## Selecting Descendant Elements
-The `selection` type has two methods that allow you to select zero or more descendant elements based on the elements in the current selection.  Per the API, these methods are:
+The `d3.selection` type has two methods that allow you to select zero or more descendant elements based on the elements in the current selection.  Per the API, these methods are:
 
 + [selection.select(selector)](https://github.com/d3/d3-selection/blob/master/README.md#selection_select) - select zero or one descendant for each item in the selection
 + [selection.selectAll(selector)](https://github.com/d3/d3-selection/blob/master/README.md#selection_selectAll) - select zero or more descendants for each item in the selection
@@ -93,7 +113,7 @@ d3.select("g")
   }
 </script>
 
-<svg width="160" height="100">
+<svg width="160" height="110">
   <g>
     <circle r="20" cx="30" cy="30" fill="lightblue" />
     <circle r="20" cx="80" cy="30" fill="lightblue" />
@@ -107,6 +127,57 @@ d3.select("g")
 </svg>
 <button id="nestedSelectButton" onclick="nestedSelect()">Add Stroke</button>
 ```
+
+## Groups
+
+In this section we discuss how D3.js stores elements in a `selection` object.  When doing so, we'll refer to the following example which calls `d3.select` and `d3.selectAll` in order to select all of the circle elements in the SVG.
+
+```
+<script>
+  var a = d3.select("#groupSVG")
+  var b = a.selectAll("g");
+  var c = b.selectAll("circle")
+    .attr("stroke", "gray")
+    .attr("stroke-width", "3");
+</script>
+
+<svg id="groupSVG" width="160" height="110">
+  <g>
+    <circle r="20" cx="30" cy="30" fill="pink" />
+    <circle r="20" cx="80" cy="30" fill="pink" />
+    <circle r="20" cx="130" cy="30" fill="pink" />
+  </g>
+  <g>
+    <circle r="20" cx="30" cy="80" fill="pink" />
+    <circle r="20" cx="80" cy="80" fill="pink" />
+    <circle r="20" cx="130" cy="80" fill="pink" />
+  </g>
+</svg>
+```
+
+If you inspect a `selection` object in the browser's console you'll notice that a `selection` object contains a `_parents` property and a `_groups` property.  The `_parents` property contains an array of Nodes, which coorespond to the elements from which the search for selected elements takes place.  When we use `d3.select` or `d3.selectAll` we are searching from the document's `html` element, thus we see that the `_parents` property holds an array containing a single element, the `html` node.  
+
+In our example, the variable `a` holds a selection that was returned by `d3.select("#groupSVG")`.  Since we use `d3.select` we search the entire document starting at the `html` element. Thus, as stated above, the selection's `_parents` property contains an array holding the document's `html` node.
+
+<img src="img/screenshots/selection_grp_a.png" alt="" height="120" />
+
+The `_groups` property contains an array of `NodeList` objects, each holding a *group* of element nodes that are descendants of a parent node.  The number of `NodeLists` will always be equal to the number of parents and `_groups[i]` will be the `NodeList` holding the descendents of `_parents[i]`.
+
+When we call `d3.select` or `d3.selectAll`, since there is only one parent node, the document's `html` node, we'll find there is ever only one `NodeList` element in the `_groups` array.
+
+In our example, selection `a` has one parent (the document's `html` element), thus it also has only one `NodeList` in `_groups` and that `NodeList` contains the SVG element that was selected.
+
+Now, when we call `select` or `selectAll` on a `selection`, all of the elements in the selection's `NodeLists` become parents in the new `selection` and as before, there will be one `NodeList` in the selection's `_groups` array for each parent.
+
+So, for example, when we select the `g` elements that are descendants of the SVG by calling `b = a.selectAll("g")` the elements in `a's` `NodeLists` become the parents in `b`.  Since the total number of elements the `a's` `NodeLists` is 1, then there is only one parent in `b's` `_parents` array (the SVG element) and one `NodeList` containing the two `g` elements that are descendents of the SVG element.
+
+<img src="img/screenshots/selection_grp_b.png" alt="" height="120" />
+
+The second call to `selectAll` selects all of the `circle` elements that are descendants of the `g` elements in `b`.  Since there are two `g` elements in `b`  there are two parents in `c` with each parent being assigned a `NodeList` containing the `circle` elements that are descendents of their parent `g` elements.
+
+<img src="img/screenshots/selection_grp_c.png" alt="" height="120" />
+
+For more information on groups and how selections are created we recommend you read Bostock's article titled [How Selections Work](https://bost.ocks.org/mike/selection/).
 
 ## Filtering Selections
 
@@ -134,3 +205,26 @@ In the example below, the 5 circle elements have radii between 5 and 25.  We se
   <circle cx="350" cy="50" r="25" fill="pink" />
 </svg>
 ```
+
+## Merging Two Selections
+
++ [selection.merge(selection)](https://github.com/d3/d3-selection/blob/master/README.md#selection_merge) - merge this selection with another selection
+
+## Selection Size
+The `d3.selection` type has two methods that allow us determine if a selection is empty and determine how many elements are in the selection.  Note that unlike other selection methods, these to methods do not return selection objects.
+
++ [selection.empty()](https://github.com/d3/d3-selection/blob/master/README.md#selection_empty) - returns true if the selection is empty
++ [selection.size()](https://github.com/d3/d3-selection/blob/master/README.md#selection_size) - returns the number of elements in the selection
+
+
+## Auxiliary Functions
+
+d3.matcher used by selection.filter
+
+d3.selector used by selection.select
+
+d3.selectorAll used by selection.selectAll
+
+
+
+

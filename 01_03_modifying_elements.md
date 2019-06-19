@@ -232,3 +232,8 @@ To begin we select the box with the class named *box* and retrieve it's text usi
 <button id="changeTextButton" onclick="reverseText()">Reverse Text</button>
 <br><br>
 ```
+
+## Auxiliary Methods
+
+d3.create
+d3.creator

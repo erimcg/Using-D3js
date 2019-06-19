@@ -2,7 +2,7 @@
 
 # Introduction
 
-[D3.js](https://d3js.org) (Data Driven Documents) is an open source JavaScript library created by [Mike Bostic](https://github.com/mbostock) that allows you to create an incredible array of dynamic data visualizations in a document's DOM.  With the library you can create standard visualizations like line graphs, pie charts, and scatter plots, but because the library was engineered to be incredibly flexible, you can also create custom visualizations and complex visualizations like the [Steamgraph](https://bl.ocks.org/mbostock/4060954) shown below.
+[D3.js](https://d3js.org) (Data Driven Documents) is an open source JavaScript library that allows you to create an incredible array of dynamic data visualizations in a document's DOM.  With the library you can create standard visualizations like line graphs, pie charts, and scatter plots, but because the library was engineered to be incredibly flexible, you can also create custom visualizations and complex visualizations like the [Steamgraph](https://bl.ocks.org/mbostock/4060954) shown below.
 
 <style>
 #button {
@@ -104,7 +104,7 @@ This book is for those that are new to the D3.js library and for those that are 
 
 In the chapters that follow, we demonstrate the various objects and methods in the library's API.  When doing so, we provide links to the official [D3.js API documentation](https://github.com/d3/d3/blob/master/API.md), discuss how to use the objects and methods, provide code examples, and give explanations for those examples.
 
-The code is provided in interactive *sandboxes* like the one below.
+The code examples are provided in interactive *sandboxes* like the one below.
 
 ```
 <script>
@@ -128,6 +128,8 @@ The code is provided in interactive *sandboxes* like the one below.
   A sandbox consists of a [CodeMirror](https://codemirror.net) editor, a menu, and a rendering area. In the example, above the editor is hidden.  To make the editor visible, simply press the <img class="menu_button" src="img/gray_show_button.png"> button in the menu.  To close the editor, press the <img class="menu_button" src="img/gray_hide_button.png"> button.
 
   Since it is impossible to illustrate every possible use of the numerous objects and methods in D3.js, the reader is encouraged to experiment with the code.  When doing so, you'll notice that if you make a change to the code in the editor, the result is not immediately reflected in the rendering area.  To see the result of your changes, you must *rerender* the code by pressing the <img class="menu_button" src="img/gray_publish_button.png"> button in the editor's menu.  To *reset* the code to the original code that we provide, press the <img class="menu_button" src="img/gray_reset_button.png"> button.
+  
+  If you would like to view a code example in a separate window, press the <img class="menu_button" src="img/gray_detach_button.png"> button.
 
 ## Getting Started
 

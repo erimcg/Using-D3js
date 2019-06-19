@@ -117,9 +117,18 @@ Consider the following example.
 
 ``` {cm: visible}
 <script>
-root.sum((d) => d.size);
+  var data = {"name":"A", "size":1, "children":[
+                 {"name":"B", "size":2},
+                 {"name":"C", "size":3, "children":[
+                     {"name":"E", "size":5},
+                     {"name":"F", "size":6}]},
+                 {"name":"D", "size":4}]};
 
-d3.select("#sumText").html("root.value: " + root.value);
+  var root = d3.hierarchy(data);
+  
+  root.sum((d) => d.size);
+
+  d3.select("#sumText").html("root.value: " + root.value);
 </script>
 
 <div id="sumText"></div>
@@ -151,6 +160,16 @@ As a final example in this chapter we reverse the order of each node's children.
 
 ```
 <script>
+  var data = {"name":"A", "size":1, "children":[
+               {"name":"B", "size":2},
+               {"name":"C", "size":3, "children":[
+                   {"name":"E", "size":5},
+                   {"name":"F", "size":6}]},
+               {"name":"D", "size":4}]};
+
+  var root = d3.hierarchy(data);
+  var count = root.descendants().length;
+  
   text = "";
   i = 0;
 
