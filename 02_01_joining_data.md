@@ -1,3 +1,4 @@
+
 {{meta {docid: joining_data}}}
 
 <style>
@@ -22,9 +23,13 @@ var homeless = [134278, 89503, 32190, 23548, 21112];
 The d3.selection type has a number of methods that allow you to bind data to visual elements and get the data that is bound to visual elements.  Per the API these methods are:
 
 + [selection.data(array)](https://github.com/d3/d3-selection/blob/master/README.md#joining-data) - join elements to data
-+ [selection.enter()](https://github.com/d3/d3-selection/blob/master/README.md#selection_enter) - get the temporary elements for the data not bound to elements
-+ [selection.exit()](https://github.com/d3/d3-selection/blob/master/README.md#selection_exit) - get the elements that are missing data
 + [selection.datum([value])](https://github.com/d3/d3-selection/blob/master/README.md#selection_datum) - get or set the data bound to the elements in the selection
+
+
++ [selection.enter()](https://github.com/d3/d3-selection/blob/master/README.md#selection_enter) - get the temporary elements for the data not bound to elements
++ [selection.merge(selection)](https://github.com/d3/d3-selection/blob/master/README.md#selection_merge) - merge this selection with another selection
++ [selection.exit()](https://github.com/d3/d3-selection/blob/master/README.md#selection_exit) - get the elements that are missing data
+
 + [selection.join(enter,[,update][,exit])](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_join) - a convenience method which can be used as an alternative to the above method calls.
 
 When creating data visualizations we often change the appearance of the visual elements based on some data.  For example, the length of each bar in a bar graph.
@@ -289,6 +294,10 @@ u.enter()
 
 u.exit().remove();
 </pre>
+
+## Selection.join
+
+// Coming soon.
 
 ## Setting and Getting Bound Data
 

@@ -768,12 +768,12 @@ Examples of different angles and radii:
             .text(d => d.text)
             .attr("x", d => d.x)
             .attr("y", d=> d.y)
-            .attr("font-size", "15px")
+            .attr("font-size", "10px")
             .attr("text-anchor", "middle")
             .attr("transform", "translate(100,100)");
 </script>
 
-<svg id="demoPointRadialA" width="200" height="200"></svg>
+<svg id="demoPointRadialA" width="250" height="200"></svg>
 <svg id="demoPointRadialR" width="200" height="200"></svg>
 ```
 
@@ -826,14 +826,13 @@ We can append some `text` elements to our SVG to label our pie graph with the na
     .data(data)
     .enter()
     .append("text")
-    .attr("x", d => d3.pointRadial((d.startAngle + d.endAngle)/2 , (50+90)/2)[0])
-    .attr("y", d => d3.pointRadial((d.startAngle + d.endAngle)/2 , (50+90)/2)[1])
+    .attr("x", d => d3.pointRadial((d.startAngle + d.endAngle  - 0.1)/2 , (50+90)/2)[0])
+    .attr("y", d => d3.pointRadial((d.startAngle + d.endAngle  - 0.1)/2 , (50+90)/2)[1])
     .attr("text-anchor", "middle")
     .text(d => d.data.name)
     .attr("font-size", "15px")
     .attr("fill", "white")
     .attr("transform","translate(100,100)");
-console.log(data);
 </script>
 
 <svg id="demoPointRadialLabel" width="200" height="200"></svg>

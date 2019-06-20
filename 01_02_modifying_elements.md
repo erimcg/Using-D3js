@@ -58,16 +58,14 @@ Once we have a `d3.selection` object that contains zero or more elements, we can
 + [selection.html([vaue])](https://github.com/d3/d3-selection/blob/master/README.md#selection_html) - set, remove, or get the inner HTML content
 + [selection.text([value])](https://github.com/d3/d3-selection/blob/master/README.md#selection_text) - set, remove, or get the text content
 
-As you can see, each of the methods above can be used to set, remove, or get a characteristic (e.g. attribute, class, inner HTML) of an element. Since the API is similar in many cases, we'll look at the first three methods together, then `selection.classed`, and finally the last two methods.
-
 ## Selection.each
 
 The `selection.each` method allows us to call a function for each element in a selection.
- The argument to `each` is a function and as with `selection.filter`, we can pass in a named function, unnamed function, a lambda expression, or specify the function inline. 
+ The argument to `each` is a function and as with `selection.filter`, we can pass in a named function, unnamed function, or a lambda expression. 
  
-When `each` is executed, the function that is passed to it is executed once for each element in the selection and each time is passed `d` (data from a data join), `i` (index), and `nodes` (an array of elements in the current group.)  `nodes[i]` is used to retrieve the current element in the selection for which the function is being called.
+When `each` is executed, the function that is passed to it is executed once for each element in the selection and each time it is executed it is passed `d` (data from a data join), `i` (index), and `nodes` (an array of elements in the current group.)  `nodes[i]` is used to retrieve the current element in the selection for which the function is being called.
  
-In the example below, the lambda expression is called for each element in the selection and each time checks to see if the index of the element is even, and if so, sets it's fill color to pink.
+In the example below, a lambda expression is called for each element in the selection and each time checks to see if the index of the element is even, and if so, sets it's fill color to pink.
 
 <pre>
 d3.selectAll("#eachSVG circle").each((d,i,nodes) => {
@@ -233,7 +231,3 @@ To begin we select the box with the class named *box* and retrieve it's text usi
 <br><br>
 ```
 
-## Auxiliary Methods
-
-d3.create
-d3.creator
