@@ -11,7 +11,6 @@
 
 <script>
 //This is the function that adds the axis to some of the stacks
-
 function addAxis(svgSel, d, xscale, yscale, firstStack){
 	let dates, maxPValues, maxNValues;
 	
@@ -66,14 +65,106 @@ function addAxis(svgSel, d, xscale, yscale, firstStack){
             .call(yAxis);
     }
 }
+
+//This function is used to add labels to all the areas
+function addLabels(selection, data, area){
+        selection.selectAll(".label")
+            .data(data)
+            .join("text")
+            .text(d => d.key)
+            .attr("transform", d3.areaLabel(area).minHeight(9.5))
+            .attr("fill", "blaack");
+    }
 </script>
 
 # Stacks
 
-+ [Stacks](https://github.com/d3/d3-shape#stacks)
+When having multiple sets of data, it may be useful to show multiple areas on top of each other. Examples of this include [stacked bar charts](https://en.wikipedia.org/wiki/Bar_chart#Grouped_and_Stacked), [stacked area charts](https://community.jaspersoft.com/wiki/html5-stacked-area-chart-reference), and [steamgraphs](https://en.wikipedia.org/wiki/Streamgraph).
 
-+ [d3.stack()](https://github.com/d3/d3-shape/blob/master/src/stack.js)
-+ [stack(data[,arguements])]()
+To create these type of charts/graphs, we can use `d3.stack()`. `d3.stack()` cannot be used solely on its own to generate charts, but is usually used with areas or SVG rects. `d3.stack()` takes existing data sets and returns a new series data set that can easily be used with areas or SVG rects. 
+
+For example lets start with this small data set:
+<pre>
+var data = [
+    {day: 1, appleSales: 10, bananaSales: 20, orangeSales: 15},
+    {day: 2, appleSales: 15, bananaSales: 15, orangeSales: 15},
+    {day: 3, appleSales: 20, bananaSales: 25, orangeSales: 15}
+];
+</pre>
+
+To make a reasonably graph showing the simultaneous sales of each fruit on a particular day we can use stacks. To set up any basic stack generator we should define the `keys`. The keys are what pieces of data from the data set the stack generator will be comparing and generating a series of. In this case with this data, our keys would be `appleSales`, `bananaSales`, and `orangeSales`.
+<pre>
+var stackGen = d3.stack()
+    .keys(["appleSales", "bananaSales", "orangeSales"]);
+</pre>
+
+We can then pass our data into this stack to return a series:
+<pre>
+var stackedSeries = stackGen(data); 
+</pre>
+
++ [d3.stack()](https://github.com/d3/d3-shape/blob/master/src/stack.js) - Returns back a stack generator. Typically used with `d3.area()` or SVG rects
++ [stack(data[,arguements])]() - Takes some sort of data set or array. Returns back a series data set for use in an area or SVG rect.
++ [stack.keys([keys])]() - Takes an array of strings that are the names of the different series we want to use.
+
+For this particular data set our series will look like:
+<img src="img/screenshots/stack_gen_data.png" alt="" width="485" height="358" />
+
+As we can see, it generates the data into an array of 3 more arrays (1 for each of our keys). Inside each keys' array, there contains more arrays containing the `y0` and `y1` positions of each point for the particular series. The `x` position can be taken from the `day` property in the `data` array of each positions array.
+
+However we are not done yet, we still need an area generator and some scales to work with this new data to generate the graph:
+<pre>
+var xScale = d3.scaleLinear().domain([1,3]).range([25, 275]);
+var yScale = d3.scaleLinear().domain([0,60]).range([275, 25]);
+
+var areaGen = d3.area()
+    .x(d => xScale(d.data.day))
+    .y0(d => yScale(d[0]))
+    .y1(d => yScale(d[1]));
+</pre>
+ 
+Now we can use the `stackedSeries` data with our `areaGen` to create multiple SVG paths:
+<pre>
+d3.select(svgID)
+    .selectAll(".areas")
+    .data(stackedSeries)
+    .join("path")
+    .attr("d", d => areaGen(d))
+    .attr("fill", (d, i) d3.schemeSet3[i]);
+</pre>
+ 
+ ```
+<script>
+    var data = [
+        {day: 1, appleSales: 10, bananaSales: 20, orangeSales: 15},
+        {day: 2, appleSales: 15, bananaSales: 15, orangeSales: 15},
+        {day: 3, appleSales: 20, bananaSales: 25, orangeSales: 15}
+    ];
+    var stackGen = d3.stack()
+        .keys(["appleSales", "bananaSales", "orangeSales"]);
+    var stackedSeries = stackGen(data); 
+    
+    var xScale = d3.scaleLinear().domain([1,3]).range([50, 275]);
+    var yScale = d3.scaleLinear().domain([0,60]).range([275, 25]);
+    
+    var areaGen = d3.area()
+        .x(d => xScale(d.data.day))
+        .y0(d => yScale(d[0]))
+        .y1(d => yScale(d[1]));
+        
+    d3.select("#demo0")
+        .selectAll(".areas")
+        .data(stackedSeries)
+        .join("path")
+        .attr("d", d => areaGen(d))
+        .attr("fill", (d, i) => d3.schemeSet3[i]);
+        
+    addLabels(d3.select("#demo0"), stackedSeries, areaGen);
+    addAxis(d3.select("#demo0"), stackedSeries, xScale, yScale, true);
+</script>
+
+<svg id="demo0" width= "300" height="300"></svg>
+ ```
 
 
 ### Using Stacks with Rects
@@ -168,16 +259,6 @@ function addAxis(svgSel, d, xscale, yscale, firstStack){
         .y1(d => yScale(d[1]))
         .curve(d3.curveBasis);
         
-    var areaLabel = d3.areaLabel()
-        .paddingLeft(0.1)
-        .paddingRight(.1)
-        .paddingBottom(0.1)
-        .paddingTop(0.1)
-        .minHeight(9.5)
-        .x((d) => xScale(d.data.month))
-        .y0(d => yScale(d[0]))
-        .y1(d => yScale(d[1]));
-        
     d3.select("#demo2")
     	.selectAll('.areas')
         .data(stackedSeries)
@@ -189,14 +270,8 @@ function addAxis(svgSel, d, xscale, yscale, firstStack){
         .append("g")
         .attr("transform", "translate(10,150)")
         .call(legend);
-        
-    d3.select("#demo2")
-        .selectAll('.label')
-        .data(stackedSeries)
-        .join('text')
-        .text(d => d.key)
-        .attr('transform', areaLabel)
-        .attr("fill", "black");
+    
+    addLabels(d3.select("#demo2"), stackedSeries, area);
 </script>
 
 <svg id="demo2" width="300" height="300"></svg>
@@ -240,19 +315,7 @@ function addAxis(svgSel, d, xscale, yscale, firstStack){
         .y0((d) => yScale(d[0]))
         .y1((d) => yScale(d[1]))
         .curve(d3.curveBasis);
-        
-    var areaLabel = d3.areaLabel()
-        .paddingLeft(0.1)
-        .paddingRight(.1)
-        .paddingBottom(0.1)
-        .paddingTop(0.1)
-        .minHeight(9.5)
-        .x((d) => xScale(d.data.month))
-        .y0(d => yScale(d[0]))
-        .y1(d => yScale(d[1]));
 	
-    //console.stringify(stackedSeries);
-    
     d3.select("#demo3")
     	.selectAll('.areas')
         .data(stackedSeries)
@@ -265,22 +328,33 @@ function addAxis(svgSel, d, xscale, yscale, firstStack){
         .attr("transform", "translate(10,100)")
         .call(legend);
         
-    d3.select("#demo3")
-        .selectAll('.label')
-        .data(stackedSeries)
-        .join('text')
-        .text(d => d.key)
-        .attr('transform', areaLabel)
-        .attr("fill", "black");
+    addLabels(d3.select("#demo3"), stackedSeries, area);
 </script>
 
 <svg id="demo3" width="300" height="300"></svg>
 <svg id="demo3Legend" width="1" height="300"></svg>
 ```
-+ [stack.keys([keys])]()
+
 + [stack.value([value])]()
 + [stack.order([order])]()
 + [stack.offset([offset])]()
+
+
+### Adding Areas Function
+In all future examples we will be using this function to add the areas of our stacks:
+
+``` {cm: visable}
+<script>
+    function addAreas(selection, data, area, customTransform){ //customTransform not neccesary
+        selection.selectAll(".areas")
+            .data(data)
+            .join("path")
+            .attr("d", d => area(d))
+            .attr("fill", d => colorScale(d.key))
+            .attr("transform" , customTransform);
+    }
+</script>
+```
 
 ## Stack Ordering
 
@@ -300,8 +374,6 @@ By setting the `.order([order])` accessor of a stack we can change where each se
         {month: new Date(2015, 6, 1), fruitSales: {apples: 1500, bananas: 1250, cherries: 960,  dates: 400, oranges: 2000, grapes: 150}},
         {month: new Date(2015, 7, 1), fruitSales: {apples: 1000, bananas:  750, cherries: 1060, dates: 400, oranges: 2100, grapes: 100}}
     ];
-
-
 
     var xScale = d3.scaleTime().domain([data[0].month, data[data.length - 1].month]).range([50,275]);
     var yScale = d3.scaleLinear().domain([0,10000]).range([275,25]);
@@ -328,46 +400,12 @@ By setting the `.order([order])` accessor of a stack we can change where each se
         .y0(d => yScale(d[0]))
         .y1(d => yScale(d[1]))
         .curve(d3.curveBasis);
-        
-    var areaLabel = d3.areaLabel() // Area Label for adding labels to each series' areas
-        .paddingLeft(0.1)
-        .paddingRight(.1)
-        .paddingBottom(0.1)
-        .paddingTop(0.1)
-        .minHeight(9.5)
-        .x((d) => xScale(d.data.month))
-        .y0(d => yScale(d[0]))
-        .y1(d => yScale(d[1]));
                 
-    d3.select("#demo4n") // Areas to stackOrderNone
-        .selectAll('.areas')
-        .data(stackedSeries1)
-        .join('path')
-        .attr('d', (d) => area(d))
-        .attr("fill", d => colorScale(d.key));
-
-    d3.select("#demo4r") // Areas to stackOrderReverse
-        .selectAll('.areas')
-        .data(stackedSeries2)
-        .join('path')
-        .attr('d', (d) => area(d))
-        .attr("fill", d => colorScale(d.key));
-        
-    d3.select("#demo4n") // Labels to stackOrderNone
-        .selectAll('.label')
-        .data(stackedSeries1)
-        .join('text')
-        .text(d => d.key)
-        .attr('transform', areaLabel)
-        .attr("fill", "black");   
-                
-    d3.select("#demo4r") // Labels to stackOrderReverse
-        .selectAll('.label')
-        .data(stackedSeries2)
-        .join('text')
-        .text(d => d.key)
-        .attr('transform', areaLabel)
-        .attr("fill", "black");
+    addAreas(d3.select("#demo4n"), stackedSeries1, area); // Areas to stackOrderNone
+    addAreas(d3.select("#demo4r"), stackedSeries2, area); // Areas to stackOrderReverse
+     
+    addLabels(d3.select("#demo4n"), stackedSeries1, area) // Labels to stackOrderNone
+    addLabels(d3.select("#demo4r"), stackedSeries2, area) // Labels to stackOrderReverse
 </script>
 
 <svg id="demo4n" width="300" height="300"></svg>
@@ -414,46 +452,12 @@ By setting the `.order([order])` accessor of a stack we can change where each se
             .y0(d => yScale(d[0]))
             .y1(d => yScale(d[1]))
             .curve(d3.curveBasis);
-            
-		var areaLabel = d3.areaLabel()
-            .paddingLeft(0.1)
-            .paddingRight(.1)
-            .paddingBottom(0.1)
-            .paddingTop(0.1)
-            .minHeight(9.5)
-            .x((d) => xScale(d.data.month))
-            .y0(d => yScale(d[0]))
-            .y1(d => yScale(d[1]));
-            
-        d3.select("#demo5a")
-            .selectAll('.areas')
-            .data(stackedSeries1)
-            .join('path')
-            .attr('d', (d) => area(d))
-            .attr("fill", d => colorScale(d.key));
-
-        d3.select("#demo5d")
-            .selectAll('.areas')
-            .data(stackedSeries2)
-            .join('path')
-            .attr('d', (d) => area(d))
-            .attr("fill", d => colorScale(d.key));
-            
-        d3.select("#demo5a")
-            .selectAll('text')
-            .data(stackedSeries1)
-            .join('text')
-            .text(d => d.key)
-            .attr('transform', areaLabel)
-            .attr("fill", "black");   
-            
-        d3.select("#demo5d")
-            .selectAll('text')
-            .data(stackedSeries2)
-            .join('text')
-            .text(d => d.key)
-            .attr('transform', areaLabel)
-            .attr("fill", "black");
+        
+        addAreas(d3.select("#demo5a"), stackedSeries1, area); // Areas to stackOrderAscending
+        addAreas(d3.select("#demo5d"), stackedSeries2, area); // Areas to stackOrderDescending 
+        
+        addLabels(d3.select("#demo5a"), stackedSeries1, area); // Add Labels to stackOrderAcsending
+        addLabels(d3.select("#demo5d"), stackedSeries2, area); // Add Labels to stackOrderDescending
    </script>
 
    <svg id="demo5a" width="300" height="300"></svg>
@@ -487,7 +491,7 @@ Finally those indices are sorted least to greatest:
 ```
 <script>
     var data = [
-   		{month: new Date(2015, 0, 1), fruitSales: {apples: 1,    bananas: 1,   oranges: 1,   grapes: 1}},
+   		{month: new Date(2015, 0, 1),  fruitSales: {apples: 1,    bananas: 1,   oranges: 1,   grapes: 1}},
         {month: new Date(2015, 1, 1),  fruitSales: {apples: 10,   bananas: 1,   oranges: 1,   grapes: 1}},
         {month: new Date(2015, 2, 1),  fruitSales: {apples: 25,   bananas: 1,   oranges: 1,   grapes: 1}},
         {month: new Date(2015, 3, 1),  fruitSales: {apples: 10,   bananas: 1,   oranges: 1,   grapes: 1}},
@@ -533,48 +537,12 @@ Finally those indices are sorted least to greatest:
         .y0(d => yScale(d[0] + 25/2))
         .y1(d => yScale(d[1] + 25/2))
         .curve(d3.curveBasis);
-        
-    var areaLabel = d3.areaLabel()
-        .paddingLeft(0.1)
-        .paddingRight(0.1)
-        .paddingBottom(0.1)
-        .paddingTop(0.1)
-        .minHeight(9.5)
-        .x((d) => xScale(d.data.month))
-        .y0(d => yScale(d[0]))
-        .y1(d => yScale(d[1]));
 
-    d3.select("#demo6a")
-        .selectAll('.areas')
-        .data(stackedSeries1)
-        .join('path')
-        .attr('d', (d) => area1(d))
-        .attr("fill", d => colorScale(d.key));
-
-    d3.select("#demo6i")
-        .selectAll('.areas')
-        .data(stackedSeries2)
-        .join('path')
-        .attr('d', (d) => area2(d))
-        .attr("fill", d => colorScale(d.key));
+    addAreas(d3.select("#demo6a"), stackedSeries1, area1); // Areas to stackOrderAppearance
+    addAreas(d3.select("#demo6i"), stackedSeries2, area2); // Areas to stackOrderInsideOut
         
-    d3.select("#demo6a")
-        .selectAll('text')
-        .data(stackedSeries1)
-        .join('text')
-        .text(d => d.key)
-        .attr('transform', areaLabel)
-        .attr("fill", "black");   
-        
-    d3.select("#demo6i")
-    	.append("g")
-        .attr("transform", "translate(0,-65)")
-        .selectAll('text')
-        .data(stackedSeries2)
-        .join('text')
-        .text(d => d.key)
-        .attr('transform', areaLabel)
-        .attr("fill", "black");
+    addLabels(d3.select("#demo6a"), stackedSeries1, area1); // Labels to stackOrderAppearance
+    addLabels(d3.select("#demo6i"), stackedSeries2, area2); // Labels to stackOrderInsideOut
 </script>
 
 <svg id="demo6a" class="svgClass" width="300" height="200"></svg>
@@ -634,36 +602,11 @@ By setting the `.offset([offset])` we can control the baselines that our stacks 
         .y1(d => yScaleExpand(d[1]))
         .curve(d3.curveBasis);
     
-                
-    d3.select("#demo7n") // Areas to stackOrderNone
-        .selectAll('.areas')
-        .data(stackedSeries1)
-        .join('path')
-        .attr('d', (d) => areaNone(d))
-        .attr("fill", d => colorScale(d.key));
-
-    d3.select("#demo7e") // Areas to stackOrderReverse
-        .selectAll('.areas')
-        .data(stackedSeries2)
-        .join('path')
-        .attr('d', (d) => areaExpanding(d))
-        .attr("fill", d => colorScale(d.key));
+    addAreas(d3.select("#demo7n"), stackedSeries1, areaNone); // Areas to stackOffsetNone
+    addAreas(d3.select("#demo7e"), stackedSeries2, areaExpanding); // Areas to stackOffsetExpanding
         
-    d3.select("#demo7n") // Labels to stackOrderNone
-        .selectAll('.label')
-        .data(stackedSeries1)
-        .join('text')
-        .text(d => d.key)
-        .attr('transform', d3.areaLabel(areaNone).minHeight(9.5))
-        .attr("fill", "black");   
-                
-    d3.select("#demo7e") // Labels to stackOrderReverse
-        .selectAll('.label')
-        .data(stackedSeries2)
-        .join('text')
-        .text(d => d.key)
-        .attr('transform', d3.areaLabel(areaExpanding).minHeight(9.5))
-        .attr("fill", "black");
+    addLabels(d3.select("#demo7n"), stackedSeries1, areaNone); // Labels to stackOffsetNone
+    addLabels(d3.select("#demo7e"), stackedSeries2, areaExpanding); // Labels to stackOffsetExpanding
 </script>
 
 <svg id="demo7n" width="300" height="300"></svg>
@@ -766,39 +709,11 @@ By setting the `.offset([offset])` we can control the baselines that our stacks 
         .y1(d => yScale(d[1]))
         .curve(d3.curveBasis);
     
-                
-    d3.select("#demo9s") // Areas to stackOffsetSilhouette
-        .selectAll('.areas')
-        .data(stackedSeries1)
-        .join('path')
-        .attr('d', (d) => area(d))
-        .attr("fill", d => colorScale(d.key))
-        .attr("transform", "translate(0,-150)");
-
-    d3.select("#demo9w") // Areas to stackOffsetWiggle
-        .selectAll('.areas')
-        .data(stackedSeries2)
-        .join('path')
-        .attr('d', (d) => area(d))
-        .attr("fill", d => colorScale(d.key));
-        
-    d3.select("#demo9s") // Labels to stackOffsetSilhouette
-    	.append('g')
-        .attr("transform", "translate(0, -150)")
-        .selectAll('.label')
-        .data(stackedSeries1)
-        .join('text')
-        .text(d => d.key)
-        .attr('transform', d3.areaLabel(area).minHeight(9.5))
-        .attr("fill", "black");   
-                
-    d3.select("#demo9w") // Labels to stackOffsetWiggle
-        .selectAll('.label')
-        .data(stackedSeries2)
-        .join('text')
-        .text(d => d.key)
-        .attr('transform', d3.areaLabel(area).minHeight(9.5))
-        .attr("fill", "black");
+    addAreas(d3.select("#demo9s"), stackedSeries1, area, "translate(0, -150)"); // Areas to stackOffsetSilhouette
+    addAreas(d3.select("#demo9w"), stackedSeries2, area); // Areas to stackOrderReverse // Areas to stackOffsetWiggle
+    
+    addLabels(d3.select("#demo9s").append('g').attr("transform", "translate(0, -150)"), stackedSeries1, area); // Labels to stackOffsetSilhouette
+    addLabels(d3.select("#demo9w"), stackedSeries2, area); // Labels to stackOffsetWiggle
 </script>
 
 <svg id="demo9s" width="300" height="300"></svg>
@@ -872,3 +787,17 @@ function addAxis(svgSel, d, xscale, yscale, firstStack){
 ```
 
 ## d3-area-label
+
+```
+<script>
+    //This function is used to add labels to all the areas
+    function addLabels(selection, data, area){
+        selection.selectAll(".label")
+            .data(data)
+            .join("text")
+            .text(d => d.key)
+            .attr("transform", d3.areaLabel(area).minHeight(9.5))
+            .attr("fill", "blaack");
+    }
+</script>
+```
