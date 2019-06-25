@@ -9,6 +9,9 @@
 
 # Curves
 
+In this section we will discuss the different curves available that can be applied to various generators. Curves *cannot* be used on their own, but are instead used within [areas](./05_04_areas.html) and [lines](./05_03_lines.md).
+
+## Curves
 As you may have seen in [d3.lines()](/05_03_lines.html) and [d3.area()](/05_04_areas.html) applying a curve will curve the line.
 For most, if not all, examples we have gone through, we have used d3.curveBasis as the curve, but there are many more types provided by d3.
 
