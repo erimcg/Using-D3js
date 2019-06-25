@@ -103,9 +103,9 @@ We can then pass our data into this stack to return a series:
 var stackedSeries = stackGen(data); 
 </pre>
 
-+ [d3.stack()](https://github.com/d3/d3-shape/blob/master/src/stack.js) - Returns back a stack generator. Typically used with `d3.area()` or SVG rects
-+ [stack(data[,arguements])]() - Takes some sort of data set or array. Returns back a series data set for use in an area or SVG rect.
-+ [stack.keys([keys])]() - Takes an array of strings that are the names of the different series we want to use.
++ [d3.stack()](https://github.com/d3/d3-shape#stack) - Returns back a stack generator. Typically used with `d3.area()` or SVG rects
++ [stack(data[,arguements])](https://github.com/d3/d3-shape#_stack) - Takes some sort of data set or array. Returns back a series data set for use in an area or SVG rect.
++ [stack.keys([keys])](https://github.com/d3/d3-shape#stack_keys) - Takes an array of strings that are the names of the different series we want to use.
 
 For this particular data set our series will look like:
 <img src="img/screenshots/stack_gen_data.png" alt="" width="485" height="358" />
@@ -282,6 +282,8 @@ var stack = d3.stack()
 
 `key` is the named object `value` is looking for in the data array passed in. Now our stack generator will look in `fruitSales` for the keys.
 
++ [stack.value([value])](https://github.com/d3/d3-shape#stack_value) - Takes a function. Sets the value for where the stack generator will look for keys.
+
 ```
 <script>
     var data = [
@@ -328,7 +330,7 @@ var stack = d3.stack()
 <svg id="demo3" width="300" height="300"></svg>
 ```
 
-+ [stack.value([value])]()
+
 
 ### Adding Areas Function
 In all future examples we will be using this function to add the areas of our stacks:
@@ -350,10 +352,10 @@ In all future examples we will be using this function to add the areas of our st
 
 By setting the `.order([order])` accessor of a stack we can change where each series appears in the stack. The default ordering if one is not set is d3.stackOrderNone.
 
-+ [stack.order([order])]()
++ [stack.order([order])](https://github.com/d3/d3-shape#stack_order) - Takes an order type or a function that is used to determine the order. The order is where the series in the stack appear.
 
-+ [d3.stackOrderNone(series)]() - Orders all the series based on the ordering of the keys. If you define the stack with `.keys(["a", "b", "c"])` the order of the series will be "a", "b", "c", from bottom to top.
-+ [d3.stackOrderReverse(series)]() - Orders all the series based on the <b>reverse</b> ordering of the keys. If you define the stack with `.keys(["a", "b", "c"])` the order of the series will be "a", "b", "c", from <b>top to bottom</b>. This is the opposite of `d3.stackOrderNone()`.
++ [d3.stackOrderNone(series)](https://github.com/d3/d3-shape#stackOrderNone) - Orders all the series based on the ordering of the keys. If you define the stack with `.keys(["a", "b", "c"])` the order of the series will be "a", "b", "c", from bottom to top.
++ [d3.stackOrderReverse(series)](https://github.com/d3/d3-shape#stackOrderReverse) - Orders all the series based on the <b>reverse</b> ordering of the keys. If you define the stack with `.keys(["a", "b", "c"])` the order of the series will be "a", "b", "c", from <b>top to bottom</b>. This is the opposite of `d3.stackOrderNone()`.
 ```
 <script>
     var data = [
@@ -404,8 +406,8 @@ By setting the `.order([order])` accessor of a stack we can change where each se
 <svg id="demo4r" width="300" height="300"></svg>
 ```
 
-+ [d3.stackOrderAscending(series)]() - Orders all the series based on the sum of <i>all</i> the values of each series. The series with the smallest sum with be placed on the bottom, ascending upwards to the largest.
-+ [d3.stackOrderDescending(series)]() - Orders all the series based on the sum of <i>all</i> the values of each series. The series with the largest sum with be placed on the bottom, ascending upwards to the smallest. This is the opposite of `d3.stackOrderAscending()`.
++ [d3.stackOrderAscending(series)](https://github.com/d3/d3-shape#stackOrderAscending) - Orders all the series based on the sum of <i>all</i> the values of each series. The series with the smallest sum with be placed on the bottom, ascending upwards to the largest.
++ [d3.stackOrderDescending(series)](https://github.com/d3/d3-shape#stackOrderDescending) - Orders all the series based on the sum of <i>all</i> the values of each series. The series with the largest sum with be placed on the bottom, ascending upwards to the smallest. This is the opposite of `d3.stackOrderAscending()`.
 ```
 <script>
         var data = [
@@ -476,8 +478,8 @@ Finally those indices are sorted least to greatest:
 
 <table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#409cff;text-align:center"></th><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#ff5858;text-align:center">Apples</th><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#b56fff;text-align:center;vertical-align:top">Grapes</th><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#ffcb2f;text-align:center;vertical-align:top">Oranges</th><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#fffc9e;text-align:center;vertical-align:top">Bananas</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">Index</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">2</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">5</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">8</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">11</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top"></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top" colspan="4">-------------------------------------------------------&gt;</td></tr></table>
 
-+ [d3.stackOrderApperance(series)]() - will place the smallest indices on the bottom of the stack, and the series with the largest index will be on the top.
-+ [d3.stackOrderInsideOut(series)]() - will place the smallest indices in the middle working its way outward for the largest. 
++ [d3.stackOrderApperance(series)](https://github.com/d3/d3-shape#stackOrderAppearance) - will place the smallest indices on the bottom of the stack, and the series with the largest index will be on the top.
++ [d3.stackOrderInsideOut(series)](https://github.com/d3/d3-shape#stackOrderInsideOut) - will place the smallest indices in the middle working its way outward for the largest. 
 `d3.stackOrderInsideOut()` should have its `offest` set to `d3.stackOffsetWiggle()` and is used to make streamgraphs.
 
 ```
@@ -545,10 +547,10 @@ Finally those indices are sorted least to greatest:
 
 By setting the `.offset([offset])` we can control the baselines that our stacks use. The baseline for the default offset is 0, so every stack bottoms out at zero and works its way up. 
 
-+ [stack.offset([offset])]()
++ [stack.offset([offset])](https://github.com/d3/d3-shape#stack_offset) - Takes an offset type or function that computes the offset. Sets the stack generators offset, which determines how the series in the stack appear.
 
-+ [d3.stackOffsetNone(series, order)]() - Applies a zero baseline. Is the default offset.
-+ [d3.stackOffsetExpand(series, order)]() - Applies a zero baseline, and normalizes every point to be within the range `[`0,1`]`.
++ [d3.stackOffsetNone(series, order)](https://github.com/d3/d3-shape#stackOffsetNone) - Applies a zero baseline. Is the default offset.
++ [d3.stackOffsetExpand(series, order)](https://github.com/d3/d3-shape#stackOffsetExpand) - Applies a zero baseline, and normalizes every point to be within the range `[`0,1`]`.
 
 ```
 <script>
@@ -622,7 +624,7 @@ By setting the `.offset([offset])` we can control the baselines that our stacks 
 </svg>
 ```
 
-+ <a id="diverging"></a>[d3.stackOffsetDiverging(series, order)]() - Has positive values above 0, and negative values below 0. Best used with SVG Rects instead of areas.
++ <a id="diverging"></a>[d3.stackOffsetDiverging(series, order)](https://github.com/d3/d3-shape#stackOffsetDiverging) - Has positive values above 0, and negative values below 0. Best used with SVG Rects instead of areas.
 ```
 <script>
     var data = [
@@ -682,8 +684,8 @@ By setting the `.offset([offset])` we can control the baselines that our stacks 
 </svg>
 ```
 
-+ [d3.stackOffsetSilhouette(series, order)]() - Shifts the baseline so that the center of the streamgraph is 0.
-+ [d3.stackOffsetWiggle(series, order)]() - Shifts the baseline to minimize the wiggle of the layers. Recommended for streamgraphs alongside `d3.stackOrderInsideOut())`. Has a variable baseline that changes throughout the streamgraph.
++ [d3.stackOffsetSilhouette(series, order)](https://github.com/d3/d3-shape#stackOffsetSilhouette) - Shifts the baseline so that the center of the streamgraph is 0.
++ [d3.stackOffsetWiggle(series, order)](https://github.com/d3/d3-shape#stackOffsetWiggle) - Shifts the baseline to minimize the wiggle of the layers. Recommended for streamgraphs alongside `d3.stackOrderInsideOut())`. Has a variable baseline that changes throughout the streamgraph.
 
 ```
 <script>
@@ -747,7 +749,7 @@ By setting the `.offset([offset])` we can control the baselines that our stacks 
 
 #### Axis Code
 
-Below is the function `addAxis` which is used to determine the scales and add axis to some stacks on this page. If you need a refresher see [axis](/04_03_axis.html). It may seem complex at first, but the function checks for `null` frequently so that we can only use what we need.
+Below is the function `addAxis` which is used to determine the scales and add axis to some stacks on this page. If you need a refresher see [axis](./04_03_axis.html). It may seem complex at first, but the function checks for `null` frequently so that we can only use what we need.
 
 ```
 <script>
@@ -812,7 +814,7 @@ function addAxis(svgSel, d, xscale, yscale, firstStack){
 
 ## d3-area-label
 
-Below is the function `addLabel` which is used to add text labels to our areas. If you need a refresher see the previous section [areas](/05_04_areas.html)
+Below is the function `addLabel` which is used to add text labels to our areas. If you need a refresher see the previous section [areas](./05_04_areas.html)
 
 ```
 <script>
