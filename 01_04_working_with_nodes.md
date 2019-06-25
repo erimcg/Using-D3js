@@ -47,7 +47,7 @@ The `d3.selection` type has two methods that allow us to retrieve nodes from a s
 + [selection.node()](https://github.com/d3/d3-selection/blob/master/README.md#selection_node) - returns the first non-null element in the selection
 + [selection.nodes()](https://github.com/d3/d3-selection/blob/master/README.md#selection_nodes) - returns an array containing all of the non-null elements in the selection
 
-## Retrieving the Window Object
+## Node Window
 
 + [d3.window(node)](https://github.com/d3/d3-selection/blob/master/README.md#window) - returns the window that own's the node, if it exists.
 

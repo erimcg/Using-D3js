@@ -2,7 +2,7 @@
 
 # Introduction
 
-[D3.js](https://d3js.org) (Data Driven Documents) is an open source JavaScript library that allows you to create an incredible array of dynamic data visualizations in a document's DOM.  With the library you can create standard visualizations like line graphs, pie charts, and scatter plots, but because the library was engineered to be incredibly flexible, you can also create custom visualizations and complex visualizations like the [Steamgraph](https://bl.ocks.org/mbostock/4060954) shown below.
+[D3.js](https://d3js.org) (Data Driven Documents) is an open source JavaScript library that allows you to create an incredible array of dynamic data visualizations in a document's DOM.  With the library you can create standard visualizations like line graphs, pie charts, and scatter plots, but because the library was engineered to be incredibly flexible, you can also create custom visualizations and complex visualizations like the [Streamgraph](https://bl.ocks.org/mbostock/4060954) shown below.
 
 <style>
 #button {
@@ -19,7 +19,7 @@
 }
 </style>
 
-<div id="steamgraph">
+<div id="streamgraph">
     <button id="button" onclick="transition()">Update</button>
     <svg width="700" height="400"></svg>
 </div>

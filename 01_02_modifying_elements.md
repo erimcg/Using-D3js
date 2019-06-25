@@ -45,7 +45,7 @@
 
 # Modifying Elements in Selections
 
-Once we have a `d3.selection` object that contains zero or more elements, we can modify the elements in the selection in unison by calling the `d3.selection` methods shown below.
+Once we have a `d3.selection` object, we can modify the elements in the selection in unison by calling the `d3.selection` methods shown below.
 
 + [selection.each(function)](https://github.com/d3/d3-selection/blob/master/README.md#selection_each) - call a function for each element in the selection
 

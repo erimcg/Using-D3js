@@ -262,10 +262,9 @@ We then create an arc generator and join the *new data* to the `path` elements e
     .append("g")
     .attr("transform", "translate(100,100)");
 
- var angleGen = d3.pie();
+  var angleGen = d3.pie();
 
- var data = angleGen([1,1,1,1,4,2,2,4]);
-console.log(data);
+  var data = angleGen([1,1,1,1,4,2,2,4]);
 
   var arcGen = d3.arc()
     .innerRadius(0)
