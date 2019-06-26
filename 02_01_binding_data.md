@@ -1,5 +1,5 @@
 
-{{meta {docid: joining_data}}}
+{{meta {docid: binding_data}}}
 
 <style>
   button{

@@ -1,37 +1,23 @@
-{{meta {docid: updating_data}}}
+{{meta {docid: modifying_data}}}
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
 
-# Updating Data
+# Modifying Data
 
-In this tutorial, we'll look at how to add new visual elements after new data has been added to the array of joined data. To that end, we'll look again at the `data` method, and in particular, the use of a key function that is passed as an argument to the method.
+When the dataset used for a visualization changes, we may need to update the visual elements to reflect the new data, possibly adding or removing visual elements, and changing the visual characteristics of elements. 
 
-+ [selection.data(array, key-function)](https://github.com/d3/d3-selection/blob/master/README.md#selection_data) - join data to elements
+If the data is held in an array, then the position of the new data in the array, may affect the rendering speed and appearance of the visualization as the following example shows.
 
-## The Data Method - A Review
-
-Lets review the `data` method.  The `data` method binds data to visual elements by adding a __data__ property to the visual elements' nodes.  The method returns an update selection that contains all of the visual elements that were bound.  The update selection has an `entry` method and an `exit` method that return a set of pseudo-elements for each unbound data element when we have too few visual elements and a set of visual elements that did not have data bound to them when we have too many visual elements, respectively.
-
-## Rejoining a Data Array
-
-When the data array has been modified we need to update the visual elements to reflect the new data, possibly adding or removing visual elements.
-
-Suppose, for example, we have a svg element with 2 rect child elements that has been joined to a data array with 2 integer values containing the values 100 and 10 ([100, 10]). So the first rect is bound to 100 and the second rect is bound to 10.  Suppose next that a new value (1000) has been added to the beginning of the array.  So now the array hold 3 integers, and looks like this: [1000,100,10].
-
-When we use the general form for joining data, we first select the svg and then the rect elements (there are 2), and then call the `data` method, passing in the array.  Since there are 2 visual elements the `data` method binds the first 2 elements in the array to those 2 visual elements.  So, 1000 is bound to the first rect and 100 is bound to the second rect.
-
-We then call `enter` to get the entry selection (which contains one pseudo-element bound to 10) and call `append` to add a rect for the pseudo-element.  This produces a third rect element bound to the value 10.
-
-Recall that 10 was bound to the second rect earlier; now it is bound to the third.  This movement of data from one visual element to another causes unnecessary computation and unpleasant visual side effects as shown below.
+The demonstration below uses buttons to incrementally add and remove data in an (initially empty) array.  The elements in the array are then bound to the elements in the visualization (appending and removing new elements when necessary).  
 
 ```
 <script>
 var data = [
-    {"state": "California","population": 134278 },
-    {"state": "Florida",   "population": 32190 },
-    {"state": "Washington","population": 21112 },
-    {"state": "New York","population": 89503 },
-    {"state": "Texas","population": 23548 }
+    {"state": "Washington","population": 21112},
+    {"state": "Texas","population": 23548},
+    {"state": "Florida",   "population": 32190},
+    {"state": "New York","population": 89503},
+    {"state": "California","population": 134278}
 ];
 
 var homeless = [];
@@ -66,11 +52,11 @@ function appendData() {
 
 function reset() {
     data = [
-    {"state": "California","population": 134278 },
-    {"state": "Florida",   "population": 32190 },
-    {"state": "Washington","population": 21112 },
-    {"state": "New York","population": 89503 },
-    {"state": "Texas","population": 23548 }
+    {"state": "Washington","population": 21112},
+    {"state": "Texas","population": 23548},
+    {"state": "Florida",   "population": 32190},
+    {"state": "New York","population": 89503},
+    {"state": "California","population": 134278}
     ];
 
     homeless = [];
@@ -136,11 +122,11 @@ var u = d3.select("#bargraph2")
 ```
 <script>
 var data2 = [
-    {"state": "California","population": 134278 },
-    {"state": "Florida",   "population": 32190 },
-    {"state": "Washington","population": 21112 },
-    {"state": "New York","population": 89503 },
-    {"state": "Texas","population": 23548 }
+    {"state": "Washington","population": 21112},
+    {"state": "Texas","population": 23548},
+    {"state": "Florida",   "population": 32190},
+    {"state": "New York","population": 89503},
+    {"state": "California","population": 134278}
 ];
 
 var homeless2 = [];
@@ -176,11 +162,11 @@ function appendData2() {
 
 function reset2() {
     data2 = [
-    {"state": "California","population": 134278 },
-    {"state": "Florida",   "population": 32190 },
-    {"state": "Washington","population": 21112 },
-    {"state": "New York","population": 89503 },
-    {"state": "Texas","population": 23548 }
+    {"state": "Washington","population": 21112},
+    {"state": "Texas","population": 23548},
+    {"state": "Florida",   "population": 32190},
+    {"state": "New York","population": 89503},
+    {"state": "California","population": 134278}
     ];
 
     homeless2 = [];

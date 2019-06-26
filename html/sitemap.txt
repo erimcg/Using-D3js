@@ -4,7 +4,7 @@ http://using-d3js.com/01_01_creating_selections.html
 http://using-d3js.com/01_02_modifying_elements.html
 http://using-d3js.com/01_03_modifying_dom_using_selections.html
 http://using-d3js.com/01_04_working_with_nodes.html
-http://using-d3js.com/02_01_joining_data.html
+http://using-d3js.com/02_01_binding_data.html
 http://using-d3js.com/02_02_joining_object_data.html
 http://using-d3js.com/02_03_updating_data.html
 http://using-d3js.com/02_04_sorting_elements.html
@@ -17,7 +17,7 @@ http://using-d3js.com/04_05_sequential_scales.html
 http://using-d3js.com/04_06_quantize_scales.html
 http://using-d3js.com/04_07_ordinal_scales.html
 http://using-d3js.com/04_08_legends.html
-http://using-d3js.com/05_01_shapes.html
+http://using-d3js.com/05_01_paths.html
 http://using-d3js.com/05_02_arcs_pie_charts.html
 http://using-d3js.com/05_03_lines.html
 http://using-d3js.com/05_04_areas.html
