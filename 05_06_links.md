@@ -11,10 +11,14 @@
 
 # Links
 
+In this section we'll discuss how to draw links. 
+Links can be used independently when the coordinates are predefined, or within a [hierarchical layouts](./06_01_hierarchal.html)where the points are computed based on the layout.
+
+
+##Links
 Links are paths that create a smooth Bézier curve from a source point to a target point.
 When having a large amount of points that need to be shown as being connected, links can be used to easily show their relation.
 
-Links can be used independently when the coordinates are predefined, or within a [hierarchical layouts](/06_01_hierarchal.html)where the points are computed based on the layout. [Hierarchical layouts](/06_01_hierarchal.html)are discussed in more detail in the next chapter.
 
 There are three different types of link generators that D3 provides:
 + [d3.linkVertical()](https://github.com/d3/d3-shape#linkVertical) - Typically used when the root is on the left/right edge with the children going right/left.

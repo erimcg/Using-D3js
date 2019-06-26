@@ -7,7 +7,7 @@
     .sandbox-output { text-align: center;}
 </style>
 # Areas and Area Radials
-In this tutorial we will discuss how to draw areas and area radials.
+In this tutorial we will discuss how to draw areas and area radials. Areas can be used on their own or with [stacks](./05_08_stacks.html).
 
 ## Areas
 D3 provides [d3.area()](https://github.com/d3/d3-shape#area), a method that returns an area generator that is used to create areas.

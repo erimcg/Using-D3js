@@ -9,6 +9,10 @@
 
 # Symbols
 
+In this section we will discuss different symbols available and how to make our own. 
+Symbols can be used on their own, but are typically used more when we have other charts.
+
+## Symbols
 Thus far in most of our examples, when we have nodes that need to be put onto an svg, we append a `circle`. 
 However, changing the shape of our nodes can supply us with more ways to represent our data.
 

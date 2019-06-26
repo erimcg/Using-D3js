@@ -79,6 +79,9 @@ function addLabels(selection, data, area){
 
 # Stacks
 
+In this section we will discuss how to draw stacks. Stacks utilize SVG rects or [areas](./05_04_areas.html).
+
+## Stacks
 When having multiple sets of data, it may be useful to show multiple areas on top of each other. Examples of this include [stacked bar charts](https://en.wikipedia.org/wiki/Bar_chart#Grouped_and_Stacked), [stacked area charts](https://community.jaspersoft.com/wiki/html5-stacked-area-chart-reference), and [streamgraphs](https://en.wikipedia.org/wiki/Streamgraph).
 
 To create these type of charts/graphs, we can use `d3.stack()`. `d3.stack()` cannot be used solely on its own to generate charts, but is usually used with areas or SVG rects. `d3.stack()` takes existing data sets and returns a new series data set that can easily be used with areas or SVG rects. 
