@@ -280,14 +280,17 @@ Both `d3.create` and `d3.creator` take as an argument a string that specifies th
 
 ```
 <script>
-  var circleGen = d3.creator("circle");
-  
-  d3.select("#createSVG")
-    .append(circleGen)
-    .attr("r", 25)
-    .attr("cx", 50)
-    .attr("cy", 50)
-    .attr("fill", "lightblue");
+var circleGen = d3.creator("circle");
+
+d3.select("#createSVG")
+  .selectAll("circle")
+  .data([1,2,3])
+  .enter()
+  .append(circleGen)
+  .attr("r", 25)
+  .attr("cx", (d) => d * 60)
+  .attr("cy", 50)
+  .attr("fill", "lightblue");
 </script>
 
 <svg id="createSVG" width="400" height="90" ></svg>
