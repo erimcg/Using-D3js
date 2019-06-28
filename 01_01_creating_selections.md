@@ -1,4 +1,4 @@
-{{meta {docid: selections}}}
+{{meta {docid: creating_selections}}}
 
 <style>
   svg {
@@ -18,7 +18,6 @@
 </style>
 
 <script src="https://d3js.org/d3.v5.min.js"></script>
-
 
 
 # Creating Selection
@@ -211,14 +210,6 @@ In the example below, the 5 circle elements have radii between 5 and 25.  We se
 ```
 
 Note that `selection.filter` preserves the parents of the `selection` on which it is called, but does not preserve the indexes of the remaining elements in groups `NodeLists`.
-
-
-## Selection Size
-The `d3.selection` type has two methods that allow us determine if a selection is empty and determine how many elements are in the selection.  Note that unlike other selection methods, these to methods do not return selection objects.
-
-+ [selection.empty()](https://github.com/d3/d3-selection/blob/master/README.md#selection_empty) - returns true if the selection is empty
-+ [selection.size()](https://github.com/d3/d3-selection/blob/master/README.md#selection_size) - returns the number of elements in the selection
-
 
 ## Auxiliary Functions
 

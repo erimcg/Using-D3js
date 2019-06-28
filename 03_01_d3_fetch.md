@@ -8,7 +8,7 @@
     }
 </style>
 
-<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="https://d3js.org/d3-fetch.v1.min.js"></script>
 
 <script>

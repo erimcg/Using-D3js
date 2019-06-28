@@ -1,5 +1,5 @@
 
-{{meta {docid: applying_functions}}}
+{{meta {docid: create_delete_move_elements}}}
 
 <style>
     button{
@@ -45,15 +45,21 @@
 </style>
 <script src="https://d3js.org/d3.v5.min.js"></script>
 
-# Modifying The DOM Using Selections
+# Creating, Deleting, and Moving Elements
 
-D3 has a number of methods that can be used to modify the DOM.  They include the following:
+D3.js has a number of `selection` methods that add, remove, and reposition elements in the DOM.  They include the following:
 
 + [selection.append(type)](https://github.com/d3/d3-selection/blob/master/README.md#selection_append) - create, append, and select new elements
 + [selection.insert(type[, selector])](https://github.com/d3/d3-selection/blob/master/README.md#selection_insert) - create, insert and select new elements
 + [selection.clone([deep])](https://github.com/d3/d3-selection/blob/master/README.md#selection_clone) - insert clones of selected elements
 + [selection.remove()](https://github.com/d3/d3-selection/blob/master/README.md#selection_remove) - remove elements from the document
-+ [selection.call(function[, arguments...])](https://github.com/d3/d3-selection/blob/master/README.md#selection_call) - executes a function on an arbitrary selection
++ [selection.raise()](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_raise) - reinsert selected elements into the DOM as the last child of their respective parents
++ [selection.lower()](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_lower) - reinsert selection elements into the DOM as the last child of their respective parents
+
+D3.js also includes two methods that create elements that are unattached to the DOM.
+
++ [d3.create(name)](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#create) - creates and returns an unattached element in the current document
++ [d3.creator(name)](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#creator) - creates and returns a function that creates unattached elements in the current document.
 
 ## Selection.append
 
@@ -163,7 +169,7 @@ In the example below we have an outer div with its id set to `insertBox`.  Nest
 </div>
 ```
 
-The `insert` method inserts a new element for each element in the selection.  In the example below we create a selection containing the 3 blue boxes and call `insert` on it.  The `insert` method creates 3 new pink boxes and appends each of them as a child of a different blue boxes.
+The `insert` method inserts a new element for each element in the selection.  In the example below we create a selection containing the 3 blue boxes and call `insert` on it.  The `insert` method creates 3 new pink boxes and appends each of them as a child of a different blue box.
 
 ```
 <script>
@@ -232,46 +238,63 @@ The `selection.remove()` method removes the elements in the selection from the D
 </div>
 ```
 
-## Selection.call
+## Selection.raise
 
-The `selection.call` method takes a function as an argument.  When `selection.call` is invoked on a selection, it executes the function that was passed to it and returns the selection on which it was called.  If the function passed to `call`, lets call it `f`, has *k* parameters, then *k* additional arguments must be passed to `call`.  When `f` is executed, the additional values passed to `call` are passed to `f`.
+The [selection.raise()](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_raise) method reinserts the elements in the selection into the DOM as the last child of their respective parents.
 
-This method is useful when you have a set of manipulations that you need to run on multiple selections.  
-
-In the example, below we have a method named `addElements` which adds `n` number of divs before to each element in the selection.  Note: this isn't possible with the `selection.insert` method which inserts elements as children of the elements in the selection.
 ```
 <script>
-
-
-    function addElements(selection, n) {
-      let nodeList = selection.nodes();
-      for (let i = 0; i < nodeList.length; i++) {
-        for (let j = 0; j < n; j++) {
-          let newElm = document.createElement("div");
-          newElm.className = "box aqua-box";
-          nodeList[i].parentNode.insertBefore(newElm, nodeList[i]);
-        }
-      }
-    }
-
-    function addElementsWithCall() {
-        d3.selectAll("#callBoxes > div")
-          .call(addElements, 2);
-    }
+function raise() {  
+  d3.select("#raiseSVG")
+    .selectAll("#pink,#violet")
+    .raise();
+    
+  d3.select("#raiseSVG")
+    .selectAll("circle")
+    .attr("cx", (d, i) => 30 + (i * 60));
+}
 </script>
 
-<button onclick="addElementsWithCall()">Insert Elements</button>
+<svg id="raiseSVG" width="300" height="60">
+  <circle r="25" cx="30" cy="30" fill="lightblue" />
+  <circle id="pink" r="25" cx="90" cy="30" fill="pink" />
+  <circle id="violet" r="25" cx="150" cy="30" fill="violet" />
+  <circle r="25" cx="210" cy="30" fill="lightblue" />
+</svg>
 
-<div id="callBoxes" style="display: inline-block;">
-    <div class="box pink-box"></div>
-    <div class="box pink-box"></div>
-    <div class="box pink-box"></div>
-</div>
+<button onclick="raise()">Raise</button>
 ```
 
-## Auxiliary Methods
+## Selection.lower
 
-D3.js contains a pair of functions that are used to create new elements, as you would `document.createElement` and `document.createElementNS`.
+The [selection.lower()](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_lower) method reinserts the elements in the selection into the DOM as the last child of their respective parents.
+
+```
+<script>  
+function lower() {  
+  d3.select("#lowerSVG")
+    .selectAll("#pink,#violet")
+    .lower();
+    
+  d3.select("#lowerSVG")
+    .selectAll("circle")
+    .attr("cx", (d, i) => 30 + (i * 60)); 
+}
+</script>
+
+<svg id="lowerSVG" width="300" height="60">
+  <circle r="25" cx="30" cy="30" fill="lightblue" />
+  <circle id="pink" r="25" cx="90" cy="30" fill="pink" />
+  <circle id="violet" r="25" cx="150" cy="30" fill="violet" />
+  <circle r="25" cx="210" cy="30" fill="lightblue" />
+</svg>
+
+<button onclick="lower()">Lower</button>
+```
+
+## Creating Unattached Elements
+
+D3.js contains a pair of functions that are used to create new elements that are not to the DOM.
 
 + [d3.create(name)](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#create) - creates and returns an unattached element in the current document
 + [d3.creator(name)](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#creator) - creates and returns a function that creates unattached elements in the current document.
@@ -296,4 +319,3 @@ d3.select("#createSVG")
 <svg id="createSVG" width="400" height="90" ></svg>
 
 ```
-

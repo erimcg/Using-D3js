@@ -56,7 +56,7 @@ Once we have a `d3.selection` object, we can modify the elements in the selectio
 
 + [selection.classed(names[, value])](https://github.com/d3/d3-selection/blob/master/README.md#selection_classed) -  add, remove, and check the existence of CSS classes
 
-+ [selection.html([vaue])](https://github.com/d3/d3-selection/blob/master/README.md#selection_html) - set, remove, or get the inner HTML content
++ [selection.html([value])](https://github.com/d3/d3-selection/blob/master/README.md#selection_html) - set, remove, or get the inner HTML content
 + [selection.text([value])](https://github.com/d3/d3-selection/blob/master/README.md#selection_text) - set, remove, or get the text content
 
 ## Selection.each
@@ -64,7 +64,7 @@ Once we have a `d3.selection` object, we can modify the elements in the selectio
 The `selection.each` method allows us to call a function for each element in a selection.
  The argument to `each` is a function and as with `selection.filter`, we can pass in a named function, unnamed function, or a lambda expression. 
  
-When `each` is executed, the function that is passed to it is executed once for each element in the selection and each time it is executed it is passed `d` (data from a data join), `i` (index), and `nodes` (an array of elements in the current group.)  `nodes[i]` is used to retrieve the current element in the selection for which the function is being called.
+When `each` is executed, the function that is passed to it is executed once for each element in the selection and each time it is executed it is passed `d` (the data bound to the element - See [Chapter 2](http://using-d3js.com/02_01_binding_data.html)), `i` (the element's group index), and `nodes` (the element's group.)  `nodes[i]` is used to retrieve the current element in the selection for which the function is being called.
  
 In the example below, a lambda expression is called for each element in the selection and each time checks to see if the index of the element is even, and if so, sets it's fill color to pink.
 

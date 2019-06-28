@@ -47,7 +47,14 @@
 
 <script src="https://d3js.org/d3.v5.min.js"></script>
 
-# Ordering Elements
+# Reordering Elements
+
+We can reorder elements in a selection of elements that have data bound to them by using the following two `selection` methods.
+
++ [selection.sort(compare)](https://github.com/d3/d3-selection/blob/master/README.md#selection_sort) - reposition in the DOM the selected elements based on a comparator function
++ [selection.order()](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_order) - reposition in the DOM the selected elements based on the order of the elements in the selection.
+
+## Selection.sort
 
 The [selection.sort(compare)](https://github.com/d3/d3-selection/blob/master/README.md#selection_sort) method sorts the elements in a selection based on the *data* that is *bound* to the elements and `compare`, a comparator function, and then reinserts the elements into the DOM in the newly sorted order.
 
@@ -61,7 +68,7 @@ You can pass `sort` a user defined comparator or pass it one of the comparators 
 
 Note that `sort`, only repositions the elements in the DOM.  If the elements need to be repositioned on the screen, based on their new order in the DOM, then the `attr` method should be called after `sort`.
 
-## Sorting Circles
+### Sorting Circles
 
 In the example below we select all of the circles in an SVG, sort them based on their radii, and change their `cx` property so that they appear in sorted order.
   
@@ -105,7 +112,7 @@ function sortByRadius(){
 <button onclick="sortByRadius()">Sort</button>
 ```
 
-## Sorting Bars
+### Sorting Bars
 
 Sometimes we'll bind object data to the elements in a selection and sort them according to some property of the bound data.
 
@@ -236,7 +243,7 @@ function sort() {
 <button onclick="sort()">Sort</button>
 ```
 
-### Swapping Circles
+### Swapping Circles and Squares
 
 The following examples shows how we can reorder a pair of circles using `order`.
 
@@ -343,58 +350,4 @@ function swap3() {
 </div>
 <button onclick="swap2()">Swap 1</button>
 <button onclick="swap3()">Swap 2</button>
-```
-
-## Selection.raise
-
-The [selection.raise()](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_raise) method reinserts the elements in the selection into the DOM as the last child of their respective parents.
-
-```
-<script>
-function raise() {  
-  d3.select("#raiseSVG")
-    .selectAll("#pink,#violet")
-    .raise();
-    
-  d3.select("#raiseSVG")
-    .selectAll("circle")
-    .attr("cx", (d, i) => 30 + (i * 60));
-}
-</script>
-
-<svg id="raiseSVG" width="300" height="60">
-  <circle r="25" cx="30" cy="30" fill="lightblue" />
-  <circle id="pink" r="25" cx="90" cy="30" fill="pink" />
-  <circle id="violet" r="25" cx="150" cy="30" fill="violet" />
-  <circle r="25" cx="210" cy="30" fill="lightblue" />
-</svg>
-
-<button onclick="raise()">Raise</button>
-```
-
-## Selection.lower
-
-The [selection.lower()](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_lower) method reinserts the elements in the selection into the DOM as the last child of their respective parents.
-
-```
-<script>  
-function lower() {  
-  d3.select("#lowerSVG")
-    .selectAll("#pink,#violet")
-    .lower();
-    
-  d3.select("#lowerSVG")
-    .selectAll("circle")
-    .attr("cx", (d, i) => 30 + (i * 60)); 
-}
-</script>
-
-<svg id="lowerSVG" width="300" height="60">
-  <circle r="25" cx="30" cy="30" fill="lightblue" />
-  <circle id="pink" r="25" cx="90" cy="30" fill="pink" />
-  <circle id="violet" r="25" cx="150" cy="30" fill="violet" />
-  <circle r="25" cx="210" cy="30" fill="lightblue" />
-</svg>
-
-<button onclick="lower()">Lower</button>
 ```
