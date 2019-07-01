@@ -15,14 +15,19 @@
 
 In this section we will be discussing d3 polygons. 
 Polygons are used on their own.
+In this section we will utilize [d3.line()](./05_03_lines.html).
 
 ## Polygons
 
-In all the other shape sections we have been using points to draw lines to represent our data. 
-However, in polygons we do not draw lines between all of our points, instead we use polygons to draw a line *around the perimeter of all the points*.
+In all the other shape sections we have been using points to draw lines or paths to represent our data. 
+However, in polygons we do not draw lines between all of our points, instead we use polygons to draw a line *around the perimeter of the points*.
 
-In order to create our polygons we need to pass `d3.polygonHull` an array of points. Unlike most other shapes, we cannot define our `x` and `y` positions within a larger data set. 
-This means that whatever array we pass in *must* be in a form of: `[[x1, y1], [x2, y2], [x3, y3]...]`
+Unlike many other shapes, there is no `d3.polygon` generator function. Instead a "polygon" is an array that contains the perimeter points organized counterclockwise around (0,0). 
+To get a perimeter array we can pass `d3.polygonHull` an array of many points and it will return a perimeter array. 
+This perimeter array can also be referred to being the polygon itself, the outline, or the hull.
+
+As we discussed, in order to create our polygons we need to pass `d3.polygonHull` an array of points. Unlike most other shapes, we cannot define our `x` and `y` positions within a larger data set. 
+This means that whatever array we pass in *must* be in a form of: <br> `[[x1, y1], [x2, y2], [x3, y3]...]`.
 
 These are the points we will be using:
 <pre>
@@ -33,38 +38,27 @@ var points = [
 ];
 </pre>
 
-`d3.polygonHull` can take this array of points and it will return another array that contains the outline of the array passed in. 
-The new outline array that `d3.polygonHull` returns has its points ordered counter-clockwise around the origin point {0,0}.
+Now that we have all our points, we can pass this array into `d3.polygonHull()` to get our perimeter array or hull: 
 
-+ [d3.polygonHull(points)](https://github.com/d3/d3-polygon#polygonHull)
++ [d3.polygonHull(points)](https://github.com/d3/d3-polygon#polygonHull) - Takes an array of points and returns the perimeter/outline or "hull" ordered counterclockwise around (0,0).
 
 <pre>
 var hull = d3.polygonHull(points);
 </pre>
 
-There is no `d3.polygon` generator function, this means that if we want to visually display our polygon we have to generate the `d` attribute of our path ourselves. 
-Since we should be able to draw to canvasses or SVGs, we will be using this function to draw the hull:
-``` {cm: visible}
-<script>
-function drawHull(context, hull){
-    context.moveTo(hull[0][0], hull[0][1]);
-    for(var i = 1; i < hull.length; ++i){
-        context.lineTo(hull[i][0], hull[i][1]);
-    }
-    context.fillStyle = "red";
-    context.strokeStyle = "black";
-    context.closePath();
-    return context;
-}
-</script>
-```
-
-Now we just append a path to our SVG and call `drawHull` on its `d` attribute.
-
+Since there is no `d3.polygon` generator function to pass into the `d` attribute of a `path`, if we want to visually display our polygon we have to use [`d3.line()`](./05_03_lines.html):
 <pre>
-d3.select("#demoPolygon")
+var line = d3.line()
+    .x(d => d[0])
+    .y(d => d[1])
+    .curve(d3.curveLinearClosed);
+</pre>
+
+Now we can append a `path` to our `svg` and call `line(hull)` on its `d` attribute.
+<pre>
+d3.select("#svg")
     .append("path")
-    .attr("d", drawHull(d3.path(), hull))
+    .attr("d", line(hull))
     .attr("stroke", "black")
     .attr("fill", "red");
 </pre>
@@ -78,17 +72,18 @@ var points = [
 ];
 var hull = d3.polygonHull(points);
 
-context = d3.select("#demoPolygonC").node().getContext("2d");
-drawHull(context, hull).fill(); // sets the context and fills it
-context.stroke(); // adds the stroke outline to the canvas
+var line = d3.line()
+    .x(d => d[0])
+    .y(d => d[1])
+    .curve(d3.curveLinearClosed);
 
-d3.select("#demoPolygonSVG") //adds the hull to the SVG
-    .append("path")
-    .attr("d", drawHull(d3.path(), hull))
+d3.select("#demoPolygonLine") //adds the hull to the SVG
+	.append("path")
+    .attr("d", line(hull))
     .attr("stroke", "black")
     .attr("fill", "red");
     
-d3.select("#demoPolygonSVG") // adds all the nodes to the SVG
+d3.select("#demoPolygonLine") // adds all the nodes to the SVG
 	.selectAll()
     .data(points)
     .join("circle")
@@ -97,19 +92,19 @@ d3.select("#demoPolygonSVG") // adds all the nodes to the SVG
     .attr("r", 2);
 </script>
 
-<canvas id="demoPolygonC" width=200 height=200></canvas>
-<svg id="demoPolygonSVG" width=200 height=200></svg>
+<svg id="demoPolygonLine" width=200 height=200></svg>
 ```
 
 ## Additional Methods
 
-Polygons have additional utility methods that other shapes do not.
+Polygons have additional utility methods that other shapes do not:
 
 + [d3.polygonArea(polygon)](https://github.com/d3/d3-polygon#polygonArea) - Takes a polygon hull array and returns back the array of the polygon.
-+ [d3.polygonCentroid(polygon) ](https://github.com/d3/d3-polygon#polygonCentroid) - Takes a polygon hull array and returns back the coordinates of the polygons centroid. 
-
-+ [d3.polygonContains(polygon, point)](https://github.com/d3/d3-polygon#polygonContains) - Takes a polygon hull array and a point and returns true or false in the point is inside the polygon.
 + [d3.polygonLength(polygon)](https://github.com/d3/d3-polygon#polygonLength) - Takes a polygon hull array and returns the perimeter of the polygon.
+
++ [d3.polygonCentroid(polygon) ](https://github.com/d3/d3-polygon#polygonCentroid) - Takes a polygon hull array and returns back the coordinates of the polygons centroid as an array. 
++ [d3.polygonContains(polygon, point)](https://github.com/d3/d3-polygon#polygonContains) - Takes a polygon hull array and a point and returns true or false in the point is inside the polygon.
+
 
 ```
 <script>
@@ -121,11 +116,17 @@ var points = [
 var hull = d3.polygonHull(points);
 var selection = d3.select("#demoMethods");
 
+var line = d3.line()
+    .x(d => d[0])
+    .y(d => d[1])
+    .curve(d3.curveLinearClosed);
+
 selection //adds the hull to the SVG
-    .append("path")
-    .attr("d", drawHull(d3.path(), hull))
+	.append("path")
+    .attr("d", line(hull))
     .attr("stroke", "black")
     .attr("fill", "red");
+    
 selection // adds all the nodes to the SVG
 	.selectAll()
     .data(points)
