@@ -7,7 +7,7 @@
     .sandbox-output { text-align: center;}
 </style>
 
-# Lines and Radial Lines
+# Lines
 In this section we'll discuss how to draw lines. Lines can be used on their own, but they are also used in many other areas of this chapter such as [areas](./05_04_areas.html) and [links](./05_06_links.html).
 
 ## Lines

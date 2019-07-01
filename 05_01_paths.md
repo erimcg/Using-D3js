@@ -207,8 +207,7 @@ function addRectOutline(origin, width, height, selection){
 
 # Paths
 
-In this section we will discuss Canvas contexts, SVG paths, and `d3.path()`, 
-a D3 utility for converting [CanvasPathMethods](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D#Paths) into a usable string that can be used by an SVG path.
+In this section we discuss `d3.path()`, a utility for creating strings that describe SVG path.
 This benefits us by letting us make shapes, lines, or any other graphic only once and be usable by both SVGs and Canvasses.
 `d3.path()` can be used by itself, and it is utilized by every other shape in this chapter.
 
@@ -246,56 +245,6 @@ d3.select("#demoSvgPath")
 <svg id="demoSvgPath" width="100" height="100"></svg>
 ```
 
-## Canvas
-
-Canvasses are an newer alternative to SVGs that offer [more advanced features with more applications](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API). 
-However, for the purposes of this book, we will only be discussing what relates to D3 and we will continue to use SVGs for most of our examples.
-
-Canvasses have a similar set-up in HTML compared to SVGs:
-<pre>
-&lt;canvas id="canvas1" width="200" height="100">&lt;/canvas>
-</pre> 
-
-Unlike SVGs, where we could place additional tags inside of our SVG tag, with canvasses we have to use javascript to add visual elements to a canvas. To add visual elements we call function on a canvas' `context`. 
-We can get this context by first selecting the canvas, and then using `getContext('2d')` on the canvas node:
-<pre>
-var canvas = d3.select("#canvas1");
-var context = canvas.node().getContext('2d');
-</pre> 
-
-Now that we have the context we can begin to call methods on it that tell how something should be drawn on the canvas. There are many similar commands compared to SVG command; however, now they are just functions we call instead of setting a string. 
-For example to do the same shape as the SVG exampe:
-<pre>
-context.moveTo(25,25);
-context.lineTo(75,25);
-context.lineTo(75,75);
-context.closePath();
-
-context.fillStyle = "red";
-context.fill(); //Adds the background color
-
-context.stroke(); // Adds the lines
-</pre>
-
-[For a complete list of all available Canvas Rendering Context 2d commands and their syntax.](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D)
-
-```
-<script>
-var canvas = d3.select("#canvas1");
-var context = canvas.node().getContext('2d');
-
-context.moveTo(25,25); //Sets the line paths
-context.lineTo(75,25);
-context.lineTo(75,75);
-context.closePath();
-
-context.fillStyle = "red"; //Sets the background color
-context.fill(); //Adds the background color
-
-context.stroke(); // Adds the lines
-</script>
-<canvas id="canvas1" width="100" height="100"></canvas>
-```
 
 ## d3.path
 
@@ -857,3 +806,57 @@ function addRectOutline(origin, width, height, selection){
         </marker>
     </defs>
 </svg>
+
+
+## Canvas
+
+[canvas path methods](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D#Paths) 
+
+Canvasses are an newer alternative to SVGs that offer [more advanced features with more applications](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API). 
+However, for the purposes of this book, we will only be discussing what relates to D3 and we will continue to use SVGs for most of our examples.
+
+Canvasses have a similar set-up in HTML compared to SVGs:
+<pre>
+&lt;canvas id="canvas1" width="200" height="100">&lt;/canvas>
+</pre> 
+
+Unlike SVGs, where we could place additional tags inside of our SVG tag, with canvasses we have to use javascript to add visual elements to a canvas. To add visual elements we call function on a canvas' `context`. 
+We can get this context by first selecting the canvas, and then using `getContext('2d')` on the canvas node:
+<pre>
+var canvas = d3.select("#canvas1");
+var context = canvas.node().getContext('2d');
+</pre> 
+
+Now that we have the context we can begin to call methods on it that tell how something should be drawn on the canvas. There are many similar commands compared to SVG command; however, now they are just functions we call instead of setting a string. 
+For example to do the same shape as the SVG exampe:
+<pre>
+context.moveTo(25,25);
+context.lineTo(75,25);
+context.lineTo(75,75);
+context.closePath();
+
+context.fillStyle = "red";
+context.fill(); //Adds the background color
+
+context.stroke(); // Adds the lines
+</pre>
+
+[For a complete list of all available Canvas Rendering Context 2d commands and their syntax.](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D)
+
+```
+<script>
+var canvas = d3.select("#canvas1");
+var context = canvas.node().getContext('2d');
+
+context.moveTo(25,25); //Sets the line paths
+context.lineTo(75,25);
+context.lineTo(75,75);
+context.closePath();
+
+context.fillStyle = "red"; //Sets the background color
+context.fill(); //Adds the background color
+
+context.stroke(); // Adds the lines
+</script>
+<canvas id="canvas1" width="100" height="100"></canvas>
+```
