@@ -16,7 +16,9 @@ for (let file of fs.readdirSync(".").sort()) {
   let meta = (/{{meta (.*)}}/.exec(text) || {1: "{}"})[1]
   let includes = /\bload_files: (\[.*?\])/.exec(meta)
   if (includes) includes = JSON.parse(includes[1]);
-  console.log(text);
+
+  //console.log("filename: " + text.match(/(?:^|\n)# (.*?)\n/)[0]);
+
   let chapter = {number: +chapNum,
                  id: match[1],
                  title: text.match(/(?:^|\n)# (.*?)\n/)[1],

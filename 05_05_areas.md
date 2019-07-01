@@ -6,6 +6,7 @@
     svg { background-color: white; display: inline-block;}
     .sandbox-output { text-align: center;}
 </style>
+
 # Areas and Area Radials
 In this tutorial we will discuss how to draw areas and area radials. Areas can be used on their own or with [stacks](./05_08_stacks.html).
 

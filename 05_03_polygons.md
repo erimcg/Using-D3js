@@ -7,11 +7,8 @@
     .sandbox-output { text-align: center;}
 </style>
 
-<script>
-//Put any global scripts here
-</script>
-
 # Polygons
+
 
 In this section we will be discussing d3 polygons. 
 Polygons are used on their own.

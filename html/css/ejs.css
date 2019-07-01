@@ -45,6 +45,11 @@ nav a {
   text-decoration: none !important;
 }
 
+svg {
+    background-color: white;
+    display: inline-block;
+}
+
 a.subtlelink {
   color: black !important;
   text-decoration: none !important;
@@ -228,6 +233,7 @@ blockquote footer:before {
   /*white-space: pre;*/
   max-height: 25em;
   overflow: auto;
+  text-align: center;
 }
 
 .sandbox-output:empty {
