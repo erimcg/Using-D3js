@@ -1,0 +1,31 @@
+<html>
+
+<head>
+  <title>Using D3.js></title>
+
+  <style>
+    div {
+      display:inline-block;
+      text-align: center;
+    }
+  </style>
+
+</head>
+
+<body>
+
+<div>
+  <h3> Sorry! </h3>
+  <p style="font-size: medium">The link you're trying to find has been changed.  Please see the text's
+  table of contents for the new link.  Thank you.</p>
+  <p style="font-size: small">You should be redirected in a few seconds.  If not, please click <a href="using-d3js.com">here</a>.</p>
+
+</div>
+
+
+
+
+</body>
+
+
+</html>
