@@ -46,8 +46,8 @@ nav a {
 }
 
 svg {
-    background-color: white;
-    display: inline-block;
+  background-color: white;
+  display: inline-block;
 }
 
 a.subtlelink {
@@ -93,7 +93,6 @@ p:hover a.p_ident:after, pre:hover a.c_ident:after, h2:hover a.h_ident:after, h3
     right: -13px;
   }
 }
-
 
 code, pre, .CodeMirror {
   font-size: 14px;
@@ -217,7 +216,7 @@ blockquote footer:before {
 }
 
 .editor-wrap {
-  margin: 1rem 0;
+  margin: 1rem 0 0 0;
   position: relative;
   -moz-transition: margin-left .5s ease-out, margin-right .5s ease-out;
   -webkit-transition: margin-left .5s ease-out, margin-right .5s ease-out;
@@ -423,6 +422,16 @@ figure {
   margin: 0 30px;
 }
 
+figure.sandbox {
+  text-align: center;
+  margin-top: 2px;
+}
+
+figcaption {
+  color: #4ab;
+  font-size: 0.80em;
+}
+
 figure.chapter {
   text-align: center;
   margin: 3em 0 2em;
@@ -453,6 +462,7 @@ span.keyname { font-variant: small-caps }
 figure img {
   max-width: 100%;
 }
+
 
 div.solution:before {
   content: "» Display hints...";
@@ -501,4 +511,10 @@ sub {
 
 sup {
   font-size: 70%;
+}
+
+aside {
+  margin: 40px 0 0 0;
+  padding: 20px 20px;
+  background-color: #F8F8F8;
 }
