@@ -212,7 +212,7 @@ SVG's can contain [various elements](https://developer.mozilla.org/en-US/docs/We
 `Paths` can be appended to `svgs` like `lines` and `rects` and have similar attributes, such as `stroke` and `fill`.
 `Paths`, however, have a `d` attribute that defines its shape and position. 
 
-The `d` attribute contains a string that specifies *commands* and numbers which define instructions for drawing the path. Multiple commands can be chained together in a single string and are read from left to right.
+The `d` attribute contains a string that specifies *commands* and numbers which define command parameters. Multiple commands can be chained together in a single string and are read from left to right.
 
 For example, to create a path that starts at the point *(25,25)*, draws a line to *(75,25)*, then draws a line to *(75,75)* and finally closes the path we can use the following path definition.
 

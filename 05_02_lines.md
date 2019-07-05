@@ -9,7 +9,7 @@
 
 # Lines
 
-In this section we'll discuss how to draw lines. Lines can be used on their own, but they are also used in many other areas of this chapter such as [areas](./05_04_areas.html) and [links](./05_06_links.html).
+In this section we'll discuss how to draw lines using D3.js' line generator. Lines can be used on their own, but they're also used in many other areas of this chapter such as [areas](./05_05_areas.html) and [links](./05_08_links.html).
 
 ## Lines
 
@@ -50,6 +50,7 @@ We use these methods to generate the line shown below.
 
 <svg id="demo" width="200" height="200"></svg>
 ```
+<figure class="sandbox"><figcaption>Figure 1. .</figcaption></figure>
 
 To begin we create an array of data and scales that will be used to scale the data to fit the svg.
 
@@ -129,6 +130,7 @@ d3.select("#demo1")
 
 <svg id="demo1" width="200" height="200"></svg>
 ```
+<figure class="sandbox"><figcaption>Figure 2. .</figcaption></figure>
 
 ### Excluding Points
 Sometimes we may want to exclude certain points on the line. To do this we can call [line.defined([defined])](https://github.com/d3/d3-shape#line_defined) on our line generator.
@@ -176,6 +178,7 @@ When we remove a point, the line segments that would have been created using tha
 
 <svg id="demo2" width="200" height="200"></svg>
 ```
+<figure class="sandbox"><figcaption>Figure 3. .</figcaption></figure>
 
 ### Curving the Line
 
@@ -220,6 +223,7 @@ var line = d3.line()
 
 <svg id="demo3" width="200" height="200"></svg>
 ```
+<figure class="sandbox"><figcaption>Figure 4. .</figcaption></figure>
 
 We discuss curves in-depth in the section on [curves](05_05_curves.html).
 
@@ -267,6 +271,7 @@ A radial line is a line where each point on the line is determined by an origin,
     <g transform="translate(100,100)"></g>
 </svg>
 ```
+<figure class="sandbox"><figcaption>Figure 5. .</figcaption></figure>
 
 For the angle generator, we will use the same x values as before, but change the `scaleLinear.range` to be between 0 and 2*Math.PI (the number of radians around a circle) and for the radius generator we will use the y values, but change the `scaleLinear.range` to return a value between 40 and 80.
 
@@ -328,6 +333,7 @@ var lineRadial = d3.lineRadial()
     <g transform="translate(100,100)"></g>
 </svg>
 ```
+<figure class="sandbox"><figcaption>Figure 6. .</figcaption></figure>
 
 + [line.context([context])](https://github.com/d3/d3-shape#line_context) (Not Shown)
 + [lineRadial.context([context])](https://github.com/d3/d3-shape#lineRadial_context) (Not Shown)
