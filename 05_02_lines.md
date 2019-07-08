@@ -2,140 +2,245 @@
 
 <script src="https://d3js.org/d3.v5.min.js"></script>
 
-<style>
-    svg { background-color: white; display: inline-block;}
-    .sandbox-output { text-align: center;}
-</style>
-
 # Lines
 
-In this section we'll discuss how to draw lines. Lines can be used on their own, but they are also used in many other areas of this chapter such as [areas](./05_04_areas.html) and [links](./05_06_links.html).
+We learned in the previous section that we can draw lines in an SVG by creating a `path` element and setting its `d` attribute to a string that describes the path.  We also learned that we can create a string that describes a path using `d3.path` rather than manually writing the path description string.  When we use `d3.path`, however, we have to know the actual *x* and *y* coordinates of the starting, ending, and control points for the lines.  In this section we'll discuss how to use [d3.line()](https://github.com/d3/d3-shape#lines), a line generator, which generates path description strings by interpolating the coordinates from an array of data.
 
-## Lines
+To begin, we create an instance of the line generator on which we can call various line methods, which themselves return a reference to `this` line generator, allowing us to chain multiple line method calls.
 
-D3 provides [d3.line()](https://github.com/d3/d3-shape#lines), a method that returns a line generator that can be used to create a polyline or a spline.
+<pre>
+var line = d3.line();
+</pre>
 
-In order to render a line, the line generator computes the points for the line.  To compute the points it requires an array of data and functions for computing x and y values from that data.  The points generated from the data are used as endpoints or control points of line segments or curves, respectively.  The other points are interpolated and by default a linear interpolation is used.
+By default, the line generator assumes the data set is an array of coordinates, where each coordinate is specified by an array of two elements, *[x,y]*.  
 
-+ [line(data)](https://github.com/d3/d3-shape#_line) - invoke the line generator using the array of data passed to it
-+ [line.x([x])](https://github.com/d3/d3-shape#line_x) - sets the x accessor to the argument passed to it which may be either a number or a function that returns a number
-+ [line.y([y])](https://github.com/d3/d3-shape#line_y) - sets the y accessor to the argument passed to it which may be either a number or a function that returns a number
-
-We use these methods to generate the line shown below.
-
-```
-<script>
- var data = [
-    {x: 0, y: 0},
-    {x: 1, y: 3},
-    {x: 2, y: 12},
-    {x: 3, y: 8},
-    {x: 4, y: 17},
-    {x: 5, y: 15},
-    {x: 6, y: 20}];
-
-   var xScale = d3.scaleLinear().domain([0, 6]).range([25, 175]);
-   var yScale = d3.scaleLinear().domain([0,20]).range([175, 25]);
-
-   var line = d3.line()
-      .x(d => xScale(d.x))
-      .y(d => yScale(d.y));
-
-   d3.select("#demo")
-    .append("path")
-    .attr("d", line(data))
-    .attr("fill", "none")
-    .attr("stroke", "black");
-</script>
-
-<svg id="demo" width="200" height="200"></svg>
-```
-
-To begin we create an array of data and scales that will be used to scale the data to fit the svg.
+The line shown in Figure 2 is generated using the following array of coordinates.
 
 <pre>
 var data = [
-    {x: 0, y: 0},
-    {x: 1, y: 3},
-    {x: 2, y: 12},
-    {x: 3, y: 8},
-    {x: 4, y: 17},
-    {x: 5, y: 15},
-    {x: 6, y: 20}];
+  [25,  175],
+  [50,  152.5],
+  [75,  85],
+  [100, 115],
+  [125, 47.5],
+  [150, 62.5],
+  [175, 25]];
+</pre>
+
+We can now compute the SVG `path` description string by invoking [line(data)](https://github.com/d3/d3-shape#_line).
+
+<pre>
+var desc = line(data);
+</pre>
+
+```
+<script>
+var data = [
+  [25,  175],
+  [50,  152.5],
+  [75,  85],
+  [100, 115],
+  [125, 47.5],
+  [150, 62.5],
+  [175, 25]];
+
+var line = d3.line();
+var desc = line(data);
+
+console.log(desc);
+</script>
+```
+<figure class="sandbox"><figcaption>Figure 1. Path element description string.</figcaption></figure>
+
+We then render the line in an `svg` element by setting a `path` element's `d` attribute equal to `line(data)`.
+
+```
+<script>
+var data = [
+  [25,  175],
+  [50,  152.5],
+  [75,  85],
+  [100, 115],
+  [125, 47.5],
+  [150, 62.5],
+  [175, 25]];
+
+var line = d3.line();
+
+d3.select("#demo1")
+  .append("path")
+  .attr("d", line(data))
+  .attr("fill", "none")
+  .attr("stroke", "red");
+</script>
+
+<svg id="demo1" width="200" height="200"></svg>
+```
+<figure class="sandbox"><figcaption>Figure 2. Line created using an array of coordinates.</figcaption></figure>
+
+## Accessor Methods
+
+The line generator has two methods that can be called to assign the line generator custom *x* and *y* coordinate accessors.
+
++ [line.x([x])](https://github.com/d3/d3-shape#line_x) - sets or gets the x accessor.  If `x` is provided, it must be a number or a function that returns a number.  If `x` is not provide, returns the *x* coordinate accessor function. 
++ [line.y([y])](https://github.com/d3/d3-shape#line_y) - sets or gets the y accessor.  If `y` is provided, it must be a number or a function that returns a number.  If `y` is not provide, returns the *y* coordinate accessor function. 
+
+When `line.x` and `line.y` are passed functions (or lambda expressions), the functions are called for each element in the dataset and when called, are passed the current data element `d`, the index of the current element `i`, and the array of data on which the generator is invoked, `data`.
+
+When `line.x` and `line.y` are called without an argument, the methods return the line generator's current accessor.
+
+In Figure 3, the data source is an array of objects, where each object contains two properties: `day` and `rank`.  In order to use the values in the `day` and `rank` properties as *x* and *y* coordinates, respectfully, we set *x* and *y* accessor functions.
+
+<pre>
+var data = [
+  {day: 25,  rank: 175},
+  {day: 50,  rank: 152.5},
+  {day: 75,  rank: 85},
+  {day: 100, rank: 115},
+  {day: 125, rank: 47.5},
+  {day: 150, rank: 62.5},
+  {day: 175, rank: 25}];
+
+var line = d3.line()
+  .x((d) => d.day)
+  .y((d) => d.rank);
+</pre>
+
+```
+<script>
+var data = [
+  {day: 25,  rank: 175},
+  {day: 50,  rank: 152.5},
+  {day: 75,  rank: 85},
+  {day: 100, rank: 115},
+  {day: 125, rank: 47.5},
+  {day: 150, rank: 62.5},
+  {day: 175, rank: 25}];
+
+var line = d3.line()
+  .x((d) => d.day)
+  .y((d) => d.rank);
+
+d3.select("#demo2")
+  .append("path")
+  .attr("d", line(data))
+  .attr("fill", "none")
+  .attr("stroke", "red");
+    
+</script>
+
+<svg id="demo2" width="200" height="200"></svg>
+```
+<figure class="sandbox"><figcaption>Figure 3. Line created using array of objects and accessor functions.</figcaption></figure>
+
+In Figure 4, we use `d3.scaleLinear` to scale the data in the dataset.  To begin, we create an array of data and create scales that will be used to scale the data to fit the svg.
+
+<pre>
+var data = [
+  {x: 0, y: 0},
+  {x: 1, y: 3},
+  {x: 2, y: 12},
+  {x: 3, y: 8},
+  {x: 4, y: 17},
+  {x: 5, y: 15},
+  {x: 6, y: 20}];
 
 var xScale = d3.scaleLinear().domain([0, 6]).range([25, 175]);
 var yScale = d3.scaleLinear().domain([0,20]).range([175, 25]);
 </pre>
 
-Next, we create a line generator and set the x and y accessor functions.
+Next, we create a line generator and use the scales in the *x* and *y* accessor methods.
 
 <pre>
 var line = d3.line()
-    .x(d => xScale(d.x))
-    .y(d => yScale(d.y));
-</pre>
-
-Finally, we append a `path` element to the svg element and explicitly call the line generator, passing the data array to it, to get a string that can be used for the `d` attribute.
-
-<pre>
-d3.select("#demo1")
-    .append("path")
-    .attr("d", line(data))
-    .attr("fill", "none")
-    .attr("stroke", "black");
-</pre>
-
-### Using Joined Data to Set the Path String
-
-We can also compute the `d` attribute of a `path` element, not by calling the line generator directly, but rather, by joining the data to the `path` element and by passing the line generator as the second argument of `selection.attr` when setting the `d` attribute.
-
-The line generator is automatically called for each element in the array that was joined to the `path` element.
-
-<pre>
-d3.select("#demo1")
-  .append("path")
-  .data([data])
-  .attr("d", line)
-  .attr("fill", "none")
-  .attr("stroke", "black");
+  .x(d => xScale(d.x))
+  .y(d => yScale(d.y));
 </pre>
 
 ```
 <script>
- var data = [
-    {x: 0, y: 0},
-    {x: 1, y: 3},
-    {x: 2, y: 12},
-    {x: 3, y: 8},
-    {x: 4, y: 17},
-    {x: 5, y: 15},
-    {x: 6, y: 20}];
-   
-   var xScale = d3.scaleLinear().domain([0, 6]).range([25, 175]);
-   var yScale = d3.scaleLinear().domain([0,20]).range([175, 25]);
-  
-   var line = d3.line()
-      .x(d => xScale(d.x))
-      .y(d => yScale(d.y));
-      
-   d3.select("#demo1")
-    .append("path")
-    .data([data])
-    .attr("d", line)
-    .attr("fill", "none")
-    .attr("stroke", "black");
+var data = [
+  {x: 0, y: 0},
+  {x: 1, y: 3},
+  {x: 2, y: 12},
+  {x: 3, y: 8},
+  {x: 4, y: 17},
+  {x: 5, y: 15},
+  {x: 6, y: 20}];
 
+var xScale = d3.scaleLinear().domain([0, 6]).range([25, 175]);
+var yScale = d3.scaleLinear().domain([0,20]).range([175, 25]);
+
+var line = d3.line()
+  .x(d => xScale(d.x))
+  .y(d => yScale(d.y));
+
+d3.select("#demo3")
+  .append("path")
+  .attr("d", line(data))
+  .attr("fill", "none")
+  .attr("stroke", "red");
 </script>
 
-<svg id="demo1" width="200" height="200"></svg>
+<svg id="demo3" width="200" height="200"></svg>
 ```
+<figure class="sandbox"><figcaption>Figure 4. Line created using accessor functions and scales.</figcaption></figure>
 
-### Excluding Points
-Sometimes we may want to exclude certain points on the line. To do this we can call [line.defined([defined])](https://github.com/d3/d3-shape#line_defined) on our line generator.
+## Using Bound Data
 
-+ [line.defined([defined])](https://github.com/d3/d3-shape#line_defined) - takes as an argument a boolean or a function that returns a boolean.  For each point, if the value returned is true, the point is kept, otherwise it is removed.
+We can also compute the `d` attribute of a `path` element, not by invoking the line generator directly, but rather, by joining the data to the `path` element and then passing the line generator as the second argument of `selection.attr` when setting the `d` attribute.
 
-Using the same data as above, to exclude the 4th index in the series we include a call to `line.defined` when defining the line generator:
+<pre>
+d3.select("#demo1")
+  .append("path")
+  .data([data])          // bind the dataset to the path element
+  .attr("d", line)       // pass the line generator
+  .attr("fill", "none")
+  .attr("stroke", "red");
+</pre>
+
+Note how we bind the dataset to the `path` element by passing to `selection.data` an *array* containing the dataset (`[data]`), not the dataset itself.  Also note that we pass the line generator itself to `selection.attr` not the string created by the line generator.
+
+```
+<script>
+var data = [
+  {x: 0, y: 0},
+  {x: 1, y: 3},
+  {x: 2, y: 12},
+  {x: 3, y: 8},
+  {x: 4, y: 17},
+  {x: 5, y: 15},
+  {x: 6, y: 20}];
+
+var xScale = d3.scaleLinear().domain([0, 6]).range([25, 175]);
+var yScale = d3.scaleLinear().domain([0,20]).range([175, 25]);
+
+var line = d3.line()
+  .x(d => xScale(d.x))
+  .y(d => yScale(d.y));
+
+d3.select("#demo4")
+  .append("path")
+  .data([data])
+  .attr("d", line)
+  .attr("fill", "none")
+  .attr("stroke", "red");
+</script>
+
+<svg id="demo4" width="200" height="200"></svg>
+```
+<figure class="sandbox"><figcaption>Figure 5. Line created from data bound to a path element.</figcaption></figure>
+
+Note that the dataset is passed to `selection.data` inside an array.
+
+## Excluding Points
+Sometimes we may want to exclude certain points on the line. To do this we can set the *defined* accessor function by calling [line.defined([defined])](https://github.com/d3/d3-shape#line_defined) on our line generator.
+
++ [line.defined([defined])](https://github.com/d3/d3-shape#line_defined) - takes as an argument a boolean or a function that returns a boolean.  
+
+When the line generator computes points, it invokes the *defined* accessor for each element in the dataset, passing it the current data element `d`, the index of the current element `i`, and the array of data on which the generator is invoked, `data`.  If the *defined* accessor evaluates to true, a point is generated for the data element, otherwise the element is ignored.  By default, the *defined* accessor returns true for all elements in the dataset.
+
+In Figure 6 we exclude the point that was generated from the data element at index 4 by passing a lambda expression to `line.defined` which returns true unless `i` is `4`.
 
 <pre>
 var line = d3.line()
@@ -144,44 +249,44 @@ var line = d3.line()
   .defined((d,i) => i != 4);
 </pre> 
 
-When we remove a point, the line segments that would have been created using that point are omitted.
-
 ```
 <script>
- var data = [
-    {x: 0, y: 0},
-    {x: 1, y: 3},
-    {x: 2, y: 12},
-    {x: 3, y: 8},
-    {x: 4, y: 17},
-    {x: 5, y: 15},
-    {x: 6, y: 20}];
-   
- var xScale = d3.scaleLinear().domain([0, 6]).range([25, 175]);
- var yScale = d3.scaleLinear().domain([0,20]).range([175, 25]);
-  
-   var line = d3.line()
-      .x(d => xScale(d.x))
-      .y(d => yScale(d.y))
-      .defined((d,i) => i != 4);
-      
- d3.select("#demo2")
-    .append("path")
-    .data([data])
-    .attr("d", line)
-    .attr("fill", "none")
-    .attr("stroke", "black");
+var data = [
+  {x: 0, y: 0},
+  {x: 1, y: 3},
+  {x: 2, y: 12},
+  {x: 3, y: 8},
+  {x: 4, y: 17},
+  {x: 5, y: 15},
+  {x: 6, y: 20}];
 
+var xScale = d3.scaleLinear().domain([0, 6]).range([25, 175]);
+var yScale = d3.scaleLinear().domain([0,20]).range([175, 25]);
+
+var line = d3.line()
+  .x(d => xScale(d.x))
+  .y(d => yScale(d.y))
+  .defined((d,i) => i != 4);
+
+d3.select("#demo5")
+  .append("path")
+  .data([data])
+  .attr("d", line)
+  .attr("fill", "none")
+  .attr("stroke", "red");
 </script>
 
-<svg id="demo2" width="200" height="200"></svg>
+<svg id="demo5" width="200" height="200"></svg>
 ```
+<figure class="sandbox"><figcaption>Figure 6. Line with a missing point.</figcaption></figure>
 
-### Curving the Line
+## Curving the Line
 
-To create a curve we need to change the way that the points are interpolated.  For this we can call [line.curve([curve])](https://github.com/d3/d3-shape#line_curve) passing in a predefined curve factory.
+To create a curve we need to change the way that the points are interpolated.  For this we can call [line.curve([curve])](https://github.com/d3/d3-shape#line_curve) passing it a predefined curve factory.  D3.js provides several curve factories which we discuss in the section on [curves](05_04_curves.html).
 
-The example below demonstrates the use of the d3.curveBasis curve factory when creating a line generator.
+If `line.curve` is called without an argument, the current curve factory is returned, which by default is the [d3.curveLinear](https://github.com/d3/d3-shape/blob/v1.3.4/README.md#curveLinear) curve factory.
+
+Figure 7 sets the line generator's curve factory to `d3.curveBasis` producing a cubic basis spline.
 
 <pre>
 var line = d3.line()
@@ -192,142 +297,91 @@ var line = d3.line()
 
 ```
 <script>
- var data = [
-    {x: 0, y: 0},
-    {x: 1, y: 3},
-    {x: 2, y: 12},
-    {x: 3, y: 8},
-    {x: 4, y: 17},
-    {x: 5, y: 15},
-    {x: 6, y: 20}];
+var data = [
+  {x: 0, y: 0},
+  {x: 1, y: 3},
+  {x: 2, y: 12},
+  {x: 3, y: 8},
+  {x: 4, y: 17},
+  {x: 5, y: 15},
+  {x: 6, y: 20}];
 
- var xScale = d3.scaleLinear().domain([0, 6]).range([25, 175]);
- var yScale = d3.scaleLinear().domain([0,20]).range([175, 25]);
+var xScale = d3.scaleLinear().domain([0, 6]).range([25, 175]);
+var yScale = d3.scaleLinear().domain([0,20]).range([175, 25]);
 
-   var line = d3.line()
-      .x(d => xScale(d.x))
-      .y(d => yScale(d.y))
-      .curve(d3.curveBasis);
-      
- d3.select("#demo3")
-    .append("path")
-    .data([data])
-    .attr("d", line)
-    .attr("fill", "none")
-    .attr("stroke", "black");
-
-</script>
-
-<svg id="demo3" width="200" height="200"></svg>
-```
-
-We discuss curves in-depth in the section on [curves](05_05_curves.html).
-
-## Radial Lines
-
-A radial line is a line where each point on the line is determined by an origin, a radius, and an angle.
-
-[d3.lineRadial()](https://github.com/d3/d3-shape#lineRadial) returns a line generator for creating radial lines.  Like line generators, a radial line generator needs to compute the x and y coordinates for the points on the line.  The radial line generator, however, computes them a bit differently.  Instead of using x and y accessor functions to compute the x and y coordinates, radial line generators have angle and radius accessor functions which compute the angle and radius from the data.
-
-+ [lineRadial.angle([angle])](https://github.com/d3/d3-shape#lineRadial_angle) - takes either a number or a function that returns a number as an argument. The angle represented by the argument or the value returned by the function is considered in radians.
-
-+ [lineRadial.radius([radius])](https://github.com/d3/d3-shape#lineRadial_radius) - takes either a number or function that returns a number as an argument.
-
-### lineRadial Example
-
-```
-<script>
- var data = [
-    {x: 0, y: 0},
-    {x: 1, y: 3},
-    {x: 2, y: 12},
-    {x: 3, y: 8},
-    {x: 4, y: 17},
-    {x: 5, y: 15},
-    {x: 6, y: 20}];
-   
- var xScale = d3.scaleLinear().domain([0, 6]).range([0, 2* Math.PI]);
- var yScale = d3.scaleLinear().domain([0,20]).range([40, 80]);
-  
- var lineRadial = d3.lineRadial()
-      .angle(d => xScale(d.x))
-      .radius(d => yScale(d.y));
-      
- d3.select("#demo4")
-    .select("g")
-    .append("path")
-    .data([data])
-    .attr("d", lineRadial)
-    .attr("fill", "none")
-    .attr("stroke", "black");
-
-</script>
-
-<svg id="demo4" width="200" height="200">
-    <g transform="translate(100,100)"></g>
-</svg>
-```
-
-For the angle generator, we will use the same x values as before, but change the `scaleLinear.range` to be between 0 and 2*Math.PI (the number of radians around a circle) and for the radius generator we will use the y values, but change the `scaleLinear.range` to return a value between 40 and 80.
-
-<pre>
-var xScale = d3.scaleLinear().domain([0, 6]).range([0, 2* Math.PI]);
-var yScale = d3.scaleLinear().domain([0,20]).range([40, 80]);
-</pre>
-
-*Note:* It is also important to know that the origin is at (0,0) of the element in which the line is drawn.  To accommodate for this, we add a new `g` element to our svg and translate it into the middle, then draw the line inside the g element.
-
-### Other lineRadial Methods
-
-Just like with lines, radial line generators have the following methods:
-
-+ [lineRadial.defined([defined])](https://github.com/d3/d3-shape#lineRadial_defined)
-+ [lineRadial.curve([curve])](https://github.com/d3/d3-shape#lineRadial_curve)
-
-In this example when we create the radial line generator we change the curve factory using `curve` and exclude points with `defined` as we did in the earlier example.
-
-<pre>
-var lineRadial = d3.lineRadial()
-  .angle(d => xScale(d.x))
-  .radius(d => yScale(d.y))
-  .defined((d,i) => i != 4)
+var line = d3.line()
+  .x(d => xScale(d.x))
+  .y(d => yScale(d.y))
   .curve(d3.curveBasis);
+  
+d3.select("#demo6")
+  .append("path")
+  .data([data])
+  .attr("d", line)
+  .attr("fill", "none")
+  .attr("stroke", "red");
+</script>
+
+<svg id="demo6" width="200" height="200"></svg>
+```
+<figure class="sandbox"><figcaption>Figure 7. Line contructed using data bound to a path element.</figcaption></figure>
+
+## Rendering Lines to a Context
+
+We can render the line in a `canvas` element's `context` by using [line.context([context])](https://github.com/d3/d3-shape#line_context).  
+
+If no argument is passed to `line.context`, the method returns the current context, which by default is null.  If, however, a context is passed to `line.context`, the line will be rendered in the context when the line generator is invoke.
+
+In Figure 8, we use the same data and scales as in the previous example.  After defining the data and the scales, we get the 2d `context` from the `canvas` element.
+
+<pre>
+var context = d3.select("#demo7").node().getContext("2d");
+</pre>
+
+We then create the line generator and call `line.context` to set the context.
+
+<pre>
+var line = d3.line()
+  .x(d => xScale(d.x))
+  .y(d => yScale(d.y))
+  .context(context);
+</pre>
+
+We then render the line by invoking the line generator, setting the stroke color, and calling  `context.stroke`.
+
+<pre>
+line(data);
+context.strokeStyle = "red";
+context.stroke();
 </pre>
 
 ```
 <script>
- var data = [
-    {x: 0, y: 0},
-    {x: 1, y: 3},
-    {x: 2, y: 12},
-    {x: 3, y: 8},
-    {x: 4, y: 17},
-    {x: 5, y: 15},
-    {x: 6, y: 20}];
-   
- var xScale = d3.scaleLinear().domain([0, 6]).range([0, 2* Math.PI]);
- var yScale = d3.scaleLinear().domain([0,20]).range([40, 80]);
+var data = [
+  {x: 0, y: 0},
+  {x: 1, y: 3},
+  {x: 2, y: 12},
+  {x: 3, y: 8},
+  {x: 4, y: 17},
+  {x: 5, y: 15},
+  {x: 6, y: 20}];
+
+var xScale = d3.scaleLinear().domain([0, 6]).range([25, 175]);
+var yScale = d3.scaleLinear().domain([0,20]).range([175, 25]);
+
+var context = d3.select("#demo7").node().getContext("2d");
+
   
- var lineRadial = d3.lineRadial()
-      .angle(d => xScale(d.x))
-      .radius(d => yScale(d.y))
-      .defined((d,i) => i != 4)
-      .curve(d3.curveBasis);
-      
- d3.select("#demo5")
-    .select("g")
-    .append("path")
-    .data([data])
-    .attr("d", lineRadial)
-    .attr("fill", "none")
-    .attr("stroke", "black");
+var line = d3.line()
+  .x(d => xScale(d.x))
+  .y(d => yScale(d.y))
+  .context(context);
+  
+line(data);
+context.strokeStyle = "red";
+context.stroke();
+</script> 
 
-</script>
-
-<svg id="demo5" width="200" height="200">
-    <g transform="translate(100,100)"></g>
-</svg>
+<canvas id="demo7" width="200" height="200"></canvas>
 ```
-
-+ [line.context([context])](https://github.com/d3/d3-shape#line_context) (Not Shown)
-+ [lineRadial.context([context])](https://github.com/d3/d3-shape#lineRadial_context) (Not Shown)
+<figure class="sandbox"><figcaption>Figure 8. Rendering a line in a canvas element.</figcaption></figure>
