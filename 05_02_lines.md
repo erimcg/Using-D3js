@@ -186,9 +186,9 @@ d3.select("#demo3")
 ```
 <figure class="sandbox"><figcaption>Figure 4. Line created using accessor functions and scales.</figcaption></figure>
 
-## Using Bound Data to Set the Path String
+## Using Bound Data
 
-We can also compute the `d` attribute of a `path` element, not by invoking the line generator directly, but rather, by joining the data to the `path` element and then passing the line generator as the second argument of `selection.attr` when setting the `d` attribute.  The line generator is automatically called for each element in the array that was bound to the `path` element.
+We can also compute the `d` attribute of a `path` element, not by invoking the line generator directly, but rather, by joining the data to the `path` element and then passing the line generator as the second argument of `selection.attr` when setting the `d` attribute.
 
 <pre>
 d3.select("#demo1")
@@ -199,7 +199,7 @@ d3.select("#demo1")
   .attr("stroke", "red");
 </pre>
 
-Note how we bind the dataset to the `path` element by passing to `selection.data` an *array* containing the dataset (`[data]`), not the dataset itself.  Also note that we pass the line generator itself to `selection.attr`, not the string created by the line generator.
+Note how we bind the dataset to the `path` element by passing to `selection.data` an *array* containing the dataset (`[data]`), not the dataset itself.  Also note that we pass the line generator itself to `selection.attr` not the string created by the line generator.
 
 ```
 <script>
@@ -230,6 +230,8 @@ d3.select("#demo4")
 <svg id="demo4" width="200" height="200"></svg>
 ```
 <figure class="sandbox"><figcaption>Figure 5. Line created from data bound to a path element.</figcaption></figure>
+
+Note that the dataset is passed to `selection.data` inside an array.
 
 ## Excluding Points
 Sometimes we may want to exclude certain points on the line. To do this we can set the *defined* accessor function by calling [line.defined([defined])](https://github.com/d3/d3-shape#line_defined) on our line generator.
@@ -324,7 +326,7 @@ d3.select("#demo6")
 ```
 <figure class="sandbox"><figcaption>Figure 7. Line contructed using data bound to a path element.</figcaption></figure>
 
-### Rendering Lines to a Context
+## Rendering Lines to a Context
 
 We can render the line in a `canvas` element's `context` by using [line.context([context])](https://github.com/d3/d3-shape#line_context).  
 

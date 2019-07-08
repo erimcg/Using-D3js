@@ -241,7 +241,7 @@ The [`d3.path()`](https://github.com/d3/d3-path#d3-path)  method is convenient f
 <table style="font-size: small; border: 0; margin: 0; padding: 0;">
 <tr>
 <td>Path Method</td>  
-<td>Canvas Method</td> 
+<td>Context Method</td> 
 <td>SVG Command</td> 
 </tr>
 <tr>
