@@ -76,7 +76,7 @@ d3.select("#demo1")
 ```
 <figure class="sandbox"><figcaption>Figure 1. 6 points (left), outline of convex hull (right). </figcaption></figure>
   
-D3.js provides a function named `d3.polygonHull` which computes the set of points that produce a convex hull.
+D3.js provides a function named `d3.polygonHull` which computes the minimal set of points that produce a convex hull.
 
 + [d3.polygonHull(points)](https://github.com/d3/d3-polygon#polygonHull) - Takes an array of `points` and returns a subset of `points` that form the perimeter or "hull".  
 
