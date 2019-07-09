@@ -8,7 +8,7 @@ http://using-d3js.com/01_05_selection_call.html
 http://using-d3js.com/02_01_binding_data.html
 http://using-d3js.com/02_02_binding_object_data.html
 http://using-d3js.com/02_03_modifying_data.html
-http://using-d3js.com/02_04_ordering_elements.html
+http://using-d3js.com/02_04_reordering_elements.html
 http://using-d3js.com/03_01_d3_fetch.html
 http://using-d3js.com/04_01_scaling_functions.html
 http://using-d3js.com/04_02_continuous_scales.html
@@ -20,13 +20,14 @@ http://using-d3js.com/04_07_ordinal_scales.html
 http://using-d3js.com/04_08_legends.html
 http://using-d3js.com/05_01_paths.html
 http://using-d3js.com/05_02_lines.html
-http://using-d3js.com/05_03_polygons.html
+http://using-d3js.com/05_03_radial_lines.html
 http://using-d3js.com/05_04_curves.html
 http://using-d3js.com/05_05_areas.html
 http://using-d3js.com/05_06_stacks.html
 http://using-d3js.com/05_07_arcs_pie_charts.html
 http://using-d3js.com/05_08_links.html
-http://using-d3js.com/05_09_symbols.html
+http://using-d3js.com/05_09_polygons.html
+http://using-d3js.com/05_10_symbols.html
 http://using-d3js.com/06_01_hierarchal.html
 http://using-d3js.com/06_02_trees.html
 http://using-d3js.com/06_03_treemaps.html
@@ -34,4 +35,4 @@ http://using-d3js.com/06_04_partitions.html
 http://using-d3js.com/06_05_packs.html
 http://using-d3js.com/07_01_word_clouds.html
 http://using-d3js.com/07_02_chords.html
-http://using-d3js.com/08_01_tooltips.html
+http://using-d3js.com/08_01_events.html
