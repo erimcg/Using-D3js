@@ -9,7 +9,7 @@
 
 # Polygons
 
-In this section we will be discussing D3.js polygons.
+In this section we will be discussing how to compute 
 
 A "polygon" is an array of points containing `x` and `y` positions in the form: `[[x0, y0], [x1, y1], [x2, y2], ..., [xn, yn]]` that are ordered counter-clockwise around the centroid. 
 These positions represent the *perimeter* of the shape (also known as the *hull* or *outline*), and we will draw lines in the order of the positions (0 => 1 => 2 => ... => n).
