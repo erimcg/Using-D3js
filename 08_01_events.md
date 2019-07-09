@@ -26,6 +26,38 @@
 
 # Events
 
+```
+<script>
+function mouseMove(event){
+    pos = [event.offsetX, event.offsetY];
+    d3.select("#textMouseMove")
+    	.text("Position: [" + pos[0] + " , " + pos[1] + "]");
+    	
+}
+function mouseEnter(node){
+    d3.select(node)
+    	.attr("fill", "green");
+}
+function mouseOut(node){
+    d3.select(node)
+    	.attr("fill", "red");
+}
+var amountClicked = 0;
+function click(){
+	amountClicked++;
+    d3.select("#textClickAmount")
+    	.text("Times Clicked: " + amountClicked);
+}
+</script>
+
+<svg id="demoEvent" width=300 height=200>
+    <circle id="circleMouseMove" cx=90 cy=100 r=50 onmousemove="mouseMove(event)" onclick="click()"></circle>
+    <text id="textMouseMove" x=30 y=190 font-size="15px" text-anchor="start"></text>
+    <circle id="circleColorChange" cx=210 cy=100 r=50 onmouseenter="mouseEnter(this)" onmouseout="mouseOut(this)" onclick="click()"></circle> 
+	<text id="textClickAmount" x=175 y=190 font-size="15px" text-anchor="start"></text>
+</svg>
+```
+<figure class="sandbox"><figcaption>Figure 1. A circle with an onmousemove and onclick function (left) and a circle with an onmouseenter, onmouseout, and onclick function (right). All the events were added in the HTML, not by javascript. </figcaption></figure>
 
 ## selection.on
 
@@ -54,7 +86,6 @@ d3.select("#circleColorChange")
 <svg id="demoMouse" width=300px height=200px>
     <circle id="circleMouseMove" cx=90 cy=100 r=50></circle>
     <text id="textMouseMove" x=30 y=190 font-size="15px" text-anchor="start"></text>
-    
     <circle id="circleColorChange" cx=210 cy=100 r=50></circle> <text id="textMouseEnter" x=200 y=190 font-size="12px" text-anchor="middle"></text>
 </svg>
 ```
