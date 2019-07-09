@@ -26,14 +26,11 @@
 
 # Events
 
+
+
+## Adding an event using HTML
 ```
 <script>
-function mouseMove(event){
-    pos = [event.offsetX, event.offsetY];
-    d3.select("#textMouseMove")
-    	.text("Position: [" + pos[0] + " , " + pos[1] + "]");
-    	
-}
 function mouseEnter(node){
     d3.select(node)
     	.attr("fill", "green");
@@ -42,24 +39,41 @@ function mouseOut(node){
     d3.select(node)
     	.attr("fill", "red");
 }
-var amountClicked = 0;
-function click(){
-	amountClicked++;
-    d3.select("#textClickAmount")
-    	.text("Times Clicked: " + amountClicked);
-}
 </script>
 
-<svg id="demoEvent" width=300 height=200>
-    <circle id="circleMouseMove" cx=90 cy=100 r=50 onmousemove="mouseMove(event)" onclick="click()"></circle>
-    <text id="textMouseMove" x=30 y=190 font-size="15px" text-anchor="start"></text>
-    <circle id="circleColorChange" cx=210 cy=100 r=50 onmouseenter="mouseEnter(this)" onmouseout="mouseOut(this)" onclick="click()"></circle> 
-	<text id="textClickAmount" x=175 y=190 font-size="15px" text-anchor="start"></text>
+<svg id="demoEvent" width=200 height=200>
+    <circle id="circleColorChangeH" cx=100 cy=100 r=50 onmouseenter="mouseEnter(this)" onmouseout="mouseOut(this)" ></circle> 
 </svg>
 ```
-<figure class="sandbox"><figcaption>Figure 1. A circle with an onmousemove and onclick function (left) and a circle with an onmouseenter, onmouseout, and onclick function (right). All the events were added in the HTML, not by javascript. </figcaption></figure>
+<figure class="sandbox"><figcaption>Figure 1 - A circle with an onmouseenter and onmouseout function. All the events were added in the HTML, not by JavaScript. </figcaption></figure>
 
-## selection.on
+## Adding an event using javascript
+
+Adding our events into the HTML code is nice when we already have the elements in the `.html` file, but if we are dynamically adding elements to our page this method will not work. Instead, we can use JavaScript to add event listeners 
+
+```
+<script>
+    var selection = d3.select("#demoJSEvent");
+    document.getElementById("circleColorChangeJ")
+        .addEventListener("mouseenter", function(event){
+            selection
+                .select("#circleColorChangeJ")
+                .attr("fill", "red");
+        });
+    document.getElementById("circleColorChangeJ")
+        .addEventListener("mouseout", function(event){
+            selection
+                .select("#circleColorChangeJ")
+                .attr("fill", "green");
+        });
+</script>
+<svg id="demoJSEvent" width=200 height=200>
+    <circle id="circleColorChangeJ" cx=100 cy=100 r=50></circle> 
+</svg>
+```
+<figure class="sandbox"><figcaption>Figure 2 - A circle with an onmouseenter and onmouseout function (right). All the events were added via javascript. </figcaption></figure>
+
+## Adding an event using D3.js
 
 + [*selection*.on(typenames[,listener[, options]])](https://github.com/d3/d3-selection#selection_on) - 
 
@@ -68,34 +82,78 @@ Calls the `listener` function when the event is invoked.
 Passing in a `listener` function will replace any current `listener` function, or remove it if null is passed in. 
 If there is no `listener` function passed in, any already assigned `listener` function for that event will be called instead.
 
+`this` and `n[i]` refer to the node calling the event.
+
 ```
 <script>
-d3.select("#circleMouseMove")
-	.on("mousemove", function() {
-	    let pos = d3.mouse(d3.select("#demoMouse").node());
-    	d3.select("#textMouseMove")
-        	.text("Position: [" + Math.round(pos[0]) + " , " + Math.round(pos[1]) + "]");
-	});
-    
-d3.select("#circleColorChange")
+d3.select("#demoSelectOn")
+    .select("#circleColorChangeD")
 	.on("mouseenter", (d,i,n) => n[i].setAttribute("fill", "green"))
     .on("mouseout",   (d,i,n) => n[i].setAttribute("fill", "red"));
 
 </script>
 
-<svg id="demoMouse" width=300px height=200px>
-    <circle id="circleMouseMove" cx=90 cy=100 r=50></circle>
-    <text id="textMouseMove" x=30 y=190 font-size="15px" text-anchor="start"></text>
-    <circle id="circleColorChange" cx=210 cy=100 r=50></circle> <text id="textMouseEnter" x=200 y=190 font-size="12px" text-anchor="middle"></text>
+<svg id="demoSelectOn" width=200px height=200px>
+    <circle id="circleColorChangeD" cx=100 cy=100 r=50></circle>
 </svg>
 ```
+<figure class="sandbox"><figcaption>Figure 3 - A circle with an onmouseenter and onmouseout function. All the events were added using selection.on from D3.js. </figcaption></figure>
 
 ## d3.event
 
-+ [d3.event](https://github.com/d3/d3-selection#event) - Returns the current event being invoked. This contains various fields such as event.pathX/Y and event.timeStamp and methods like event.preventDefault(). Only works when the event handler that is triggered was registered by `*selection*.on`
-+ [d3.mouse(container)](https://github.com/d3/d3-selection#mouse) - Returns the location of the current event relative to the specified `container`. A *container* is an HTML node. Works on `d3.event` which is the current event that has been triggered, so long as its handler was registered by `*selection*.on`.
+Using `selection.on` has additional advantages when it comes to handling events. Any event that is registered via `selection.on` will be accessible inside the event handler with the static field `d3.event`. 
+`d3.event` always points to the *current* event being invoked, so it is useful inside event functions to access various fields or methods on the event (such as `event.timeStamp` or `event.preventDefault()`). 
 
-+ [d3.clientPoint(container, event)](https://github.com/d3/d3-selection#clientPoint) - Returns the location of the event passed in relative to the specified `container`. This accepts any event, not just `d3.event`, so it is useful for event handlers registered outside of `*selection*.on`. 
++ [d3.event](https://github.com/d3/d3-selection#event) - Returns the current event being invoked. This contains various fields such as event.pathX/Y and event.timeStamp and methods like event.preventDefault(). Only works when the event handler that is triggered was registered by `selection.on`
+
+In Figure 4 we show an example using `d3.event.timeStamp`.
+```
+<script>
+d3.select("#circleTime")
+    .on("click", function(){
+        d3.select("#textTime")
+            .text(Math.round(d3.event.timeStamp) + "ms");
+    });
+</script>
+
+<svg id="demoTime" width=200 height=200>
+    <circle id="circleTime" cx="100" cy="100" r="50"></circle>
+    <text id= "textTime" x="100" y="190" text-anchor="middle" font-size="16px"></text>
+</svg>
+```
+<figure class="sandbox"><figcaption>Figure 4 - A circle with an onclick function that shows when the circle was clicked (in milliseconds from the load of the page).  </figcaption></figure>
+
+One situation we may run into is needing to know where an event is triggered. `d3.event` contains the fields `event.pathX` and `event.pathY` which tell us the position of the mouse when the event was triggered, but this position is in relation to the *entire HTML document*. So while it may help us in some situations, it wont help us figure out where the mouse is within our visualizations. To aid in this scenario D3.js provides us with `d3.mouse(container)`.
+
+When we call `d3.mouse(container)` we pass in the node that we want to have our event position related to. `d3.mouse` will return back an array of the `x` and `y` positions of where the current event was triggered. In many cases, we will pass in the `svg` node that our visualizations lie in. 
+
++ [d3.mouse(container)](https://github.com/d3/d3-selection#mouse) - Returns the location of the current event relative to the specified `container`. A *container* is an HTML node. Uses the same event that is in `d3.event`, so the event must have been registered by `selection.on`.
+
+In Figure 5 we use `d3.mouse` and pass in the svg node. We use the position it returns to update a text element to show the position.
+
+<figure class="sandbox"><figcaption>Figure 5 - A circle with an onmousemove function that shows where the mouse is on the SVG.  </figcaption></figure>
+
+```
+<script>
+d3.select("#demoMouseMove")
+    .select("#circleMouseMoveM")
+	.on("mousemove", function() {
+	    let pos = d3.mouse(d3.select("#demoMouseMove").node());
+    	d3.select("#demoMouseMove")
+        	.select("#textMouseMoveM")
+        	.text("Position: [" + Math.round(pos[0]) + " , " + Math.round(pos[1]) + "]");
+	});
+</script>
+
+<svg id="demoMouseMove" width=200px height=200px>
+    <circle id="circleMouseMoveM" cx=100 cy=100 r=50></circle>
+    <text id="textMouseMoveM" x=40 y=190 font-size="15px" text-anchor="start"></text>
+</svg>
+```
+<figure class="sandbox"><figcaption>Figure 5 - A circle with an onmousemove function that shows where the mouse is on the svg. The event was added via D3.js. </figcaption></figure>
+
++ [d3.clientPoint(container, event)](https://github.com/d3/d3-selection#clientPoint) - Returns the location of the event passed in relative to the specified `container`. This accepts any event, not just `d3.event`, so it is useful for event handlers registered outside of `selection.on`. 
+
 
 <!--
 ## Tooltips
@@ -160,5 +218,4 @@ d3.selectAll(".box")
 
 <div class="box"></div>
 ```
-
 -->
