@@ -11,7 +11,7 @@
 
 In this section we will be discussing D3.js polygons.
 
-A "polygon" is an array of points containing `x` and `y` positions in the form: `[[x0, y0], [x1, y1], [x2, y2], ..., [xn, yn]]` and are ordered counter-clockwise around the centroid. 
+A "polygon" is an array of points containing `x` and `y` positions in the form: `[[x0, y0], [x1, y1], [x2, y2], ..., [xn, yn]]` that are ordered counter-clockwise around the centroid. 
 These positions represent the *perimeter* of the shape (also known as the *hull* or *outline*), and we will draw lines in the order of the positions (0 => 1 => 2 => ... => n).
 
 Let's use the following data set:
@@ -176,87 +176,6 @@ var hull = d3.polygonHull(points);
 <svg id="demoMap" width=200 height=200></svg>
 ```
 <figure class="sandbox"><figcaption>Figure 2. A polygon where the hull was generated from an array of objects using Array.map.</figcaption></figure>
-
-
-<!--In most cases we will not have the outline or not have it ordered properly so we can use `d3.polygonHull(points)` to generate a new array that contains the perimeter points of all the points passed in.
-This new outline array is a polygon.
-
-Lets say we have the foll
-To draw our polygons we will u [d3.line()](./05_03_lines.html).
-
-However, in polygons we do not draw lines between all of our points, instead we use polygons to draw a line *around the perimeter of the points*.
-
-Unlike many other shapes, there is no `d3.polygon` generator function. Instead a "polygon" is an array that contains the perimeter points organized counterclockwise around (0,0). 
-To get a perimeter array we can pass `d3.polygonHull` an array of many points and it will return a perimeter array. 
-This perimeter array can also be referred to being the polygon itself, the outline, or the hull.
-
-As we discussed, in order to create our polygons we need to pass `d3.polygonHull` an array of points. Unlike most other shapes, we cannot define our `x` and `y` positions within a larger data set. 
-This means that whatever array we pass in *must* be in a form of: <br> `[[x1, y1], [x2, y2], [x3, y3], ...]`.
-
-These are the points we will be using:
-<pre>
-var points = [
-    [50,50],[50,40],[50,160],[160,50],[80,75],
-    [60,30],[40,120],[120,120],[140,175],[85,90],
-    [100,80],[85,110],[75,60],[150,150],[140,130]
-];
-</pre>
-
-Now that we have all our points, we can pass this array into `d3.polygonHull()` to get our perimeter array or hull: 
-
-
-
-<pre>
-var hull = d3.polygonHull(points);
-</pre>
-
-Since there is no `d3.polygon` generator function to pass into the `d` attribute of a `path`, if we want to visually display our polygon we have to use [`d3.line()`](./05_03_lines.html):
-<pre>
-var line = d3.line()
-    .curve(d3.curveLinearClosed);
-</pre>
-
-Now we can append a `path` to our `svg` and call `line(hull)` on its `d` attribute.
-<pre>
-d3.select("#svg")
-    .append("path")
-    .attr("d", line(hull))
-    .attr("stroke", "black")
-    .attr("fill", "red");
-</pre>
-
-```
-<script>
-var points = [
-    [30,50],[100,40],[50,160],[160,50],[100,175],
-    [60,30],[40,120],[120,120],[140,175],[80,150],
-    [120,80],[85,100],[75,60],[150,150],[140,130]
-];
-var hull = d3.polygonHull(points);
-
-var line = d3.line()
-    .x(d => d[0])
-    .y(d => d[1])
-    .curve(d3.curveLinearClosed);
-
-d3.select("#demoPolygonLine") //adds the hull to the SVG
-	.append("path")
-    .attr("d", line(hull))
-    .attr("stroke", "black")
-    .attr("fill", "red");
-    
-d3.select("#demoPolygonLine") // adds all the nodes to the SVG
-	.selectAll()
-    .data(points)
-    .join("circle")
-    .attr("cx", (d) => d[0])
-    .attr("cy", (d) => d[1])
-    .attr("r", 2);
-</script>
-
-<svg id="demoPolygonLine" width=200 height=200></svg>
-```
--->
 
 ## Additional Methods
 
