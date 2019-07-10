@@ -72,7 +72,7 @@ function mouseOut(node){
 
 ## Adding an event using javascript
 
-Adding our events into the HTML code works when we already have the elements in the `.html` file, but if we are dynamically adding elements to our page this method will not work. 
+Adding our events into the HTML code works when we already have the elements in the `.html` file, but if we are dynamically adding elements and events to our page this method will not work. 
 Instead, the typical way to add event listeners with JavaScript is to use [`node.addEventListener`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener). 
 To use `node.addEventListener(type, listener)` we pass in the `type` (such as `mouseenter` or `mousemove`) and the `listener` (the function called when the event is triggered).
 
@@ -82,6 +82,9 @@ document.getElementById(id)
         //do stuff
     });
 </pre>
+
+It is important to note that in the last example we added `onmouseenter` in our `.html` but when we are adding event in JavaScript we drop the `on-` and use `mouseenter`. 
+This pattern holds true in all event types that start with `on-`. 
 
 ```
 <script>
@@ -107,14 +110,31 @@ document.getElementById(id)
 
 ## Adding an event using D3.js
 
-+ [*selection*.on(typenames[,listener[, options]])](https://github.com/d3/d3-selection#selection_on) - 
+Now we know how to add events to elements in JavaScript; however, the `addEventListener` method only works on a single element at a time. 
+We could make a `for` loop to iterate over multiple elements, but this would be cumbersome, especially when working with selections from D3.js.
 
-Adds `typenames` listeners to every node in the selection. 
-Calls the `listener` function when the event is invoked. 
-Passing in a `listener` function will replace any current `listener` function, or remove it if null is passed in. 
-If there is no `listener` function passed in, any already assigned `listener` function for that event will be called instead.
+Luckily D3.js allows us to add an event to every node in a selection at once with `selection.on(typenames[,listener[,options]])`. 
+We use `selection.on` in a similar way as `addEventListener`.
 
-`this` and `n[i]` refer to the node calling the event.
+First we pass in the the type of event we want to add; however, now we can add multiple events at the same time by separating the event types with a space such as `"mouseenter mouseout"`. 
+Next we pass in the `listener` function for the event(s). This `listener` will replace any current `listener` applied to that event on that node. 
+If we want to get rid of a `listener`, we can choose to not pass one in.
+Finally, we can choose to add optional parameters to our event listener as outlined in this [event.addEventListener documentation](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener).
+
+When creating the `listener` we can use either `this` or `nodes[i]` to refer to the node that triggered the event.
+
+For example to have an element change to a random color everytime the mouse comes onto and leaves the element we could use:
+<pre>
+d3.select(id)
+    .on("mouseenter mouseout", function(){
+        d3.select(this)
+            .attr("fill", randomColor);
+    });
+</pre>
+
++ [*selection*.on(typenames[,listener[, options]])](https://github.com/d3/d3-selection#selection_on) - Sets (or removes) a `listener` on the `typenames` event(s).
+
+In Figure 3 we use `selection.on` to add our event listeners to a circle. The circle turns green when the mouse goes over it, and red when the mouse leaves.
 
 ```
 <script>
