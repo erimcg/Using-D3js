@@ -323,3 +323,4 @@ context.stroke();
 
 <canvas id="demo6" width="200" height="200"></canvas>
 ```
+ <figure class="sandbox"><figcaption>Figure 6. Radial line rendered to a context.</figcaption></figure>
