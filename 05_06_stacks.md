@@ -1,6 +1,6 @@
 {{meta {docid: stack}}}
 
-<script src="https://unpkg.com/d3-area-label@1.4.0/build/d3-area-label.js"></script>
+<script src="https://unpkg.com/d3-area-label@1.5.0/build/d3-area-label.js"></script>
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
 

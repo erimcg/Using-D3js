@@ -1,6 +1,6 @@
 {{meta {docid: areas}}}
 
-<script src="https://unpkg.com/d3-area-label@1.4.0/build/d3-area-label.js"></script>
+<script src="https://unpkg.com/d3-area-label@1.5.0/build/d3-area-label.js"></script>
 <script src="https://d3js.org/d3.v5.min.js"></script>
 
 <style>
@@ -403,7 +403,7 @@ Many times it is useful to the viewers of our visualizations to have labels indi
 
 This module is not apart of the main D3.js files so we will have to separately add it to our page:
 <pre>
-&lt;script src="https://unpkg.com/d3-area-label@1.4.0/build/d3-area-label.js">&lt;/script>
+&lt;script src="https://unpkg.com/d3-area-label@1.5.0/build/d3-area-label.js">&lt;/script>
 </pre>
 
 `d3.arealabel` is a generator with many accessors on it to determine size, conditions, and format of the labels to add. To create a label we need to either pass the generator an area, or redefine an area to use. Note that `d3.areaLabel` only works on left-to-right areas (areas that use `x`, `y0`, and `y1`).
