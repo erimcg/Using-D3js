@@ -507,22 +507,22 @@ Setting `areaLabel.interpolate` to `true` helps smaller data sets have better po
 
 ### Padding
 
-We can apply a padding to each of the sides of the text within its' bounding box. When applying a padding, we should make sure to not use large paddings that make the label hard to read. It is also important to remember that paddings are measured in *pixels*.
+We can apply a padding to each of the sides of the text within its' bounding box. When applying a padding, we should make sure to not use large paddings that make the label hard to read. It is also important to remember that each padding should be set to a value from 0 to 1; larger values will technically work still, but will result in text labels usually too small to read. The default value for each padding is 0.
 
 <pre>
 var areaLabel = d3.areaLabel([area1]).paddingLeft(5);
 </pre>
 
-+ [areaLabel.paddingLeft(paddingLeft)](https://github.com/curran/d3-area-label#paddingLeft)
-+ [areaLabel.paddingRight(paddingRight)](https://github.com/curran/d3-area-label#paddingRight)
-+ [areaLabel.paddingTop(paddingTop)](https://github.com/curran/d3-area-label#paddingTop)
-+ [areaLabel.paddingBottom(paddingBottom)](https://github.com/curran/d3-area-label#paddingBottom)
++ [areaLabel.paddingLeft(paddingLeft)](https://github.com/curran/d3-area-label#paddingLeft) - The padding on the left side of the text.
++ [areaLabel.paddingRight(paddingRight)](https://github.com/curran/d3-area-label#paddingRight) - The padding on the right side of the text.
++ [areaLabel.paddingTop(paddingTop)](https://github.com/curran/d3-area-label#paddingTop) - The padding on the top side of the text.
++ [areaLabel.paddingBottom(paddingBottom)](https://github.com/curran/d3-area-label#paddingBottom) - The padding on the bottom side of the text.
 
 
 `d3.areaLabel` also provides us with the following shortcut accessors:
 + [areaLabel.paddingX(paddingX)](https://github.com/curran/d3-area-label#paddingX) - Sets `paddingRight` and `paddingLeft` simultaneously.
 + [areaLabel.paddingY(paddingY)](https://github.com/curran/d3-area-label#paddingY) - Sets `paddingTop` and `paddingBottom` simultaneously.
-+ [areaLabel.padding(padding)](https://github.com/curran/d3-area-label#padding) - Sets `paddingX` and `paddingY` simultaneously.
++ [areaLabel.padding(padding)](https://github.com/curran/d3-area-label#padding) - Sets `paddingX` and `paddingY` simultaneously (i.e. *All* of the paddings at once). 
 
 In Figure 9 we apply a padding to every side by using `areaLabel.padding`.
 
@@ -551,12 +551,13 @@ In Figure 9 we apply a padding to every side by using `areaLabel.padding`.
         .attr("fill", "red")
         .attr("stroke", "black");
     
-    var areaLabel = d3.areaLabel().area(area).padding(15);
+    var areaLabel = d3.areaLabel().area(area).padding(.5);
     
     d3.select("#demo9")
+        .data([data])
         .append("text")
         .text("Area")
-        .attr("transform", areaLabel([data]));
+        .attr("transform", areaLabel);
 </script>
 <svg id="demo9" width=200 height=200></svg>
 ```
