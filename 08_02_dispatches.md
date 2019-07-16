@@ -8,7 +8,7 @@
 
 # Dispatches
 
-+ [d3.diispath(types...)](https://github.com/d3/d3-dispatch#dispatch)
++ [d3.dispatch(types...)](https://github.com/d3/d3-dispatch#dispatch)
 + [dispatch.on(typenames[, callback])](https://github.com/d3/d3-dispatch#dispatch_on)
 + [dispatch.copy()](https://github.com/d3/d3-dispatch#dispatch_copy)
 + [dispatch.call(type[, that[aruments]])](https://github.com/d3/d3-dispatch#dispatch_call)
