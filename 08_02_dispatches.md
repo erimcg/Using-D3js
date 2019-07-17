@@ -8,17 +8,47 @@
 
 # Dispatches
 
-+ [d3.dispatch(types...)](https://github.com/d3/d3-dispatch#dispatch) - Creates a new dispatch for the specified event types.
+To create a dispatch we call `d3.dispatch` and pass in the `types` of events that we want the dispatch to handle. Each `type` is a string. 
+
+For example, to create a dispatch that handles custom events "start" and "end":
 
 <pre>
-var dispatch = d3.dispatch("start", "end");
+var dispatchEx = d3.dispatch("start", "end");
+</pre>
+
++ [d3.dispatch(types...)](https://github.com/d3/d3-dispatch#dispatch) - Creates a new dispatch for the specified event types.
+
+Next, we need to define what the custom events `start` and `end` do. To do this we call `dispatch.on` where is `dispatch` is instance of a dispatch created in the method above. To use `dispatch.onn` we pass in the string of the type of the event and then the callback function that will be invoked when the dispatch is called.
+
+For example, to define what the `start` and `end` events do:
+
+<pre>
+dispatchEx.on("start", <i>callback function</i>);
+dispatchEx.on("end", <i>callback function</i>);
 </pre>
 
 + [dispatch.on(typenames[, callback])](https://github.com/d3/d3-dispatch#dispatch_on)
 
+All that is left now is to call our dispatch events. To do this we can use `dispatch.call` on our instance of `d3.dispatch`. For this method we first pass in the event of that dispatch we want to invoke; following this is by what we want `this` to refer to within the dispatch events callback function; finally we add any arguments we want to pass into the callback function.
+
+For example, to call `start` and `ende` when a `circle` has its `mouseenter` and `mouseout` events invoked.
+Recall that within the callback function of `selection.on` `this` refers to the node that called the event:
+
 <pre>
-dispatch.on("start", <i>callback function</i>);
+circleSelection
+  .on("mouseenter", function(){
+    dispatchEx.call("start", this, arguments...);
+    //Passes in the node that called the event as 'this'
+  })
+  .on("mouseout", function(){
+    dispatchEx.call("start", d3.select(this), arguments...);
+    //Passes in a selection of the node that call the event as 'this'
+  });
 </pre>
+
++ [dispatch.call(type[, that[, arguments...]])](https://github.com/d3/d3-dispatch#dispatch_call)
+
+In Figure 1 we create a dispatch with the types `start` and `end`. We then set `start` and `end` to change the color of `this` (which is passed in) to green and red respectively. In `start`, `this` is a node, and in `end`, `this` is a selection. We then append a `circle` and set its `mouseenter` and `mouseout` events to call the dispatches `start` and `end` respectively.
 
 ```
 <script>
@@ -47,9 +77,34 @@ d3.select("#demo1")
 </script>
 <svg id="demo1" width=200 height=200></svg>
 ```
+<figure class="sandbox"><figcaption>Figure 1 - A circle with mouseenter and mouseout events that are handled by a dispatch.  </figcaption></figure>
 
-+ [dispatch.copy()](https://github.com/d3/d3-dispatch#dispatch_copy)
+## Subtypes
 
+When declaring the types in `d3.dispatch` we can use subtypes that are also called whenever its type is called. To define a subtype we name the type followed by a `.` and the subtype. Whenever we call a dispatches type all of its subtypes will also be invoked. This is useful for when we have separate events that may need to be called at the same time.
+
+For example, to define the subtypes `start.foo` and `start.boo`:
+
+<pre>
+var dispatchEx = d3.dispatch("start.foo", "start.boo", "end");
+</pre>
+
+Now, whenever we call `dispatchEx.call("start")` `start.foo` and `start.boo` will both be invoked (assuming we give them both callback functions). 
+
+An example of this can be seen in Figure 2.
+
+## Copy
+
+D3.js supplies us with `dispatch.copy` to create a deep copy of a dispatch. The new dispatch retains all events and callbacks that the original dispatch had. The new dispatch does not contain any references to the previous, so after creating a copy changing either will not change the other.
+
+<pre>
+var dispatchEx = d3.dispatch("start", "end");
+var dispatchEx2 = dispatchEx.copy();
+</pre>
+
++ [dispatch.copy()](https://github.com/d3/d3-dispatch#dispatch_copy) - Returns a deep copy of a dispatch. The copy does not contain any references to the original.
+
+## Call vs Apply
 
 + [dispatch.call(type[, that[, arguments...]])](https://github.com/d3/d3-dispatch#dispatch_call)
 + [dispatch.apply(type[, that[,arguments]])](https://github.com/d3/d3-dispatch#dispatch_apply)
