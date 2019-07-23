@@ -14,18 +14,17 @@
 In this section we'll discuss how to draw links. 
 Links can be used independently when the coordinates are predefined, or within a [hierarchical layouts](./06_01_hierarchal.html)where the points are computed based on the layout.
 
+## Links
 
-##Links
-Links are paths that create a smooth Bézier curve from a source point to a target point.
+A link is a path that creatse a smooth Bézier curve from a source point to a target point.
 When having a large amount of points that need to be shown as being connected, links can be used to easily show their relation.
-
 
 There are three different types of link generators that D3 provides:
 + [d3.linkVertical()](https://github.com/d3/d3-shape#linkVertical) - Typically used when the root is on the left/right edge with the children going right/left.
 + [d3.linkHorizontal()](https://github.com/d3/d3-shape#linkHorizontal) - Typically used when the root is on the top/bottom edge with the children going down/up. 
 + [d3.linkRadial()](https://github.com/d3/d3-shape#linkRadial) - Typically used when the root is centered with the children spreading outwards from the root.
 
-Quick example of each:
+Figure 1 shows a quick example of each:
 ```
 <script>
     //Same data used for both diagrams
@@ -140,8 +139,9 @@ Quick example of each:
 <svg id="quickDemoH" width="200" height="200"></svg>
 <svg id="quickDemoR" width="200" height="200"></svg>
 ```
+<figure class="sandbox"><figcaption>Figure 1 - A vertical link (left), a horizontal link (center), and a radial link (right).</figcaption></figure>
 
-By default a link generator needs an object with a source and a target, which each are an array with two numbers representing the `x` and `y` values of where the link should start and end.
+A link generator needs an object with a source and a target, whichin each should be an array with two numbers representing the `x` and `y` values of where the link should start and end.
 
 An example of a single link object and a default horizontal link generator:
 <pre>
@@ -169,6 +169,8 @@ d3.select("#multiLink")
     .attr("fill", "none")
     .attr("stroke", "black");
 </pre>
+
+In Figure 2, we create a single link from one object and then multiple links from an array of objects.
 
 ```
 <script>
@@ -204,6 +206,7 @@ d3.select("#multiLink")
 <svg id="singleLink" width="200" height="100"></svg>
 <svg id="multiLink" width="200" height="100"></svg>
 ```
+<figure class="sandbox"><figcaption>Figure 2 - A single link (left) and multiple links(right).</figcaption></figure>
 
 ### `link.source()` and `link.target()`
 In most situations, the source and target are not going to be separate and easily accessible from our data like they are in the previous examples. 
@@ -230,6 +233,7 @@ var link = d3.linkHorizontal()
 </pre>
 For this example, the link generator will create a link from the parent position to the node position.
 
+In Figure 3, we create links by setting `source` and `target` to `position` and `parentPosition`, respectively.
 
 ```
 <script>
@@ -273,6 +277,7 @@ For this example, the link generator will create a link from the parent position
 
 <svg id="demoSrcTar" width="200" height="200"></svg>
 ```
+<figure class="sandbox"><figcaption>Figure 3 - Links created by setting source and target.</figcaption></figure>
 
 ### `link.x()` and `link.y()`
 
@@ -308,6 +313,8 @@ var linkGen = d3.linkVertical()
     .x(d => xScale(d[0]))
     .y(d => yScale(d[1]));
 </pre>
+
+In Figure 4, we apply a scale to `x` and `y`.
 
 ```
 <script>
@@ -377,6 +384,7 @@ var linkGen = d3.linkVertical()
 
 <svg id="demoXY" width="200" height="200"></svg>
 ```
+<figure class="sandbox"><figcaption>Figure 4 - Links with a scale applied to x and y.</figcaption></figure>
 
 ### Using `d3.linkHorizontal()` and `d3.linkVertical()`
 
@@ -397,6 +405,8 @@ Since we flipped the `x` and `y` positions in our link generator we will need to
 
 + [d3.linkVertical()](https://github.com/d3/d3-shape#linkVertical) - The default link generator, assumes root at top or bottom.
 + [d3.linkHorizontal()](https://github.com/d3/d3-shape#linkHorizontal) - Assumes left to right, converted from `d3.linkVertical()` by flipping `x` and `y` positions.
+
+In Figure 5, we use `d3.linkHorizontal` to display our chart left-to-right instead.
 
 ```
 <script>
@@ -467,6 +477,7 @@ Since we flipped the `x` and `y` positions in our link generator we will need to
 <svg id="demoH" width="200" height="200"></svg>
 <svg id="demoV" width="200" height="200"></svg>
 ```
+<figure class="sandbox"><figcaption>Figure 5 - Horizontal links.</figcaption></figure>
 
 + [d3.linkVertical()](https://github.com/d3/d3-shape#linkVertical)
 + [d3.linkHorizontal()](https://github.com/d3/d3-shape#linkHorizontal)
@@ -500,7 +511,7 @@ Our `circle` and `text` nodes will no longer be at the right point without chang
     .attr("cy", d => d3.pointRadial(xScale(d.position[0]), yScale(d.position[1]) )[1] )
 </pre>
 
-   
+In Figure 6, we use `d3.linkRaidal` to display our chart radially instead.
     
 ```
 <script>
@@ -576,5 +587,41 @@ Our `circle` and `text` nodes will no longer be at the right point without chang
 
 <svg id="demoRadial" width="350" height="350"></svg>
 ```
+<figure class="sandbox"><figcaption>Figure 6 - Radial links.</figcaption></figure>
+
+
+## Canvasses
+
+Our examples in the section all use an `SVG` as the graphic medium. If we want to work with a Canvas instead, we just pass in the `context` of a canvas into the `.context()` accessor of any of our link generators.
 
 + [link.context([context])](https://github.com/d3/d3-shape#link_context)
+
+In Figure 7 we use the same links in Figure 4, but apply them to a canvas instead. Note that we have to use additional CanvasPathMethods for our graphics to display.
+
+```
+<script>
+    var nodeData = [
+        {id: "D3",       position: [100, 25],   parentPosition: [100,25] },
+        {id: "Scales",   position: [25, 175],   parentPosition: [100, 25] },
+        {id: "Shapes",   position: [175, 175],  parentPosition: [100, 25] }];
+     
+    var selection = d3.select("#demo7");
+    var context = selection.node().getContext("2d");
+     
+    var link = d3.linkVertical()
+        .source( d => {console.log(d); return d.position;} )
+        .target( d => d.parentPosition )
+        .context(context);
+        
+    context.beginPath();
+    context.strokeStyle = "black";
+    context.fillStyle = "white";
+    for(node of nodeData) {
+        link(node);
+    }
+    context.fill();
+    context.stroke();
+</script>
+<canvas id="demo7" width=200 height=200></canvas>
+``` 
+<figure class="sandbox"><figcaption>Figure 7 - Canvas version of Figure 4.</figcaption></figure>
