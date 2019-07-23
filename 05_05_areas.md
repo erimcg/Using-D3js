@@ -1,6 +1,6 @@
 {{meta {docid: areas}}}
 
-<script src="https://unpkg.com/d3-area-label@1.4.0/build/d3-area-label.js"></script>
+<script src="https://unpkg.com/d3-area-label@1.5.0/build/d3-area-label.js"></script>
 <script src="https://d3js.org/d3.v5.min.js"></script>
 
 <style>
@@ -18,8 +18,7 @@ An area is a path that can be thought of as the enclosure between two lines.
 These two "lines" are created by setting an `x` value, which is the same for each point on the lines, and two `y` values, `y0` and `y1`, which are the bottom lines `y` position and the top lines `y` position respectively. 
 
 Like [lines](./05_02_lines.html), we have an area generator, [d3.area()](https://github.com/d3/d3-shape#area) which has a accessors we can call to set how the area is generated.
-
-Also like [lines](./05_02_lines.html), we pass data into an area and the area returns back a `string` that can be used inside a `path` `d` attribute. 
+We pass data into an area generator and it returns back a `string` that can be used inside a `path` `d` attribute. 
 + [area(data)](https://github.com/d3/d3-shape#_area) - Invokes the area generator using the array of data passed into it, returns back a `string` that can be used by the `d` attribute of a `path`.
 
 However unlike lines, areas make <b>two</b> points for every set of data passed into it. These points create the upper and lower "lines" or bounds that our area encloses. The first point uses `y0` and is used as the lower bounds of the graph. The second point uses `y1` and is used as the upper bounds. Both points use the same `x` position.
@@ -42,9 +41,7 @@ var xScale = d3.scaleLinear().domain([0, 6]).range([25, 175]);
 var yScale = d3.scaleLinear().domain([0,20]).range([175, 25]);
 </pre>
 
-Next, we will create an area generator and set the `x`, `y0` (lower bounds), and `y1` (upper bounds) accessors.
-
-We will make `y0` (lower bounds) at the graphs bottom, and `y1` (upper bounds) to be from the data we pass in:
+Next, we will create an area generator and set the `x`, `y0` (lower bounds), and `y1` (upper bounds) accessors:
 <pre>
 var area = d3.area()
       .x(d => xScale(d.x))
@@ -344,7 +341,7 @@ Our examples in the section all use an `SVG` as the graphic medium. If we want t
 + [area.context([context])](https://github.com/d3/d3-shape#area_context) - Applies the area to the context.
 + [areaRadial.context([context])](https://github.com/d3/d3-shape#areaRadial_context) - Applies the area to the context.
 
-In Figure 7 we use the same areas in Figure 2 and 5, but apply them to a canvas instead. Note that ee have to use additional CanvasPathMethods for our graphics to display.
+In Figure 7 we use the same areas in Figure 2 and 5, but apply them to a canvas instead. Note that we have to use additional CanvasPathMethods for our graphics to display.
 
 ```
 <script>
@@ -402,11 +399,11 @@ In Figure 7 we use the same areas in Figure 2 and 5, but apply them to a canvas 
 
 ## d3.arealabel
 
-Many times it is useful to the viewers of our visualizations to have labels indicating what every line or area represents. While we could use [legends](./04_08_legends.html), [Curran Kelleher](https://github.com/curran) created [d3-area-label](https://github.com/curran/d3-area-label) to dynamically add text labels inside of an area.
+Many times it is useful to the viewers of our visualizations to have labels indicating what every line or area represents. Luckily, [Curran Kelleher](https://github.com/curran) created [d3-area-label](https://github.com/curran/d3-area-label) to dynamically add text labels inside of an area.
 
-This module is not apart of the main D3.js files so we will have to seperately add it to our page:
+This module is not apart of the main D3.js files so we will have to separately add it to our page:
 <pre>
-&lt;script src="https://unpkg.com/d3-area-label@1.4.0/build/d3-area-label.js">&lt;/script>
+&lt;script src="https://unpkg.com/d3-area-label@1.5.0/build/d3-area-label.js">&lt;/script>
 </pre>
 
 `d3.arealabel` is a generator with many accessors on it to determine size, conditions, and format of the labels to add. To create a label we need to either pass the generator an area, or redefine an area to use. Note that `d3.areaLabel` only works on left-to-right areas (areas that use `x`, `y0`, and `y1`).
@@ -419,7 +416,7 @@ var areaLabel = d3.areaLabel().area(areaGen);
 + [areaLabel.area(area)](https://github.com/curran/d3-area-label#area) - Sets the `x`, `y0`, and `y1` accessors of the areaLabel to be the same as an instance of `d3.area`.
 + [areaLabel(data)](https://github.com/curran/d3-area-label#_areaLabel) - Calls the area label generator with the passed in data. Note that this data should be in the form [`area1`, `area2`, ...] where each `area#` is all the data points for an area. For example when working with a single area: `areaLabel([areaData])`.
 
-`d3.areaLabel` works by first finding the bounding box or acpect ratio around a particular `text` element. 
+`d3.areaLabel` works by first finding the bounding box or aspect ratio around a particular `text` element. 
 Next, `d3.areaLabel` will use a [bisection method](https://en.wikipedia.org/wiki/Bisection_method#Algorithm) to find the maximum size rectangle with the same aspect ratio as the text that fits within an area.
  Finally, `d3.areaLabel` modifies the `transform` attribute of a `text` element, so it returns a string that can be used when modifying the `transorm` that properly places the label where it should be.
 
@@ -510,22 +507,22 @@ Setting `areaLabel.interpolate` to `true` helps smaller data sets have better po
 
 ### Padding
 
-We can apply a padding to each of the sides of the text within its' bounding box. When applying a padding, we should make sure to not use large paddings that make the label hard to read. It is also important to remember that paddings are measured in *pixels*.
+We can apply a padding to each of the sides of the text within its' bounding box. When applying a padding, we should make sure to not use large paddings that make the label hard to read. It is also important to remember that each padding should be set to a value from 0 to 1; larger values will technically work still, but will result in text labels usually too small to read. The default value for each padding is 0.
 
 <pre>
 var areaLabel = d3.areaLabel([area1]).paddingLeft(5);
 </pre>
 
-+ [areaLabel.paddingLeft(paddingLeft)](https://github.com/curran/d3-area-label#paddingLeft)
-+ [areaLabel.paddingRight(paddingRight)](https://github.com/curran/d3-area-label#paddingRight)
-+ [areaLabel.paddingTop(paddingTop)](https://github.com/curran/d3-area-label#paddingTop)
-+ [areaLabel.paddingBottom(paddingBottom)](https://github.com/curran/d3-area-label#paddingBottom)
++ [areaLabel.paddingLeft(paddingLeft)](https://github.com/curran/d3-area-label#paddingLeft) - The padding on the left side of the text.
++ [areaLabel.paddingRight(paddingRight)](https://github.com/curran/d3-area-label#paddingRight) - The padding on the right side of the text.
++ [areaLabel.paddingTop(paddingTop)](https://github.com/curran/d3-area-label#paddingTop) - The padding on the top side of the text.
++ [areaLabel.paddingBottom(paddingBottom)](https://github.com/curran/d3-area-label#paddingBottom) - The padding on the bottom side of the text.
 
 
 `d3.areaLabel` also provides us with the following shortcut accessors:
 + [areaLabel.paddingX(paddingX)](https://github.com/curran/d3-area-label#paddingX) - Sets `paddingRight` and `paddingLeft` simultaneously.
 + [areaLabel.paddingY(paddingY)](https://github.com/curran/d3-area-label#paddingY) - Sets `paddingTop` and `paddingBottom` simultaneously.
-+ [areaLabel.padding(padding)](https://github.com/curran/d3-area-label#padding) - Sets `paddingX` and `paddingY` simultaneously.
++ [areaLabel.padding(padding)](https://github.com/curran/d3-area-label#padding) - Sets `paddingX` and `paddingY` simultaneously (i.e. *All* of the paddings at once). 
 
 In Figure 9 we apply a padding to every side by using `areaLabel.padding`.
 
@@ -554,12 +551,13 @@ In Figure 9 we apply a padding to every side by using `areaLabel.padding`.
         .attr("fill", "red")
         .attr("stroke", "black");
     
-    var areaLabel = d3.areaLabel().area(area).padding(15);
+    var areaLabel = d3.areaLabel().area(area).padding(.5);
     
     d3.select("#demo9")
+        .data([data])
         .append("text")
         .text("Area")
-        .attr("transform", areaLabel([data]));
+        .attr("transform", areaLabel);
 </script>
 <svg id="demo9" width=200 height=200></svg>
 ```
