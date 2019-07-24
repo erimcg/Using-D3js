@@ -57,7 +57,7 @@
   let nextID = 0
   let article = document.getElementsByTagName("article")[0]
 
-  function activateCode(node, e, lang, cmVisible) {
+  function activateCode(node, e, lang, cmVisible, cmUneditable) {
     if (node.style.display === "none") {
       return
     }
@@ -121,14 +121,14 @@
     renderCode(data, true);
 
     let sandboxMenu = wrap.appendChild(elt("div", {"class": "sandbox-menu"}));
-    initializeMenu(data, sandboxMenu);
+    initializeMenu(data, sandboxMenu, cmUneditable);
 
     if (cmVisible === false) {
       hideEditor(data);
     }
   }
 
-  function initializeMenu(data, node) {
+  function initializeMenu(data, node, cmUneditable) {
     let items = [
       {type: "image",
         src: "img/gray_publish_button.png",
@@ -151,7 +151,11 @@
         style: "background: white",
         handler: () => hideEditor(data)}
     ];
-
+    if(cmUneditable){
+      items = [items[2], items[3]];
+      node.appendChild(document.createElement(null));
+      node.appendChild(document.createElement(null));
+    }
     items.forEach(item => {
       let elm = node.appendChild(elt("input", item));
       elm.addEventListener('click', item.handler);
@@ -408,11 +412,16 @@
   let pres = document.getElementsByTagName("pre")
   for (let i = 0; i < pres.length; i++) {
     let pre = pres[i]
+
     if (!pre.hasAttribute('data-cm'))
       continue;
-    let state = pre.getAttribute("data-cm")
-    let cmVisible = /^(visible)$/.test(state);
-    let lang = pre.getAttribute("data-language")
-    activateCode(pre, null, lang, cmVisible);
+    let viewState = pre.getAttribute("data-cm");
+    let editState = pre.getAttribute("data-edit");
+
+    let cmVisible = /^(visible)$/.test(viewState);
+    let cmUneditable = /^(uneditable)$/.test(editState);
+
+    let lang = pre.getAttribute("data-language");
+    activateCode(pre, null, lang, cmVisible, cmUneditable);
   }
 //})

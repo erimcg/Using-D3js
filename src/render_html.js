@@ -96,8 +96,9 @@ let renderer = {
 
     let lang = config.lang || "javascript"
     let cm_visibility = config.cm || "hidden"
+    let cm_uneditable = config.edit === "uneditable" ? "uneditable" : "editable"
 
-    return `\n\n<pre${attrs(token)} class="snippet cm-s-default" data-language="${lang}" data-cm="${cm_visibility}" ${config.focus ? " data-focus=\"true\"" : ""}${config.sandbox ? ` data-sandbox="${config.sandbox}"` : ""}${config.meta ? ` data-meta="${config.meta}"` : ""}>${anchor(token)}${highlight(lang, token.content.trimRight())}</pre>`
+    return `\n\n<pre${attrs(token)} class="snippet cm-s-default" data-language="${lang}" data-edit="${cm_uneditable}" data-cm="${cm_visibility}" ${config.focus ? " data-focus=\"true\"" : ""}${config.sandbox ? ` data-sandbox="${config.sandbox}"` : ""}${config.meta ? ` data-meta="${config.meta}"` : ""}>${anchor(token)}${highlight(lang, token.content.trimRight())}</pre>`
   },
 
   hardbreak() { return `<br${close}>` },

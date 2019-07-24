@@ -16,7 +16,7 @@ In this section we discuss `d3.require`.
 + Only the built-in `exports` and `module` dependencies are allowed; no `require` as in CommonJS. The `module` entry only contains an `exports` property.
 + Named module definitions (*e.g.*, jQuery) are treated as anonymous modules.
 
-`d3.require` is not included in `d3.v5.min.js` so it has to be loaded separately: 
+`d3.require` is not included in `https://d3js.org/d3.v5.min.js`, so it has to be loaded separately: 
 <pre>
 &lt;script src="https://cdn.jsdelivr.net/npm/d3-require@1">&lt;/script>
 </pre>
@@ -31,7 +31,7 @@ After `d3.require` loads the module(s), it will call the function inside of its'
 
 In Figure 1 we use `d3.require` to load D3.js and d3-queue. We then use `d3.queue` to perform a task to add text to a `div` stating that the module is loaded. 
 
-The main D3.js script is **not** loaded on this page, so if we want to use most of D3.js we will load it via `d3.require`.
+`https://d3js.org/d3.v5.min.js` is **not** loaded on this page, so if we want to use most of D3.js we will load it via `d3.require`.
 
 ``` {cm: visible}
 <script>
