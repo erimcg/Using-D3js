@@ -11,7 +11,7 @@
 
 In this section we discuss `d3.queue`.
 
-`d3-queue` is not included in `d3.v5.min.js` so it has to be loaded separately: 
+`d3-queue` is not included in `https://d3js.org/d3.v5.min.js`, so it has to be loaded separately: 
 <pre>
 &lt;script src="https://d3js.org/d3-queue.v3.min.js">&lt;/script>
 </pre>
