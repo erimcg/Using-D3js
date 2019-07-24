@@ -152,7 +152,8 @@
         handler: () => hideEditor(data)}
     ];
     if(cmUneditable){
-      items = [items[2], items[3]];
+      items = [items[3]];
+      node.appendChild(document.createElement(null));
       node.appendChild(document.createElement(null));
       node.appendChild(document.createElement(null));
     }
