@@ -425,6 +425,7 @@ figure {
 figure.sandbox {
   text-align: center;
   margin-top: 2px;
+  max-width: 100%;
 }
 
 figcaption {
