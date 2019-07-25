@@ -30,6 +30,13 @@ D3.js provides [d3.now]() to get the amount of time a page has been loaded. This
 
 In Figure 1 we have a function `printTime` which displays in a `div` the string passed in. We also have a `d3.timer` with the callback function being set to `printTime`. `d3.timer` calls `printTime` repeatedly. Each time `printTime` is called, `d3.timer` passes in the time elapsed from when that timer was originally declared to when that timer calls `printTime` that time. 
 
+```html
+{cm: visible, edit: uneditable}
+<script>
+    var test = 4;
+</script>
+```
+
 ``` {cm: visible, edit: uneditable}
 <script>
     function printTime1(elapsed){
@@ -43,9 +50,12 @@ In Figure 1 we have a function `printTime` which displays in a `div` the string 
 
 ## d3.interval
 
-Running a function constantly with `d3.timer` can be taxing on our computers, and running many timers at once can result in visual studders if it relates to animation. To remedy this we can use a timer that is not called constantly but instead every X milliseconds.
+Running a function constantly with `d3.timer` can be taxing on our computers, and can result in visual studders or timing issues. To remedy this we can use a timer that is not called constantly but instead every X milliseconds. D3.js provides us `d3.interval` as a solution to this problem.
 
-+ [d3.interval(callback[, delay[, time]])](https://github.com/d3/d3-timer#interval) - Like `d3.timer` except it runs every `delay` milliseconds, not constantly. If `delay` is not set, it is equivalent to timer. The callback is passed the elapsed time.
+Like `d3.timer`, `d3.interval` calls a callback function that we supply or define and passes in the elapsed time.
+However, unlike `d3.timer`, `d3.interval` does not run every frame, but instead every `delay` milliseconds. If `delay` is not passed in, `d3.interval` will invoke the callback every frame like with `d3.timer`. Starts the countdown for the first invocation of the callback after `time` milliseconds from when the interval was decalred.
+ 
++ [d3.interval(callback[, delay[, time]])](https://github.com/d3/d3-timer#interval) - Like `d3.timer` except it runs once every `delay` milliseconds, not constantly. If `delay` is not set, it is equivalent to timer. The callback is passed the elapsed time.
 
 In Figure 2 we use the `printTime` function like we did in Figure 1, however now instead of using `d3.timer`, we use `d3.interval` to call the function *every* 100ms.
 ``` {cm: visible, edit: uneditable}
