@@ -33,7 +33,7 @@ In Figure 1 we use `d3.require` to load D3.js and d3-queue. We then use `d3.queu
 
 `https://d3js.org/d3.v5.min.js` is **not** loaded on this page, so if we want to use most of D3.js we will load it via `d3.require`.
 
-``` {cm: visible}
+``` {cm: visible, menu: uneditable}
 <script>
     d3.require("d3@5", "d3-queue").then(d3 => {
         d3.queue()
