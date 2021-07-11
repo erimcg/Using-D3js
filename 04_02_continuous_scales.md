@@ -265,4 +265,4 @@ If the scale function has a numeric domain, the `invert` method maps a value wi
 
 ## Nice
 
-When a domain interval is created using actual data, it is often necessary to extend the domain on both ends so that when data values are scaled, the result is not a boundary of the range.  The `nice` method does just that, it rounds the domain to *nice* round values.
+When a domain interval is created using actual data, it is often necessary to extend the domain on both ends so that when data values are scaled, the result is not a boundary of the range.  The `nice` method does just that; it rounds the endpoints of the domain to *nice* round values.
