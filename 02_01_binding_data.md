@@ -390,4 +390,4 @@ If no value is passed to the `datum` method, then the method returns the data th
 
 ## Further Reading
 
-The tutorial [How Selections Work](https://bost.ocks.org/mike/selection/) written by Bostock describes in depth what d3.selection object are and how data is joined to the elements in the selection.  We recommend everyone read this tutorial!
+The tutorial [How Selections Work](https://bost.ocks.org/mike/selection/) written by Bostock describes in depth what d3.selection objects are and how data is joined to the elements in the selection.  We recommend everyone read this tutorial!
