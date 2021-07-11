@@ -216,8 +216,8 @@ Note that `selection.filter` preserves the parents of the `selection` on which i
 D3.js contains three generator functions that are used by `selection.filter`, `selection.select`, and `selection.selectAll`.
 
 + [d3.matcher(selector)](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#matcher) - returns a function that when run returns true if *this* matches the selector passed in as an argument.
-+ [d3.selector(selector)](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selector) - returns a function that when run returns the first decendent of *this* that matches the selector passed in as an argument.
-+ [d3.selectorAll(selector)](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selectorAll) - returns a function that when run returns a `NodeList` containing the decendent of *this* that matches the selector passed in as an argument.
++ [d3.selector(selector)](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selector) - returns a function that when run returns the first descendant of *this* that matches the selector passed in as an argument.
++ [d3.selectorAll(selector)](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selectorAll) - returns a function that when run returns a `NodeList` containing the descendant of *this* that matches the selector passed in as an argument.
 
 Below we show examples of how `d3.matcher` and `d3.selector` can be used.  By calling `call` on each of the functions that are generated (`matcher` and `selector`) we change the execution context of the functions thus changing the value of `this` in each.
 
