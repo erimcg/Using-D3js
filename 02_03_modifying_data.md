@@ -8,7 +8,7 @@
 
 When the dataset used for a visualization changes, we may need to update the visual elements to reflect the new data, possibly adding or removing visual elements, and changing the visual characteristics of elements. 
 
-If the data is held in an array, then the position of the new data in the array, may affect the rendering speed and appearance of the visualization as the following examples shows.
+If the data is held in an array, then the position of the new data in the array, may affect the rendering speed and appearance of the visualization as the following examples show.
 
 The two visualizations below use buttons to incrementally add data to an array.  The elements in the array are then bound to the elements in the visualization (appending elements when necessary) and the bound data is then used to change the appearance of the elements.
 
