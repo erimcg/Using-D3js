@@ -286,7 +286,7 @@ svg.append("text")
 
 ## Adding Data Points
 
-Recall from earlier, that we have array containing 5 objects where each object has a date property and an event property.  Below, we join the data to new circle elements and set the circle's radii, color, and position. Since the date property is a string, in order to find its position on the x-axis using the `xScale` scaling function, we need to convert the string to a `Date` object.  To do so, we can use the same parsing function that we created earlier (`parseTime`) and pass the result to the scaling function (`xScale`).
+Recall from earlier that we have an array containing 5 objects, where each object has a date property and an event property.  Below, we join the data to new circle elements and set the circle's radii, color, and position. Since the date property is a string, in order to find its position on the x-axis using the `xScale` scaling function, we need to convert the string to a `Date` object.  To do so, we can use the same parsing function that we created earlier (`parseTime`) and pass the result to the scaling function (`xScale`).
 
 <pre>
 svg.selectAll("circle")
