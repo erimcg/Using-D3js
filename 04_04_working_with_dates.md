@@ -212,7 +212,7 @@ domain = [d3.timeYear.floor(domain[0]), d3.timeYear.ceil(domain[1])];
 
 ## Adding Month Ticks and an Axis Label
 
-If you'd like to add a second set of tick marks you can do so with the original x-axis function.  Below we draw tick marks for each month.  We also remove the text for the monthly tick marks since their not necessary when analyzing the axis.  Note that if we draw yearly ticks as well, we'd want to draw the yearly ticks after drawing the monthly ticks so as to not remove the labels for the yearly ticks.
+If you'd like to add a second set of tick marks you can do so with the original x-axis function.  Below we draw tick marks for each month.  We also remove the text for the monthly tick marks since they're not necessary when analyzing the axis.  Note that if we draw yearly ticks as well, we'd want to draw the yearly ticks after drawing the monthly ticks so as to not remove the labels for the yearly ticks.
 
 <pre>
 svg.append("g")
