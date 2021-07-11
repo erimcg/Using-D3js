@@ -386,7 +386,7 @@ c_nodes.attr('r', d => d * 3)
 
 The [selection.datum([value])](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_datum) method can be used to get set, or clear the data bound to the elements of a selection.  The method has an optional argument that can hold null, a constant, or a function.  Regardless of the input, the method returns the selection on which it is called.  Unlike `selection.data`, the selection returned does not contain enter or exit selections.
 
-If no value is passed to the `datum` method, then the method returns the data that is bound to the *first* non-null element in the selection.  If null is passed ot the `datum` method, the data bound to the elements in the selected are cleared.   If a constant is passed to the method, the constant is bound to each element in the selection.  If a function is passed to `datum` the function will be called for each element in the selection and will be passed `(d, i, nodes)` where `d` is the element's current data, `i` is the group index for the element, and `nodes` is the the current group (array).
+If no value is passed to the `datum` method, then the method returns the data that is bound to the *first* non-null element in the selection.  If null is passed to the `datum` method, the data bound to the elements in the selected are cleared.   If a constant is passed to the method, the constant is bound to each element in the selection.  If a function is passed to `datum` the function will be called for each element in the selection and will be passed `(d, i, nodes)` where `d` is the element's current data, `i` is the group index for the element, and `nodes` is the the current group (array).
 
 ## Further Reading
 
