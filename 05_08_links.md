@@ -221,7 +221,7 @@ var nodeData = [
 </pre>
 
 Now instead of having an array of links, we have an array of nodes with positions and a parent position. 
-We can take this array and create links between each node's position and it's parent position by setting the `source` and `target` of our link generator:
+We can take this array and create links between each node's position and its parent position by setting the `source` and `target` of our link generator:
 
 + [link.source([source])](https://github.com/d3/d3-shape#link_source) - Where the link originates from, by default needs an array where `source[0]` is `x` and `source[1]` is `y`, however where source looks for `x` and `y` can be overridden 
 + [link.target([target])](https://github.com/d3/d3-shape#link_target) - Where the link goes to, same requirements as `link.source`
