@@ -55,7 +55,7 @@ Here we demonstrate passing an array to `data` and discuss passing functions at 
 var arr = [13, 8, 3, 2, 2];
 </pre>
 
-When the `data` method is executed, it iterates over the elements in the array and for each data value adds a `__data__` property holding the data value to one of the visual element in the selection.
+When the `data` method is executed, it iterates over the elements in the array and for each data value adds a `__data__` property holding the data value to one of the visual elements in the selection.
 
 In the example below, we have a `svg` element that contains 5 `rect` elements.  We've positioned each `rect` element by setting their `x` and `y` properties, but have omitted the `width` attribute for each rectangle (for now), because we'd like the width of each rectangle to be dependent on the data that is bound to the element.
 
@@ -111,7 +111,7 @@ function createBarGraph1() {
 
 In the example above, the number of elements in the data array was equal to the number of `rect` elements in the `svg`.  It is often the case that the number of elements in the data array is different than the number of visual elements in the selection.  There are 3 different scenarios:
 
-+ There are no visual element in the selection.
++ There are no visual elements in the selection.
 + There are not enough visual elements in the selection.
 + There are too many visual elements in the selection.
 
