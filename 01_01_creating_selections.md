@@ -38,7 +38,7 @@ Each one of the methods above return a [d3.selection](https://github.com/d3/d3-s
 
 [d3.selection()](https://github.com/d3/d3-selection/blob/master/README.md#selection) is used to retrieve a selection object that only contains the root document element (i.e. [document.documentElement](https://developer.mozilla.org/en-US/docs/Web/API/Document/documentElement)) of the web page.  This method can can also be used to test for the `selection` type using `instanceof d3.selection`.
 
-To illustrate various ways that we can use these methods, lets suppose we have 5 circles rendered in an SVG as shown below.
+To illustrate various ways that we can use these methods, let's suppose we have 5 circles rendered in an SVG as shown below.
 
 ``` {cm: visible}
 <svg width="425" height="100" >

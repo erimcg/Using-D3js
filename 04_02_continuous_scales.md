@@ -107,7 +107,7 @@ var data = [
 ];
 </pre>
 
-Rather than displaying a bar graph as we did in previous examples, lets create 5 circles in a row, one circle for each state, where the radius of a circles is proportional to the size of the homeless population in the respective state.
+Rather than displaying a bar graph as we did in previous examples, let's create 5 circles in a row, one circle for each state, where the radius of a circles is proportional to the size of the homeless population in the respective state.
 
 Since we want to maintain the proportional differences between data points we'll use the `scaleLinear` method. The `scaleLinear` method returns a reference to a `continuous` object on which we can call the `domain` and `range` methods to set the domain and range of the scaling function.
 
