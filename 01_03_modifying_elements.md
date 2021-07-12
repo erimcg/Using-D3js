@@ -66,7 +66,7 @@ The `selection.each` method allows us to call a function for each element in a s
  
 When `each` is executed, the function that is passed to it is executed once for each element in the selection and each time it is executed it is passed `d` (the data bound to the element - See [Chapter 2](http://using-d3js.com/02_01_binding_data.html)), `i` (the element's group index), and `nodes` (the element's group.)  `nodes[i]` is used to retrieve the current element in the selection for which the function is being called.
  
-In the example below, a lambda expression is called for each element in the selection and each time checks to see if the index of the element is even, and if so, sets it's fill color to pink.
+In the example below, a lambda expression is called for each element in the selection and each time checks to see if the index of the element is even, and if so, sets its fill color to pink.
 
 <pre>
 d3.selectAll("#eachSVG circle").each((d,i,nodes) => {
@@ -214,7 +214,7 @@ When `selection.text` or `selection.html` is called without a `value` argument, 
 
 The example below shows how reverse the letters in an element's text node by using `selection.text` without any arguments to retrieve the text, and using `selection.text` again with a non-null argument to set the text.
 
-To begin we select the box with the class named *box* and retrieve it's text using `selection.text`, storing the string in the variable named `str`.  We then reverse the order of the letters in the string and store the result back in `str`.  Last, we select the same box again and set it's text by passing `str` to `selection.text`.
+To begin we select the box with the class named *box* and retrieve its text using `selection.text`, storing the string in the variable named `str`.  We then reverse the order of the letters in the string and store the result back in `str`.  Last, we select the same box again and set its text by passing `str` to `selection.text`.
 
 ```
 <script>

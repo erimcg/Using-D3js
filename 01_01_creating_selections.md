@@ -38,7 +38,7 @@ Each one of the methods above return a [d3.selection](https://github.com/d3/d3-s
 
 [d3.selection()](https://github.com/d3/d3-selection/blob/master/README.md#selection) is used to retrieve a selection object that only contains the root document element (i.e. [document.documentElement](https://developer.mozilla.org/en-US/docs/Web/API/Document/documentElement)) of the web page.  This method can can also be used to test for the `selection` type using `instanceof d3.selection`.
 
-To illustrate various ways that we can use these methods, lets suppose we have 5 circles rendered in an SVG as shown below.
+To illustrate various ways that we can use these methods, let's suppose we have 5 circles rendered in an SVG as shown below.
 
 ``` {cm: visible}
 <svg width="425" height="100" >
@@ -95,7 +95,7 @@ Both `selection.select` and `selection.selectAll` have one argument, a selector.
 
 If a selector function is passed to `selection.select`, the selector function must return a single element of null.  If a selector function is passed to `selection.selectAll`, the selector function must return an array or pseudo-array, like a NodeList.
 
-Consider the SVG in the example below. The SVG element uses `&lt;g&gt;` tags to group circle elements into rows.  In order to get all of the circles that are descendents of the first `g` element we call `selection.select` to get the first `g` element and then chain a call to `selection.selectAll` to get all of the `circle` elements that are children of the selected `g` element.  Once we have a selection containing the elements we want to modify, we can modify the attributes of the elements in the selection using the `attr` method.  Note: we discuss the `attr` method in the next section.
+Consider the SVG in the example below. The SVG element uses `&lt;g&gt;` tags to group circle elements into rows.  In order to get all of the circles that are descendants of the first `g` element we call `selection.select` to get the first `g` element and then chain a call to `selection.selectAll` to get all of the `circle` elements that are children of the selected `g` element.  Once we have a selection containing the elements we want to modify, we can modify the attributes of the elements in the selection using the `attr` method.  Note: we discuss the `attr` method in the next section.
 
 
 <pre>
@@ -164,7 +164,7 @@ In our example, the variable `a` holds a selection that was returned by `d3.sele
 
 <img src="img/screenshots/selection_grp_a.png" alt="" height="120" />
 
-The `_groups` property contains an array of `NodeList` objects, each holding a *group* of element nodes that are descendants of a parent node.  The number of NodeLists will always be equal to the number of parents and `_groups[i]` will be the NodeList holding the descendents of `_parents[i]`.
+The `_groups` property contains an array of `NodeList` objects, each holding a *group* of element nodes that are descendants of a parent node.  The number of NodeLists will always be equal to the number of parents and `_groups[i]` will be the NodeList holding the descendants of `_parents[i]`.
 
 When we call `d3.select` or `d3.selectAll`, since there is only one parent node, the document's `html` node, we'll find there is ever only one NodeList element in the `_groups` array.
 
@@ -172,11 +172,11 @@ In our example, selection `a` has one parent (the document's `html` element), th
 
 Now, when we call `select` or `selectAll` on a selection, all of the elements in the selection's NodeLists become parents in the new selection and as before, there will be one NodeList in the selection's `_groups` array for each parent.
 
-So, for example, when we select the g elements that are descendants of the SVG by calling `b = a.selectAll("g")` the elements in `a's` NodeLists become the parents in `b`.  Since the total number of elements the `a's` NodeLists is 1, then there is only one parent in `b's` `_parents` array (the SVG element) and one NodeList containing the two g elements that are descendents of the SVG element.
+So, for example, when we select the g elements that are descendants of the SVG by calling `b = a.selectAll("g")` the elements in `a's` NodeLists become the parents in `b`.  Since the total number of elements the `a's` NodeLists is 1, then there is only one parent in `b's` `_parents` array (the SVG element) and one NodeList containing the two g elements that are descendants of the SVG element.
 
 <img src="img/screenshots/selection_grp_b.png" alt="" height="120" />
 
-The second call to `selectAll` selects all of the circle elements that are descendants of the g elements in `b`.  Since there are two g elements in `b`  there are two parents in `c` with each parent being assigned a `NodeList` containing the `circle` elements that are descendents of their parent `g` elements.
+The second call to `selectAll` selects all of the circle elements that are descendants of the g elements in `b`.  Since there are two g elements in `b`  there are two parents in `c` with each parent being assigned a `NodeList` containing the `circle` elements that are descendants of their parent `g` elements.
 
 <img src="img/screenshots/selection_grp_c.png" alt="" height="120" />
 
@@ -216,8 +216,8 @@ Note that `selection.filter` preserves the parents of the `selection` on which i
 D3.js contains three generator functions that are used by `selection.filter`, `selection.select`, and `selection.selectAll`.
 
 + [d3.matcher(selector)](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#matcher) - returns a function that when run returns true if *this* matches the selector passed in as an argument.
-+ [d3.selector(selector)](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selector) - returns a function that when run returns the first decendent of *this* that matches the selector passed in as an argument.
-+ [d3.selectorAll(selector)](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selectorAll) - returns a function that when run returns a `NodeList` containing the decendent of *this* that matches the selector passed in as an argument.
++ [d3.selector(selector)](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selector) - returns a function that when run returns the first descendant of *this* that matches the selector passed in as an argument.
++ [d3.selectorAll(selector)](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selectorAll) - returns a function that when run returns a `NodeList` containing the descendant of *this* that matches the selector passed in as an argument.
 
 Below we show examples of how `d3.matcher` and `d3.selector` can be used.  By calling `call` on each of the functions that are generated (`matcher` and `selector`) we change the execution context of the functions thus changing the value of `this` in each.
 

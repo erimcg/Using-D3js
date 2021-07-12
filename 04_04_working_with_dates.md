@@ -212,7 +212,7 @@ domain = [d3.timeYear.floor(domain[0]), d3.timeYear.ceil(domain[1])];
 
 ## Adding Month Ticks and an Axis Label
 
-If you'd like to add a second set of tick marks you can do so with the original x-axis function.  Below we draw tick marks for each month.  We also remove the text for the monthly tick marks since their not necessary when analyzing the axis.  Note that if we draw yearly ticks as well, we'd want to draw the yearly ticks after drawing the monthly ticks so as to not remove the labels for the yearly ticks.
+If you'd like to add a second set of tick marks you can do so with the original x-axis function.  Below we draw tick marks for each month.  We also remove the text for the monthly tick marks since they're not necessary when analyzing the axis.  Note that if we draw yearly ticks as well, we'd want to draw the yearly ticks after drawing the monthly ticks so as to not remove the labels for the yearly ticks.
 
 <pre>
 svg.append("g")
@@ -286,7 +286,7 @@ svg.append("text")
 
 ## Adding Data Points
 
-Recall from earlier, that we have array containing 5 objects where each object has a date property and an event property.  Below, we join the data to new circle elements and set the circle's radii, color, and position. Since the date property is a string, in order to find its position on the x-axis using the `xScale` scaling function, we need to convert the string to a `Date` object.  To do so, we can use the same parsing function that we created earlier (`parseTime`) and pass the result to the scaling function (`xScale`).
+Recall from earlier that we have an array containing 5 objects, where each object has a date property and an event property.  Below, we join the data to new circle elements and set the circle's radii, color, and position. Since the date property is a string, in order to find its position on the x-axis using the `xScale` scaling function, we need to convert the string to a `Date` object.  To do so, we can use the same parsing function that we created earlier (`parseTime`) and pass the result to the scaling function (`xScale`).
 
 <pre>
 svg.selectAll("circle")

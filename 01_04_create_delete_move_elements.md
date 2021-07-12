@@ -192,7 +192,7 @@ The `insert` method inserts a new element for each element in the selection.  In
 
 ## Selection.clone
 
-The `selection.clone([deep])` method clones all of the selected elements and inserts them immediately after each of the selected elements.  If `true` is passed to `clone`, all of the descendent nodes of the selected elements will be cloned as well. A selection containing the newly created cloned nodes is returned.
+The `selection.clone([deep])` method clones all of the selected elements and inserts them immediately after each of the selected elements.  If `true` is passed to `clone`, all of the descendant nodes of the selected elements will be cloned as well. A selection containing the newly created cloned nodes is returned.
 
 In the example below we select all of the box divs, clone them, and change their background color to lightblue.
 
