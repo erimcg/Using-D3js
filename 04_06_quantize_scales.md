@@ -17,7 +17,7 @@ The quantize scales in d3 include:
 + [d3.scaleThreshold()](https://github.com/d3/d3-scale/blob/master/README.md#scaleThreshold) - maps a continuous domain defined by an array of threshold values to an array of elements
 
 ## Quantize Scales
-The scaleQuantize() method generates a scaling function that segments the domain into *k* uniform segments where *k* is the number of elements with the range set.  Each segments is mapped to a unique elements within the range set.
+The scaleQuantize() method generates a scaling function that segments the domain into *k* uniform segments where *k* is the number of elements with the range set.  Each segment is mapped to a unique element within the range set.
 
 As with the continuous scaling functions the domain and range are specified by calling the domain and range methods respectively.
 
