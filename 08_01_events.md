@@ -28,10 +28,10 @@
 
 In this section we discuss adding and handling events using D3.js.
 
-When displaying our visualizations in a webpage, it may help our readers if our visualizations are intractable. 
+When displaying our visualizations in a webpage, it may help our readers if our visualizations are interactive. 
 Buttons that alter the graphic and tooltips that display additional information are good ways to help convey the information in our visualizations.
 
-To add in these intractable features to our visualizations we will need to use [`events`](https://developer.mozilla.org/en-US/docs/Web/API/Event). When adding an event to any element or node we need to set two things: the event type and the listener function.
+To add in these interactive features to our visualizations we will need to use [`events`](https://developer.mozilla.org/en-US/docs/Web/API/Event). When adding an event to any element or node we need to set two things: the event type and the listener function.
 
 The event type is what scenario the element is checking for, such as when the mouse comes onto or goes off of the element (`onmouseenter` and `onmouseout` respectively).
 The listener is the function that is called whenever the event is triggered. 

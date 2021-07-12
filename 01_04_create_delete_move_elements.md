@@ -267,7 +267,7 @@ function raise() {
 
 ## Selection.lower
 
-The [selection.lower()](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_lower) method reinserts the elements in the selection into the DOM as the last child of their respective parents.
+The [selection.lower()](https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_lower) method reinserts the elements in the selection into the DOM as the first child of their respective parents.
 
 ```
 <script>  

@@ -36,3 +36,6 @@ http://using-d3js.com/06_05_packs.html
 http://using-d3js.com/07_01_word_clouds.html
 http://using-d3js.com/07_02_chords.html
 http://using-d3js.com/08_01_events.html
+http://using-d3js.com/08_02_dispatches.html
+http://using-d3js.com/08_03_require.html
+http://using-d3js.com/08_04_timers.html

@@ -74,6 +74,15 @@ function addLabels(selection, data, area){
             .attr("transform", d3.areaLabel(area).minHeight(9.5))
             .attr("fill", "black");
     }
+    
+function addAreas(selection, data, area, customTransform){ //customTransform not neccesary
+    selection.selectAll(".areas")
+        .data(data)
+        .join("path")
+        .attr("d", area)
+        .attr("fill", (d) => colorScale(d.key))
+        .attr("transform" , customTransform);
+}
 </script>
 
 # Stacks
@@ -84,9 +93,9 @@ Consider the following array containing sales data for three fruits over three m
 
 <pre>
 var data = [
-    {month: new Date(2018, 1, 1), apples: 10, bananas: 20, oranges: 15},
-    {month: new Date(2018, 2, 1), apples: 15, bananas: 15, oranges: 15},
-    {month: new Date(2018, 3, 1), apples: 20, bananas: 25, oranges: 15}
+  {month: new Date(2018, 1, 1), apples: 10, bananas: 20, oranges: 15},
+  {month: new Date(2018, 2, 1), apples: 15, bananas: 15, oranges: 15},
+  {month: new Date(2018, 3, 1), apples: 20, bananas: 25, oranges: 15}
 ];
 </pre>
 
@@ -95,9 +104,9 @@ This dataset has a form that is typically visualized using a stacked chart or gr
  ```
 <script>
 var data = [
-    {month: new Date(2018, 1, 1), apples: 10, bananas: 20, oranges: 15},
-    {month: new Date(2018, 2, 1), apples: 15, bananas: 15, oranges: 15},
-    {month: new Date(2018, 3, 1), apples: 20, bananas: 25, oranges: 15}
+  {month: new Date(2018, 1, 1), apples: 10, bananas: 20, oranges: 15},
+  {month: new Date(2018, 2, 1), apples: 15, bananas: 15, oranges: 15},
+  {month: new Date(2018, 3, 1), apples: 20, bananas: 25, oranges: 15}
 ];
 
 var stackGen = d3.stack()
@@ -166,7 +175,7 @@ var stackedSeries = stackGen(data);
 
 + [stack(data[,arguements])](https://github.com/d3/d3-shape#_stack) - Takes an array of data as an argument and returns back an array of series data.
 
-When the stack generator is invoked with a dataset, it maps each series in the dataset that we specified in `stack.keys` to a new series. Each new series contains the bottom and top y-coordinates for each data point in the original series, as well as reference to the object in the original dataset from which the top y-coordinate is computed.
+When the stack generator is invoked with a dataset, it maps each series specified in `stack.keys` to a new series. Each new series contains the bottom and top y-coordinates for each data point in the original series, as well as reference to the object in the original dataset from which the top y-coordinate is computed.
 
 The array referenced by `stackedSeries` holds the following data:
 
@@ -199,7 +208,7 @@ var areaGen = d3.area()
   .y1((d) => yScale(d[1]));
 </pre>
  
-Now we can use the `stackedSeries` data with our `areaGen` to create multiple SVG paths:
+Now we can use the `stackedSeries` data with our `areaGen` to create multiple SVG paths which are filled with different colors.
 
 <pre>
 d3.select("#demo1")
@@ -213,9 +222,9 @@ d3.select("#demo1")
  ```
 <script>
 var data = [
-    {month: new Date(2018, 1, 1), apples: 10, bananas: 20, oranges: 15},
-    {month: new Date(2018, 2, 1), apples: 15, bananas: 15, oranges: 15},
-    {month: new Date(2018, 3, 1), apples: 20, bananas: 25, oranges: 15}
+  {month: new Date(2018, 1, 1), apples: 10, bananas: 20, oranges: 15},
+  {month: new Date(2018, 2, 1), apples: 15, bananas: 15, oranges: 15},
+  {month: new Date(2018, 3, 1), apples: 20, bananas: 25, oranges: 15}
 ];
 
 var stackGen = d3.stack()
@@ -248,193 +257,161 @@ d3.select("#demo1")
  ```
 <figure class="sandbox"><figcaption>Figure 2. A basic stacked area graph. </figcaption></figure>
 
-### Creating Bar Graphs
+### Stack.value()
 
-Alternately, instead of appending areas we can append SVG rects. This is useful for making bar charts and for cases where we have negative values ([d3.stackOffsetDiverging](#diverging) on this page has an example of negative values).
+The `stack.value` method is used to retrieve the values associated with the keys from the data passed to the stack generator. By default, `stack.value` does not need to be called, as the keys are assumed to be properties of the objects in the array passed to the stack generator.
 
-To start off with, we will now use actual dates instead of arbitrary days, along with a new scale for it:
-<pre>
-var data = [
-    {month: new Date(2018, 1, 1), apples: 400, bananas: 200, cherries: 96, dates: 40},
-    {month: new Date(2018, 2, 1), apples: 160, bananas: 150, cherries: 96, dates: 40},
-    {month: new Date(2018, 3, 1), apples:  64, bananas:  96, cherries: 64, dates: 40},
-    {month: new Date(2018, 4, 1), apples:  32, bananas:  48, cherries: 64, dates: 40}
-];
-var xScale = d3.scaleTime().domain([data[0].month, data[3].month]).range([50,235]);
-</pre>
++ [stack.value([value])](https://github.com/d3/d3-shape#stack_value) - Takes a function that returns the value associated with a key.
 
-To do this effectively, we will append each series rects at once. (All apple nodes => all banana nodes => ...) To do this, we will first bind the data to new `g` elements in our SVG, there will be a `g` for each series:
-
-To generate our rects we first have to add some `g` elements to our SVG. Each of these `g` elements will be a particular series (apple, banana, etc). To do this we will select our already existing `g`, select all the new `g.series` elements, bind each series to its `g` node, join `g` elements, and set attributes (such as color for the series):
-
-<pre>
-var g = d3.select("#demo2")
-    .select('g')
-    .selectAll('g.series')
-    .data(stackedSeries)
-    .join('g')
-    .classed('series', true)
-    .style('fill', (d) => colorScale(d.key));
-</pre>
-
-Now for each of the series we will append rects. To do this we will select all the rects, bind each month to each rect and set their attributes:
-
-<pre>
-g.selectAll('rect')
-    .data((d) => d)
-    .join('rect')
-    .attr('width', 40)
-    .attr('y', (d) => yScale(d[1]))
-    .attr('x', (d) => xScale(d.data.month) - 20)
-    .attr('height', (d) => yScale(d[0]) -  yScale(d[1]));
-</pre>
-
-For this and many examples we see on this page, there are functions that generate our axis, labels, or areas. The definitions of these functions can be found at the bottom of this page.
-
-```
-<script>
-    var data = [
-      {month: new Date(2018, 1, 1), apples: 400, bananas: 200, cherries: 96, dates: 40},
-      {month: new Date(2018, 2, 1), apples: 160, bananas: 150, cherries: 96, dates: 40},
-      {month: new Date(2018, 3, 1), apples:  64, bananas:  96, cherries: 64, dates: 40},
-      {month: new Date(2018, 4, 1), apples:  32, bananas:  48, cherries: 64, dates: 40}
-    ];
-
-    var stack = d3.stack()
-        .keys(["apples", "bananas", "cherries", "dates"]);
-    var stackedSeries = stack(data);
-
-    var xScale = d3.scaleTime().domain([data[0].month, data[3].month]).range([50,235]);
-    var yScale = d3.scaleLinear().domain([0, 650]).range([275,25]);
-    var colorScale = d3.scaleOrdinal()
-            .domain(["apples", "bananas", "oranges", "cherries", "grapes", "dates"])
-            .range(["red", "yellow", "orange", "pink", "purple", "brown"]);
-            
-    //See end of page for addAxis() function definition
-    addAxis(d3.select("#demo2").append("g")
-        .attr("transform", "translate(20,0)"), data, xScale, null, true);    //Adds in the X axis with ticks
-    addAxis(d3.select("#demo2"), data, null, yScale, true);                  //Adds in the Y axis
-    addAxis(d3.select("#demo2"), null, d3.scaleLinear().range([50,275]), null, true);  //Adds in a blank X axis
-            
-	// Create a g element for each series
-    var g = d3.select("#demo2")
-        .select('g')
-        .selectAll('g.series')
-        .data(stackedSeries)
-        .join('g')
-        .classed('series', true)
-        .style('fill', (d) => colorScale(d.key));
-
-    // For each series create a rect element for each day
-    g.selectAll('rect')
-        .data((d) => d)
-        .join('rect')
-        .attr('width', 40)
-        .attr('y', (d) => yScale(d[1]))
-        .attr('x', (d) => xScale(d.data.month) - 20)
-        .attr('height', (d) => yScale(d[0]) -  yScale(d[1]));
-</script>
-
-<svg id="demo2" width="300" height="300"></svg>
-```
-<figure class="sandbox"><figcaption>Figure 3. . </figcaption></figure>
-
-### Setting .value()
-It is rare for our data to not be nested in any way. For instance, let us say we now have the following data set:
+To see how `stack.value` can be used, consider a dataset formatted as follows:
 
 <pre>
 var data = [
-      {month: new Date(2018, 0, 1), fruitSales: {apples: 400, bananas: 200, cherries: 96,  dates: 40, oranges: 250, grapes: 20}},
-      {month: new Date(2018, 1, 1), fruitSales: {apples: 160, bananas: 150, cherries: 96,  dates: 40, oranges: 200, grapes: 25}},
-      {month: new Date(2018, 2, 1), fruitSales: {apples:  64, bananas:  96, cherries: 64,  dates: 40, oranges: 150, grapes: 30}}
-      ...
-    ];
+  {month: new Date(2018, 1, 1), fruitSales: {apples: 10, bananas: 20, oranges: 15}},
+  ...
 </pre>
 
-Now, all our sales data is inside `fruitSales` and setting `keys` will not be enough for the stack generator to find our data. To get our stack generator to work with this data still we can set `value` equal to our `fruitSales`. The `value` is where the stack generator looks for its `keys`. By default the `value` is each the top level array in each data set passed in. 
+To create a stack generator with this dataset we call `d3.stack` and then set the keys to the names of the fruits as we did in the previous examples.  We then call `stack.value`, passing it a lambda expression.  The lambda expression has two parameters, `obj` and `key`, which correspond to an object in `data` and a key passed to `stack.keys`, respectively, and returns the value associated with the `key` in the object `obj`.
 
 <pre>
 var stack = d3.stack()
-        .keys(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
-        .value((d, key) => d.fruitSales[key]);
+  .keys(["apples", "bananas", "oranges"])
+  .value((obj, key) => obj.fruitSales[key]);
 </pre>
-
-`key` is the named object `value` is looking for in the data array passed in. Now our stack generator will look in `fruitSales` for the keys.
-
-+ [stack.value([value])](https://github.com/d3/d3-shape#stack_value) - Takes a function. Sets the value for where the stack generator will look for keys.
 
 ```
 <script>
-    var data = [
-      {month: new Date(2018, 0, 1), fruitSales: {apples: 400, bananas: 200, cherries: 96,  dates: 40, oranges: 250, grapes: 20}},
-      {month: new Date(2018, 1, 1), fruitSales: {apples: 160, bananas: 150, cherries: 96,  dates: 40, oranges: 200, grapes: 25}},
-      {month: new Date(2018, 2, 1), fruitSales: {apples:  64, bananas:  96, cherries: 64,  dates: 40, oranges: 150, grapes: 30}},
-      {month: new Date(2018, 3, 1), fruitSales: {apples:  32, bananas:  48, cherries: 64,  dates: 40, oranges: 100, grapes: 20}},
-      {month: new Date(2018, 4, 1), fruitSales: {apples:  40, bananas: 100, cherries: 64,  dates: 40, oranges: 115, grapes: 45}},
-      {month: new Date(2018, 5, 1), fruitSales: {apples: 100, bananas: 250, cherries: 86,  dates: 40, oranges: 225, grapes: 50}},
-      {month: new Date(2018, 6, 1), fruitSales: {apples: 150, bananas: 125, cherries: 96,  dates: 40, oranges: 200, grapes: 15}},
-      {month: new Date(2018, 7, 1), fruitSales: {apples: 100, bananas:  75, cherries: 106, dates: 40, oranges: 210, grapes: 10}}
-    ];
+var data = [
+  {month: new Date(2018, 1, 1), fruitSales: {apples: 10, bananas: 20, oranges: 15}},
+  {month: new Date(2018, 2, 1), fruitSales: {apples: 15, bananas: 15, oranges: 15}},
+  {month: new Date(2018, 3, 1), fruitSales: {apples: 20, bananas: 25, oranges: 15}}
+];
 
-    var stack = d3.stack()
-        .keys(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
-        .value((d, key) => d.fruitSales[key]);
+var stack = d3.stack()
+  .keys(["apples", "bananas", "oranges"])
+  .value((obj, key) => obj.fruitSales[key]);
 
-    var stackedSeries = stack(data);
+var stackedSeries = stack(data);
 
-    var xScale = d3.scaleTime().range([50,275]);
-    var yScale = d3.scaleLinear().range([275,25]);
-    var colorScale = d3.scaleOrdinal()
-            .domain(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
-            .range(["red", "yellow", "pink", "brown", "orange", "purple"]);
+var xScale = d3.scaleTime().domain([data[0].month, data[2].month]).range([50, 275]);
+var yScale = d3.scaleLinear().domain([0,60]).range([275, 25]);
 
-    addAxis(d3.select("#demo3"), data, xScale, yScale, false);
+var colorScale = d3.scaleOrdinal()
+  .domain(["apples", "bananas", "oranges"])
+  .range(["red", "yellow", "orange"]);
 
-    var area = d3.area()
-    	.x((d) => xScale(d.data.month))
-        .y0((d) => yScale(d[0]))
-        .y1((d) => yScale(d[1]))
-        .curve(d3.curveBasis);
-	
-    d3.select("#demo3")
-    	.selectAll('.areas')
-        .data(stackedSeries)
-        .join('path')
-        .attr('d', area)
-        .attr("fill", (d) => colorScale(d.key));
-        
-    addLabels(d3.select("#demo3"), stackedSeries, area);
+var areaGen = d3.area()
+  .x((d) => xScale(d.data.month))
+  .y0((d) => yScale(d[0]))
+  .y1((d) => yScale(d[1]));
+    
+d3.select("#demo3")
+  .selectAll(".areas")
+  .data(stackedSeries)
+  .join("path")
+  .attr("d", areaGen)
+  .attr("fill", (d) => colorScale(d.key));
 </script>
 
 <svg id="demo3" width="300" height="300"></svg>
 ```
-<figure class="sandbox"><figcaption>Figure 4. . </figcaption></figure>
+<figure class="sandbox"><figcaption>Figure 3. A stacked graph using stack.value(). </figcaption></figure>
 
+## Creating Bar Graphs
 
-### Adding Areas Function
-In all future examples we will be using this function to add the areas of our stacks:
+Instead of appending areas we can append SVG rects to create stacked bar graphs.
 
-``` {cm: visible}
-<script>
-    function addAreas(selection, data, area, customTransform){ //customTransform not neccesary
-        selection.selectAll(".areas")
-            .data(data)
-            .join("path")
-            .attr("d", area)
-            .attr("fill", (d) => colorScale(d.key))
-            .attr("transform" , customTransform);
-    }
-</script>
+To do this, we will first bind each of the series in `stackedSeries` to a new `g` elements in our SVG.  This gives us a `g` element for each fruit.
+
+<pre>
+var sel = d3.select("#demo2")
+  .select('g')
+  .selectAll('g.series')
+  .data(stackedSeries)
+  .join('g')
+  .classed('series', true)
+  .style('fill', (d) => colorScale(d.key));
+</pre>
+
+Recall that each series in `stackedSeries` is an array containing arrays where each inner array contains low and high y-coordinates.
+
+Then, for each `g` element, we append multiple `rect` element, one for each pair of low and high y-coordinates.
+
+<pre>
+sel.selectAll('rect')
+  .data((d) => d)
+  .join('rect')
+  .attr('width', 40)
+  .attr('y', (d) => yScale(d[1]))
+  .attr('x', (d) => xScale(d.data.month) - 20)
+  .attr('height', (d) => yScale(d[0]) -  yScale(d[1]));
+</pre>
+
+Note that we use functions to generate our axis, labels, and areas in the example below and in many other examples on this page. The definitions of these functions can be found at the bottom of this page.
+
 ```
+<script>
+var data = [
+  {month: new Date(2018, 1, 1), apples: 400, bananas: 200, cherries: 96, dates: 40},
+  {month: new Date(2018, 2, 1), apples: 160, bananas: 150, cherries: 96, dates: 40},
+  {month: new Date(2018, 3, 1), apples:  64, bananas:  96, cherries: 64, dates: 40},
+  {month: new Date(2018, 4, 1), apples:  32, bananas:  48, cherries: 64, dates: 40}
+];
+
+var stack = d3.stack()
+  .keys(["apples", "bananas", "cherries", "dates"]);
+  
+var stackedSeries = stack(data);
+
+var xScale = d3.scaleTime().domain([data[0].month, data[3].month]).range([50,235]);
+var yScale = d3.scaleLinear().domain([0, 650]).range([275,25]);
+var colorScale = d3.scaleOrdinal()
+  .domain(["apples", "bananas", "oranges", "cherries", "grapes", "dates"])
+  .range(["red", "yellow", "orange", "pink", "purple", "brown"]);
+        
+//See end of page for addAxis() function definition
+addAxis(d3.select("#demo2").append("g")
+  .attr("transform", "translate(20,0)"), data, xScale, null, true);    //Adds in the X axis with ticks
+addAxis(d3.select("#demo2"), data, null, yScale, true);                  //Adds in the Y axis
+addAxis(d3.select("#demo2"), null, d3.scaleLinear().range([50,275]), null, true);  //Adds in a blank X axis
+        
+// Create a g element for each series
+var sel = d3.select("#demo2")
+  .select('g')
+  .selectAll('g.series')
+  .data(stackedSeries)
+  .join('g')
+  .classed('series', true)
+  .style('fill', (d) => colorScale(d.key));
+
+// For each series create a rect element for each month
+sel.selectAll('rect')
+  .data((d) => d)
+  .join('rect')
+  .attr('width', 40)
+  .attr('y', (d) => yScale(d[1]))
+  .attr('x', (d) => xScale(d.data.month) - 20)
+  .attr('height', (d) => yScale(d[0]) -  yScale(d[1]));
+</script>
+
+<svg id="demo2" width="300" height="300"></svg>
+```
+<figure class="sandbox"><figcaption>Figure 4. A stacked bar graph. </figcaption></figure>
 
 ## Stack Ordering
 
-By setting the `.order([order])` accessor of a stack we can change where each series appears in the stack. The default ordering if one is not set is d3.stackOrderNone.
+By calling `stack.order([order])` on a stack generator we can change the order of the series in the array that is returned by the stack generator. The default ordering is `d3.stackOrderNone`, which orders the series in the same order as that of the keys.
 
-+ [stack.order([order])](https://github.com/d3/d3-shape#stack_order) - Takes an order type or a function that is used to determine the order. The order is where the series in the stack appear.
++ [stack.order([order])](https://github.com/d3/d3-shape#stack_order) - Takes an ordering function as an argument and returns the stack generator.
 
-+ [d3.stackOrderNone(series)](https://github.com/d3/d3-shape#stackOrderNone) - Orders all the series based on the ordering of the keys. If you define the stack with `.keys(["a", "b", "c"])` the order of the series will be "a", "b", "c", from bottom to top.
-+ [d3.stackOrderReverse(series)](https://github.com/d3/d3-shape#stackOrderReverse) - Orders all the series based on the <b>reverse</b> ordering of the keys. If you define the stack with `.keys(["a", "b", "c"])` the order of the series will be "a", "b", "c", from <b>top to bottom</b>. This is the opposite of `d3.stackOrderNone()`.
+If the stack generator has a non-default ordering, we can change the ordering to the default by using `d3.stackOrderNone`.
+
++ [d3.stackOrderNone(series)](https://github.com/d3/d3-shape#stackOrderNone) - Orders the series based on the ordering of the keys as defined by `stack.keys`.   For example, if you define the stack with `.keys(["a", "b", "c"])` the order of the series will be "a", "b", "c", from bottom to top.
+
+If we want an ordering that is the reverse of the default, we can use `d3.stackOrderReverse`.
+
++ [d3.stackOrderReverse(series)](https://github.com/d3/d3-shape#stackOrderReverse) - Orders the series based on the <b>reverse</b> ordering of the keys.  For example, if you define the stack with `.keys(["a", "b", "c"])` the order of the series will be "c", "b", "a", from bottom to top.
+
 ```
 <script>
     var data = [
@@ -459,6 +436,7 @@ By setting the `.order([order])` accessor of a stack we can change where each se
             .value((d, key) => d.fruitSales[key])
             .order(d3.stackOrderNone)
             .offset(d3.stackOffsetNone);
+            
     var stackedSeries1 = stack1(data);
 
     var stack2 = d3.stack()
@@ -484,10 +462,15 @@ By setting the `.order([order])` accessor of a stack we can change where each se
 <svg id="demo4n" width="300" height="300"></svg>
 <svg id="demo4r" width="300" height="300"></svg>
 ```
-<figure class="sandbox"><figcaption>Figure 5. . </figcaption></figure>
+<figure class="sandbox"><figcaption>Figure 5. Stacks using d3.stackOffsetNone (left) and d3.stackOrderReverse (right). </figcaption></figure>
 
-+ [d3.stackOrderAscending(series)](https://github.com/d3/d3-shape#stackOrderAscending) - Orders all the series based on the sum of <i>all</i> the values of each series. The series with the smallest sum with be placed on the bottom, ascending upwards to the largest.
-+ [d3.stackOrderDescending(series)](https://github.com/d3/d3-shape#stackOrderDescending) - Orders all the series based on the sum of <i>all</i> the values of each series. The series with the largest sum with be placed on the bottom, ascending upwards to the smallest. This is the opposite of `d3.stackOrderAscending()`.
+
+### Ordering based on the sum of the values in each series
+
+D3.js provides two orderings that are based on the sum of the values in each series.
+
++ [d3.stackOrderAscending(series)](https://github.com/d3/d3-shape#stackOrderAscending) -  The series with the smallest sum with be placed on the bottom, ascending upwards to the largest.
++ [d3.stackOrderDescending(series)](https://github.com/d3/d3-shape#stackOrderDescending) - The series with the largest sum with be placed on the bottom, ascending upwards to the smallest.
 ```
 <script>
         var data = [
@@ -537,31 +520,120 @@ By setting the `.order([order])` accessor of a stack we can change where each se
    <svg id="demo5a" width="300" height="300"></svg>
    <svg id="demo5d" width="300" height="300"></svg>
 ```
-<figure class="sandbox"><figcaption>Figure 6. . </figcaption></figure>
+<figure class="sandbox"><figcaption>Figure 6. Stacks using d3.stackOrderAscending (left) and d3.stackOrderDescending (right). </figcaption></figure>
 
-## d3.stackOrderAppearance( and d3.stackOrderInsideOut()
+### Ordering based on the maximum value of each series
 
-When having stacks with large amount of data, readability is important. `d3.stackOrderAppearance()` and `d3.stackOrderInsideOut()` can be used to improve readability in our stacks.
-The ways that `d3.stackOrderAppearance()` and `d3.stackOrderInsideOut()` sort are further explained and reasoned in [Stacked Graphs—Geometry & Aesthetics](http://leebyron.com/streamgraph/stackedgraphs_byron_wattenberg.pdf) by Byron & Wattenberg.
+When creating stacks to visualize large amounts of data, readability is important. `d3.stackOrderAppearance` and `d3.stackOrderInsideOut` can be used to improve readability of a stack visualization by ordering the series based on the maximum value of each series or more specifically, the index of the maximum value for each series.
 
-Below is an graphic explanation on how these orderings sort our data.
+Take for example the dataset shown below containing sales data for 4 fruits over 14 months.  When `d3.stackOrderAppearance` and `d3.stackOrderInsideOut` order the fruit series, they find the index of the maximum value for each series.  We've highlighted these indices and values in the table below.
 
-First `d3.stackOrderAppearance()` and `d3.stackOrderInsideOut()` finds at what index each series has its maximum value.
+<style>
+  table {
+    border-collapse:collapse;
+    border-spacing:0;
+    border-color:#9ABAD9;
+    margin:0 auto;
+  }
+  th, td{
+    font-family:Arial,sans-serif;
+    font-size:14px;
+    font-weight:normal;
+    padding:1px 20px;
+    border-style:solid;
+    border-width:1px;
+    overflow:hidden;
+    word-break:normal;
+    border-color:#9ABAD9;
+    text-align:center;
+    vertical-align:top;
+    background-color:#EBF5FF;
+    color:dimgray;
+  }
+  .blue {background-color:blue;color:lightgray;}
+  .red  {background-color:red;color:lightgray;}
+  .yellow {background-color:yellow;}
+  .orange {background-color:orange;}
+  .purple  {background-color:purple;color:lightgray;}
 
-<table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#fff;background-color:#409cff;text-align:center;vertical-align:top">Index</th><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#ff5858;text-align:center;vertical-align:top">Apples</th><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#fffe65;text-align:center;vertical-align:top">Bananas</th><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#ffcb2f;text-align:center;vertical-align:top">Oranges</th><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#b56fff;text-align:center;vertical-align:top">Grapes</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">0</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">10</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#ff5858;text-align:center;vertical-align:top">2</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#ff5858;font-weight:bold;text-align:center;vertical-align:top">25</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">3</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">10</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">4</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">10</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#b56fff;text-align:center;vertical-align:top">5</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#b56fff;font-weight:bold;text-align:center;vertical-align:top">25</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">6</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">10</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">7</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">10</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#f8a102;text-align:center;vertical-align:top">8</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#ffcb2f;font-weight:bold;text-align:center;vertical-align:top">25</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">9</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">10</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">10</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">10</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#fffc9e;text-align:center;vertical-align:top">11</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#fffc9e;font-weight:bold;text-align:center;vertical-align:top">25</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">12</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">10</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">13</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">Index at <br>Max Value</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#ff5858;text-align:center;vertical-align:top">Apples: 2</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#fffc9e;text-align:center;vertical-align:top">Bananas: 11</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#ffcc67;text-align:center;vertical-align:top">Oranges: 8</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 20px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#b56fff;text-align:center;vertical-align:top">Grapes: 5</td></tr></table><br>
+</style>
+<table>
+  <tr>
+    <th class="blue">Index</th>
+    <th class="red">Apples</th>
+    <th class ="yellow">Bananas</th>
+    <th class="orange">Oranges</th>
+    <th class="purple">Grapes</th>
+  </tr>
+<tr><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>1</td><td>10</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td class="red">2</td><td class="red">25</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>3</td><td>10</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>4</td><td>1</td><td>1</td><td>1</td><td>10</td></tr>
+<tr><td class="purple">5</td><td>1</td><td>1</td><td>1</td><td class="purple">25</td></tr>
+<tr><td>6</td><td>1</td><td>1</td><td>1</td><td>10</td></tr>
+<tr><td>7</td><td>1</td><td>1</td><td>10</td><td>1</td></tr>
+<tr><td class="orange">8</td><td>1</td><td>1</td><td class="orange">25</td><td>1</td></tr>
+<tr><td>9</td><td>1</td><td>1</td><td>10</td><td>1</td></tr>
+<tr><td>10</td><td>1</td><td>10</td><td>1</td><td>1</td></tr>
+<tr><td class="yellow">11</td><td>1</td><td lass="yellow">25</td><td>1</td><td>1</td></tr>
+<tr><td>12</td><td>1</td><td>10</td><td>1</td><td>1</td></tr>
+<tr><td>13</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+<tr>
+  <td>Index at <br>Max Value</td>
+  <td class="red">Apples: 2</td>
+  <td class="yellow">Bananas: 11</td>
+  <td class="orange">Oranges: 8</td>
+  <td class="purple">Grapes: 5</td>
+</tr>
+</table>
 
-Next, the orderings create an array of the indices of its maximum value.
+Next, the orderings create an array containing the *indices* of the maximum values.
 
-<table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#409cff;text-align:center"></th><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#ff5858;text-align:center">Apples</th><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#fffc9e;text-align:center;vertical-align:top">Bananas</th><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#ffcb2f;text-align:center;vertical-align:top">Oranges</th><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#b56fff;text-align:center;vertical-align:top">Grapes</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">Index</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">2</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">11</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">8</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">5</td></tr></table>
+<table>
+  <tr>
+    <th></th>
+    <th class="red">Apples</th>
+    <th class="yellow">Bananas</th>
+    <th class="orange">Oranges</th>
+    <th class="purple">Grapes</th>
+  </tr>
+  <tr>
+    <td>Indices</td>
+    <td>2</td>
+    <td>11</td>
+    <td>8</td>
+    <td>5</td>
+  </tr>
+</table>
 <br>
 
-Finally those indices are sorted least to greatest:
+Finally, the series are sorted according to the indices of their maximum values.  
 
-<table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#409cff;text-align:center"></th><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#ff5858;text-align:center">Apples</th><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#b56fff;text-align:center;vertical-align:top">Grapes</th><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#ffcb2f;text-align:center;vertical-align:top">Oranges</th><th style="font-family:Arial, sans-serif;font-size:13px;font-weight:normal;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#000000;background-color:#fffc9e;text-align:center;vertical-align:top">Bananas</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">Index</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">2</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">5</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">8</td><td style="font-family:Arial, sans-serif;font-size:13px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">11</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top"></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:1px 15px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top" colspan="4">-------------------------------------------------------&gt;</td></tr></table>
++ [d3.stackOrderAppearance(series)](https://github.com/d3/d3-shape#stackOrderAppearance) - orders the series such that the series having the earliest maximum value (i.e. series with its maximum value at the lowest index) is positioned at the bottom of the stack, and the series having the latest maximum is placed on the top.
 
-+ [d3.stackOrderApperance(series)](https://github.com/d3/d3-shape#stackOrderAppearance) - will place the smallest indices on the bottom of the stack, and the series with the largest index will be on the top.
-+ [d3.stackOrderInsideOut(series)](https://github.com/d3/d3-shape#stackOrderInsideOut) - will place the smallest indices in the middle working its way outward for the largest. 
-`d3.stackOrderInsideOut()` should have its `offest` set to `d3.stackOffsetWiggle()` and is used to make streamgraphs.
+Here we see that the series are sorted in the following order: apples, grapes, oranges, and bananas.
+
+<table>
+  <tr>
+    <th></th>
+    <th class="red">Apples</th>
+    <th class="purple">Grapes</th>
+    <th class="orange">Oranges</th>
+    <th class="yellow">Bananas</th>
+  </tr>
+  <tr>
+    <td>Indices</td>
+    <td>2</td>
+    <td>5</td>
+    <td>8</td>
+    <td>11</td>
+  </tr>
+    <tr>
+    <td></td>
+    <td colspan="4">-------------------------------------------------------&gt;</td>
+  </tr>
+</table>
 
 ```
 <script>
@@ -590,218 +662,15 @@ Finally those indices are sorted least to greatest:
 
     var stack1 = d3.stack()
             .keys(["apples", "bananas", "oranges", "grapes"])
-            .value((d, key) => d.fruitSales[key])
-            .order(d3.stackOrderAppearance)
-            .offset(d3.stackOffsetNone);
+            .value((d, key) => d.fruitSales[key]);
+            
     var stackedSeries1 = stack1(data);
 
     var stack2 = d3.stack()
             .keys(["apples", "bananas", "oranges", "grapes"])
             .value((d, key) => d.fruitSales[key])
-            .order(d3.stackOrderInsideOut)
-            .offset(d3.stackOffsetWiggle);
-    var stackedSeries2 = stack2(data);
-
-    var area1 = d3.area()
-        .x((d) => xScale(d.data.month))
-        .y0((d) => yScale(d[0]))
-        .y1((d) => yScale(d[1]))
-        .curve(d3.curveBasis);
-    var area2 = d3.area()
-        .x((d) => xScale(d.data.month))
-        .y0((d) => yScale(d[0] + 25/2))
-        .y1((d) => yScale(d[1] + 25/2))
-        .curve(d3.curveBasis);
-
-    addAreas(d3.select("#demo6a"), stackedSeries1, area1); // Areas to stackOrderAppearance
-    addAreas(d3.select("#demo6i"), stackedSeries2, area2); // Areas to stackOrderInsideOut
-        
-    addLabels(d3.select("#demo6a"), stackedSeries1, area1); // Labels to stackOrderAppearance
-    addLabels(d3.select("#demo6i"), stackedSeries2, area2); // Labels to stackOrderInsideOut
-</script>
-
-<svg id="demo6a" class="svgClass" width="300" height="200"></svg>
-<svg id="demo6i" class="svgClass" width="300" height="200"></svg>
-```
-<figure class="sandbox"><figcaption>Figure 7. . </figcaption></figure>
-
-## Stack Offsets
-
-By setting the `.offset([offset])` we can control the baselines that our stacks use. The baseline for the default offset is 0, so every stack bottoms out at zero and works its way up. 
-
-+ [stack.offset([offset])](https://github.com/d3/d3-shape#stack_offset) - Takes an offset type or function that computes the offset. Sets the stack generators offset, which determines how the series in the stack appear.
-
-+ [d3.stackOffsetNone(series, order)](https://github.com/d3/d3-shape#stackOffsetNone) - Applies a zero baseline. Is the default offset.
-+ [d3.stackOffsetExpand(series, order)](https://github.com/d3/d3-shape#stackOffsetExpand) - Applies a zero baseline, and normalizes every point to be within the range `[`0,1`]`.
-
-```
-<script>
-    var data = [
-        {month: new Date(2018, 0, 1), fruitSales: {apples: 400, bananas: 200, cherries: 96,  dates: 40, oranges: 250, grapes: 20}},
-        {month: new Date(2018, 1, 1), fruitSales: {apples: 160, bananas: 150, cherries: 96,  dates: 40, oranges: 200, grapes: 25}},
-        {month: new Date(2018, 2, 1), fruitSales: {apples:  64, bananas:  96, cherries: 64,  dates: 40, oranges: 150, grapes: 30}},
-        {month: new Date(2018, 3, 1), fruitSales: {apples:  32, bananas:  48, cherries: 64,  dates: 40, oranges: 100, grapes: 20}},
-        {month: new Date(2018, 4, 1), fruitSales: {apples:  40, bananas: 100, cherries: 64,  dates: 40, oranges: 115, grapes: 45}},
-        {month: new Date(2018, 5, 1), fruitSales: {apples: 100, bananas: 250, cherries: 86,  dates: 40, oranges: 225, grapes: 50}},
-        {month: new Date(2018, 6, 1), fruitSales: {apples: 150, bananas: 125, cherries: 96,  dates: 40, oranges: 200, grapes: 15}},
-        {month: new Date(2018, 7, 1), fruitSales: {apples: 100, bananas:  75, cherries: 106, dates: 40, oranges: 210, grapes: 10}}
-    ];
-
-    var xScale = d3.scaleTime().domain([data[0].month, data[data.length - 1].month]).range([50,275]);
-    var yScaleNone = d3.scaleLinear().domain([0,1000]).range([275,25]);
-    var yScaleExpand = d3.scaleLinear().domain([0,1]).range([275,25]);
-    var colorScale = d3.scaleOrdinal()
-        .domain(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
-        .range(["red", "yellow", "pink", "brown", "orange", "purple"]);
-
-    var stack1 = d3.stack() 
-            .keys(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
-            .value((d, key) => d.fruitSales[key])
-            .order(d3.stackOrderNone)
-            .offset(d3.stackOffsetNone);
-    var stackedSeries1 = stack1(data);
-
-    var stack2 = d3.stack()
-            .keys(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
-            .value((d, key) => d.fruitSales[key])
-            .order(d3.stackOrderNone)
-            .offset(d3.stackOffsetExpand);
-    var stackedSeries2 = stack2(data);
-
-    var areaNone = d3.area()
-        .x((d) => xScale(d.data.month))
-        .y0((d) => yScaleNone(d[0]))
-        .y1((d) => yScaleNone(d[1]))
-        .curve(d3.curveBasis);
-        
-    var areaExpanding = d3.area()
-        .x((d) => xScale(d.data.month))
-        .y0((d) => yScaleExpand(d[0]))
-        .y1((d) => yScaleExpand(d[1]))
-        .curve(d3.curveBasis);
-    
-    addAreas(d3.select("#demo7n").select("#stack"), stackedSeries1, areaNone); // Areas to stackOffsetNone
-    addAreas(d3.select("#demo7e").select("#stack"), stackedSeries2, areaExpanding); // Areas to stackOffsetExpanding
-        
-    addLabels(d3.select("#demo7n").select("#stack"), stackedSeries1, areaNone); // Labels to stackOffsetNone
-    addLabels(d3.select("#demo7e").select("#stack"), stackedSeries2, areaExpanding); // Labels to stackOffsetExpanding
-</script>
-
-<svg id="demo7n" width="300" height="300">
-  <g id="stack"></g>
-  <g id="baseline">
-      <text y="290">Baseline</text>
-      <path d="M 25 275 l 325 0" stroke="green" stroke-width="3px"></path>
-  </g>
-</svg>
-<svg id="demo7e" width="300" height="300">
-  <g id="stack"></g>
-  <g id="baseline">
-  		<text x="" y="290">Baseline</text>
-        <text x="290" y="270">0</text>
-        <text x="290" y="40">1</text>
-        <path d="M 25 25 l 325 0" stroke="green" stroke-width="3px"></path>
-        <path d="M 25 275 l 325 0" stroke="green" stroke-width="3px"></path>
-  </g>
-</svg>
-```
-<figure class="sandbox"><figcaption>Figure 8. . </figcaption></figure>
-
-+ <a id="diverging"></a>[d3.stackOffsetDiverging(series, order)](https://github.com/d3/d3-shape#stackOffsetDiverging) - Has positive values above 0, and negative values below 0. Best used with SVG Rects instead of areas.
-```
-<script>
-    var data = [
-        {month: new Date(2018, 0, 1), fruitSales: {apples: 400, bananas: 200, cherries: 96,  dates: 40, oranges: 250, grapes: 20}},
-        {month: new Date(2018, 1, 1), fruitSales: {apples: 160, bananas: 150, cherries: 96,  dates: 40, oranges: 200, grapes: 25}},
-        {month: new Date(2018, 2, 1), fruitSales: {apples:  64, bananas:  96, cherries: 64,  dates: 40, oranges: 150, grapes: -30}},
-        {month: new Date(2018, 3, 1), fruitSales: {apples:  32, bananas:  48, cherries: 64,  dates: 40, oranges: 100, grapes: -20}},
-        {month: new Date(2018, 4, 1), fruitSales: {apples:  40, bananas: 100, cherries: 64,  dates: 40, oranges: 115, grapes: -45}},
-        {month: new Date(2018, 5, 1), fruitSales: {apples: 100, bananas: -25, cherries: 86,  dates: 40, oranges: -225, grapes: 50}},
-        {month: new Date(2018, 6, 1), fruitSales: {apples: 150, bananas: -125, cherries: 96,  dates: 40, oranges: -200, grapes: 15}},
-        {month: new Date(2018, 7, 1), fruitSales: {apples: 100, bananas:  -75, cherries: 106, dates: 40, oranges: -210, grapes: 10}}
-    ];
-
-    var xScale = d3.scaleTime().domain([data[0].month, data[data.length - 1].month]).range([50+225/data.length/2, 275 - 225/data.length/2]);
-    var yScaleDiv = d3.scaleLinear().domain([-1000,1000]).range([275,25]);
-    var colorScale = d3.scaleOrdinal()
-        .domain(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
-        .range(["red", "yellow", "pink", "brown", "orange", "purple"]);
-
-    var stack = d3.stack() 
-            .keys(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
-            .value((d, key) => d.fruitSales[key])
-            .order(d3.stackOrderNone)
-            .offset(d3.stackOffsetDiverging);
-    var stackedSeries = stack(data);
-
-	addAxis(d3.select("#demo8d"), data, xScale, yScaleDiv);
-	addAxis(d3.select("#demo8d"), null, d3.scaleTime().range([50,275]), null);
-
-    // Create a g element for each series
-    var g = d3.select("#demo8d")
-        .select('#stack')
-        .selectAll('g.series')
-        .data(stackedSeries)
-        .join('g')
-        .classed('series', true)
-        .style('fill', (d) => colorScale(d.key));
-
-    // For each series create a rect element for each month
-    g.selectAll('rect')
-        .data((d) => d)
-        .join('rect')
-        .attr('width', 225/data.length)
-        .attr('y', (d) => yScaleDiv(d[1]))
-        .attr('x', (d, i) => i * (225/data.length) + 50)
-        .attr('height', (d) => yScaleDiv(d[0]) -  yScaleDiv(d[1])); 
-        
-    //Adds in the baseline
-    d3.select("#baseline8").append("path").attr("d", "M 25 " + yScaleDiv(0) + " l 325 0").attr("stroke", "green").attr("stroke-width", "5px");
-    d3.select("#baseline8").append("text").attr("x", 0).attr("y", yScaleDiv(0) - 10).text("Baseline");
-        
-</script>
-
-<svg id="demo8d" width="300" height="300">
-    <g id="stack"></g>
-    <g id="baseline8"></g>
-</svg>
-```
-<figure class="sandbox"><figcaption>Figure 9. . </figcaption></figure>
-
-+ [d3.stackOffsetSilhouette(series, order)](https://github.com/d3/d3-shape#stackOffsetSilhouette) - Shifts the baseline so that the center of the streamgraph is 0.
-+ [d3.stackOffsetWiggle(series, order)](https://github.com/d3/d3-shape#stackOffsetWiggle) - Shifts the baseline to minimize the wiggle of the layers. Recommended for streamgraphs alongside `d3.stackOrderInsideOut())`. Has a variable baseline that changes throughout the streamgraph.
-
-```
-<script>
-    var data = [
-        {month: new Date(2018, 0, 1), fruitSales: {apples: 400, bananas: 200, cherries: 96,  dates: 40, oranges: 250, grapes: 20}},
-        {month: new Date(2018, 1, 1), fruitSales: {apples: 160, bananas: 150, cherries: 96,  dates: 40, oranges: 200, grapes: 25}},
-        {month: new Date(2018, 2, 1), fruitSales: {apples:  64, bananas:  96, cherries: 64,  dates: 40, oranges: 150, grapes: 30}},
-        {month: new Date(2018, 3, 1), fruitSales: {apples:  32, bananas:  48, cherries: 64,  dates: 40, oranges: 100, grapes: 20}},
-        {month: new Date(2018, 4, 1), fruitSales: {apples:  40, bananas: 100, cherries: 64,  dates: 40, oranges: 115, grapes: 45}},
-        {month: new Date(2018, 5, 1), fruitSales: {apples: 100, bananas: 250 , cherries: 86,  dates: 40, oranges: 225, grapes: 50}},
-        {month: new Date(2018, 6, 1), fruitSales: {apples: 150, bananas: 125, cherries: 96,  dates: 40, oranges: 200, grapes: 15}},
-        {month: new Date(2018, 7, 1), fruitSales: {apples: 100, bananas:  75, cherries: 106, dates: 40, oranges: 210, grapes: 10}}
-    ];
-
-    var xScale = d3.scaleTime().domain([data[0].month, data[data.length - 1].month]).range([50,275]);
-    var yScale = d3.scaleLinear().domain([0,1000]).range([275,25]);
-    var colorScale = d3.scaleOrdinal()
-        .domain(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
-        .range(["red", "yellow", "pink", "brown", "orange", "purple"]);
-
-    var stack1 = d3.stack() 
-            .keys(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
-            .value((d, key) => d.fruitSales[key])
-            .order(d3.stackOrderNone)
-            .offset(d3.stackOffsetSilhouette);
-    var stackedSeries1 = stack1(data);
-
-    var stack2 = d3.stack()
-            .keys(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
-            .value((d, key) => d.fruitSales[key])
-            .order(d3.stackOrderInsideOut)
-            .offset(d3.stackOffsetWiggle);
+            .order(d3.stackOrderAppearance);
+            
     var stackedSeries2 = stack2(data);
 
     var area = d3.area()
@@ -809,16 +678,331 @@ By setting the `.offset([offset])` we can control the baselines that our stacks 
         .y0((d) => yScale(d[0]))
         .y1((d) => yScale(d[1]))
         .curve(d3.curveBasis);
-    
-    addAreas(d3.select("#demo9s").select("#stack9s"), stackedSeries1, area, "translate(0, -150)"); // Areas to stackOffsetSilhouette
-    addAreas(d3.select("#demo9w").select("#stack9w"), stackedSeries2, area); // Areas to stackOrderReverse // Areas to stackOffsetWiggle
-    
-    addLabels(d3.select("#demo9s").select("#stack9s").append("g").attr("transform", "translate(0, -150)"), stackedSeries1, area); // Labels to stackOffsetSilhouette
-    addLabels(d3.select("#demo9w").select("#stack9w"), stackedSeries2, area); // Labels to stackOffsetWiggle
 
-    //Adds the baseline the Silhouette
-	d3.select("#baseline9s").append("path").attr("d", "M 25 " + yScale(0) + " l 325 0").attr("stroke", "green").attr("stroke-width", "5px");
-    d3.select("#baseline9s").append("text").attr("x", 0).attr("y", yScale(0) - 10).text("Baseline");
+    addAreas(d3.select("#demo6"), stackedSeries1, area);  // Areas to default order
+    addAreas(d3.select("#demo6a"), stackedSeries2, area); // Areas to stackOrderAppearance
+        
+    addLabels(d3.select("#demo6"), stackedSeries1, area); // Labels to default order
+    addLabels(d3.select("#demo6a"), stackedSeries2, area); // Labels to stackOrderAppearance
+</script>
+
+<svg id="demo6" class="svgClass" width="300" height="200"></svg>
+<svg id="demo6a" class="svgClass" width="300" height="200"></svg>
+```
+<figure class="sandbox"><figcaption>Figure 7. Stacks using the default order (left) and d3.stackOrderAppearance (right). </figcaption></figure>
+
++ [d3.stackOrderInsideOut(series)](https://github.com/d3/d3-shape#stackOrderInsideOut) - orders the series, from the inside out, with the series having the earliest maximum value (i.e. series with its maximum value at the lowest index)positioned in the middle, and the series having the latest maximum value positioned on the outside.
+
+Here we see that the series are sorted in the following order: oranges, apples, grapes, and bananas.
+
+<table>
+  <tr>
+    <th></th>
+<th class="orange">Oranges</th>
+    <th class="red">Apples</th>
+    <th class="purple">Grapes</th>
+    <th class="yellow">Bananas</th>
+  </tr>
+  <tr>
+    <td>Indices</td>
+    <td>8</td>
+    <td>2</td>
+    <td>5</td>
+    <td>11</td>
+  </tr>
+    <tr>
+    <td></td>
+    <td colspan="4">&lt;-------------------------- --------------------------&gt;</td>
+  </tr>
+</table>
+
+```
+<script>
+    var data = [
+   		{month: new Date(2018, 0, 1),  fruitSales: {apples: 1,    bananas: 1,   oranges: 1,   grapes: 1}},
+        {month: new Date(2018, 1, 1),  fruitSales: {apples: 10,   bananas: 1,   oranges: 1,   grapes: 1}},
+        {month: new Date(2018, 2, 1),  fruitSales: {apples: 25,   bananas: 1,   oranges: 1,   grapes: 1}},
+        {month: new Date(2018, 3, 1),  fruitSales: {apples: 10,   bananas: 1,   oranges: 1,   grapes: 1}},
+        {month: new Date(2018, 4, 1),  fruitSales: {apples: 1,    bananas: 1,  oranges: 1,   grapes: 10}},
+        {month: new Date(2018, 5, 1),  fruitSales: {apples: 1,    bananas: 1,  oranges: 1,   grapes: 25}},
+        {month: new Date(2018, 6, 1),  fruitSales: {apples: 1,    bananas: 1,  oranges: 1,   grapes: 10}},
+        {month: new Date(2018, 7, 1),  fruitSales: {apples: 1,    bananas: 1,   oranges: 10,  grapes: 1}},
+        {month: new Date(2018, 8, 1),  fruitSales: {apples: 1,    bananas: 1,   oranges: 25,  grapes: 1}},
+        {month: new Date(2018, 9, 1),  fruitSales: {apples: 1,    bananas: 1,   oranges: 10,  grapes: 1}},
+        {month: new Date(2018, 10, 1), fruitSales: {apples: 1,    bananas: 10,   oranges: 1,   grapes: 1}},
+        {month: new Date(2018, 11, 1), fruitSales: {apples: 1,    bananas: 25,   oranges: 1,   grapes: 1}},
+        {month: new Date(2019, 0, 1),  fruitSales: {apples: 1,    bananas: 10,   oranges: 1,   grapes: 1}},
+        {month: new Date(2019, 1, 1),  fruitSales: {apples: 1,    bananas: 1,   oranges: 1,   grapes: 1}}
+    ];
+
+    var xScale = d3.scaleLinear().domain([data[0].month, data[data.length-1].month]).range([10,290]);
+    var yScale = d3.scaleLinear().domain([0,30]).range([175,25]);
+    var colorScale = d3.scaleOrdinal()
+        .domain(["apples", "bananas", "oranges", "grapes"])
+        .range(["red", "yellow", "orange", "purple"]);
+
+    var stack1 = d3.stack()
+            .keys(["apples", "bananas", "oranges", "grapes"])
+            .value((d, key) => d.fruitSales[key]);
+            
+    var stackedSeries1 = stack1(data);
+
+    var stack2 = d3.stack()
+            .keys(["apples", "bananas", "oranges", "grapes"])
+            .value((d, key) => d.fruitSales[key])
+            .order(d3.stackOrderInsideOut)
+            .offset(d3.stackOffsetWiggle);
+            
+    var stackedSeries2 = stack2(data);
+
+    var area1 = d3.area()
+        .x((d) => xScale(d.data.month))
+        .y0((d) => yScale(d[0]))
+        .y1((d) => yScale(d[1]))
+        .curve(d3.curveBasis);
+        
+    var area2 = d3.area()
+        .x((d) => xScale(d.data.month))
+        .y0((d) => yScale(d[0] + 25/2))
+        .y1((d) => yScale(d[1] + 25/2))
+        .curve(d3.curveBasis);
+
+    addAreas(d3.select("#demo6b"), stackedSeries1, area1); // Areas to stackOrderAppearance
+    addAreas(d3.select("#demo6i"), stackedSeries2, area2); // Areas to stackOrderInsideOut
+        
+    addLabels(d3.select("#demo6b"), stackedSeries1, area1); // Labels to stackOrderAppearance
+    addLabels(d3.select("#demo6i"), stackedSeries2, area2); // Labels to stackOrderInsideOut
+</script>
+
+<svg id="demo6b" class="svgClass" width="300" height="200"></svg>
+<svg id="demo6i" class="svgClass" width="300" height="200"></svg>
+```
+<figure class="sandbox"><figcaption>Figure 8. Stacks using the default order (left) and d3.stackOrderInsideOut (right). </figcaption></figure>
+
+Note that `d3.stackOrderInsideOut` can be used to make steamgraphs as we do in Figure 8. When doing so we also set the `offset` to `d3.stackOffsetWiggle`.  For more information, please see the section on stack offsets below.
+
+For more information on the orderings used by `d3.stackOrderAppearance` and `d3.stackOrderInsideOut` please see [Stacked Graphs—Geometry & Aesthetics](http://leebyron.com/streamgraph/stackedgraphs_byron_wattenberg.pdf) by Byron & Wattenberg.
+
+## Stack Offsets
+
+The *baseline* of a stack is the line *y=0*.  By default, the series are positioned above the baseline with the first series' lower y-coordinates set at the baseline.  Often, we'll want to change how the series are positioned relative to the baseline.  For example, we may want positive data points positioned above the baseline and lower data points positioned below the baseline.
+
+To change how the series are positioned relative to the baseline we call `stack.offset` and pass to it an offset function.
+
++ [stack.offset([offset])](https://github.com/d3/d3-shape#stack_offset) - Takes an offset function as an argument and returns the stack generator. 
+
+If the stack generator has an offset that is not the default, we can change it to the default using `d3.stackOffsetNone`.
+
++ [d3.stackOffsetNone(series, order)](https://github.com/d3/d3-shape#stackOffsetNone) - Applies a zero baseline.
+
+```
+<script>
+var data = [
+    {month: new Date(2018, 0, 1), fruitSales: {apples: 400, bananas: 200, cherries: 96,  dates: 40, oranges: 250, grapes: 20}},
+    {month: new Date(2018, 1, 1), fruitSales: {apples: 160, bananas: 150, cherries: 96,  dates: 40, oranges: 200, grapes: 25}},
+    {month: new Date(2018, 2, 1), fruitSales: {apples:  64, bananas:  96, cherries: 64,  dates: 40, oranges: 150, grapes: 30}},
+    {month: new Date(2018, 3, 1), fruitSales: {apples:  32, bananas:  48, cherries: 64,  dates: 40, oranges: 100, grapes: 20}},
+    {month: new Date(2018, 4, 1), fruitSales: {apples:  40, bananas: 100, cherries: 64,  dates: 40, oranges: 115, grapes: 45}},
+    {month: new Date(2018, 5, 1), fruitSales: {apples: 100, bananas: 250, cherries: 86,  dates: 40, oranges: 225, grapes: 50}},
+    {month: new Date(2018, 6, 1), fruitSales: {apples: 150, bananas: 125, cherries: 96,  dates: 40, oranges: 200, grapes: 15}},
+    {month: new Date(2018, 7, 1), fruitSales: {apples: 100, bananas:  75, cherries: 106, dates: 40, oranges: 210, grapes: 10}}
+];
+
+var xScale = d3.scaleTime().domain([data[0].month, data[data.length - 1].month]).range([50,275]);
+var yScaleNone = d3.scaleLinear().domain([0,1000]).range([275,25]);
+var yScaleExpand = d3.scaleLinear().domain([0,1]).range([275,25]);
+var colorScale = d3.scaleOrdinal()
+  .domain(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
+  .range(["red", "yellow", "pink", "brown", "orange", "purple"]);
+
+var stack = d3.stack() 
+  .keys(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
+  .value((d, key) => d.fruitSales[key])
+  .order(d3.stackOrderNone)
+  .offset(d3.stackOffsetNone);
+        
+var stackedSeries = stack(data);
+
+var areaNone = d3.area()
+  .x((d) => xScale(d.data.month))
+  .y0((d) => yScaleNone(d[0]))
+  .y1((d) => yScaleNone(d[1]))
+  .curve(d3.curveBasis);
+
+addAreas(d3.select("#demo7").select("#stack"), stackedSeries, areaNone);
+addLabels(d3.select("#demo7").select("#stack"), stackedSeries, areaNone);
+</script>
+
+<svg id="demo7" width="300" height="300">
+  <g id="stack"></g>
+  <g id="baseline">
+      <text y="290">Baseline</text>
+      <path d="M 25 275 l 325 0" stroke="black" stroke-dasharray="10,5" stroke-width="2px"></path>
+  </g>
+</svg>
+```
+<figure class="sandbox"><figcaption>Figure 9. Stack with the default offset. </figcaption></figure>
+
+If we wish to position all positive data points above the baseline and negative data points below the baseline we can use `d3.stackOffsetDiverging`. 
+
++ <a id="diverging"></a>[d3.stackOffsetDiverging(series, order)](https://github.com/d3/d3-shape#stackOffsetDiverging) - Has positive values above 0, and negative values below 0. Best used with SVG rect elements instead of areas.
+```
+<script>
+var data = [
+    {month: new Date(2018, 0, 1), fruitSales: {apples: 400, bananas: 200, cherries: 96,  dates: 40, oranges: 250, grapes: 20}},
+    {month: new Date(2018, 1, 1), fruitSales: {apples: 160, bananas: 150, cherries: 96,  dates: 40, oranges: 200, grapes: 25}},
+    {month: new Date(2018, 2, 1), fruitSales: {apples:  64, bananas:  96, cherries: 64,  dates: 40, oranges: 150, grapes: -30}},
+    {month: new Date(2018, 3, 1), fruitSales: {apples:  32, bananas:  48, cherries: 64,  dates: 40, oranges: 100, grapes: -20}},
+    {month: new Date(2018, 4, 1), fruitSales: {apples:  40, bananas: 100, cherries: 64,  dates: 40, oranges: 115, grapes: -45}},
+    {month: new Date(2018, 5, 1), fruitSales: {apples: 100, bananas: -25, cherries: 86,  dates: 40, oranges: -225, grapes: 50}},
+    {month: new Date(2018, 6, 1), fruitSales: {apples: 150, bananas: -125, cherries: 96,  dates: 40, oranges: -200, grapes: 15}},
+    {month: new Date(2018, 7, 1), fruitSales: {apples: 100, bananas:  -75, cherries: 106, dates: 40, oranges: -210, grapes: 10}}
+];
+
+var xScale = d3.scaleTime().domain([data[0].month, data[data.length - 1].month]).range([50+225/data.length/2, 275 - 225/data.length/2]);
+var yScaleDiv = d3.scaleLinear().domain([-1000,1000]).range([275,25]);
+var colorScale = d3.scaleOrdinal()
+  .domain(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
+  .range(["red", "yellow", "pink", "brown", "orange", "purple"]);
+
+var stack = d3.stack() 
+  .keys(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
+  .value((d, key) => d.fruitSales[key])
+  .order(d3.stackOrderNone)
+  .offset(d3.stackOffsetDiverging);
+  
+var stackedSeries = stack(data);
+
+addAxis(d3.select("#demo8d"), data, xScale, yScaleDiv);
+addAxis(d3.select("#demo8d"), null, d3.scaleTime().range([50,275]), null);
+
+// Create a g element for each series
+var g = d3.select("#demo8d")
+  .select('#stack')
+  .selectAll('g.series')
+  .data(stackedSeries)
+  .join('g')
+  .classed('series', true)
+  .style('fill', (d) => colorScale(d.key));
+
+// For each series create a rect element for each month
+g.selectAll('rect')
+  .data((d) => d)
+  .join('rect')
+  .attr('width', 225/data.length)
+  .attr('y', (d) => yScaleDiv(d[1]))
+  .attr('x', (d, i) => i * (225/data.length) + 50)
+  .attr('height', (d) => yScaleDiv(d[0]) -  yScaleDiv(d[1])); 
+    
+//Adds in the baseline
+d3.select("#baseline8")
+  .append("path")
+  .attr("d", "M 25 " + yScaleDiv(0) + " l 325 0")
+  .attr("stroke", "black")
+  .attr("stroke-dasharray", "10,5")
+  .attr("stroke-width", "2px");
+  
+d3.select("#baseline8")
+  .append("text")
+  .attr("x", 0)
+  .attr("y", yScaleDiv(0) - 10)
+  .text("Baseline"); 
+</script>
+
+<svg id="demo8d" width="300" height="300">
+    <g id="stack"></g>
+    <g id="baseline8"></g>
+</svg>
+```
+<figure class="sandbox"><figcaption>Figure 10. A bar graph using d3.stackOffsetDiverging. </figcaption></figure>
+
+The `d3.stackOffsetSilhouette` and `d3.stackOffsetWiggle` offset functions create streamgraphs.
+
++ [d3.stackOffsetSilhouette(series, order)](https://github.com/d3/d3-shape#stackOffsetSilhouette) - positions the series symmetrically about the baseline.
+
++ [d3.stackOffsetWiggle(series, order)](https://github.com/d3/d3-shape#stackOffsetWiggle) - positions the series so that the *wiggle* in each series is minimized. This offset function is recommended for streamgraphs alongside `d3.stackOrderInsideOut())`.
+
+```
+<script>
+var data = [
+    {month: new Date(2018, 0, 1), fruitSales: {apples: 400, bananas: 200, cherries: 96,  dates: 40, oranges: 250, grapes: 20}},
+    {month: new Date(2018, 1, 1), fruitSales: {apples: 160, bananas: 150, cherries: 96,  dates: 40, oranges: 200, grapes: 25}},
+    {month: new Date(2018, 2, 1), fruitSales: {apples:  64, bananas:  96, cherries: 64,  dates: 40, oranges: 150, grapes: 30}},
+    {month: new Date(2018, 3, 1), fruitSales: {apples:  32, bananas:  48, cherries: 64,  dates: 40, oranges: 100, grapes: 20}},
+    {month: new Date(2018, 4, 1), fruitSales: {apples:  40, bananas: 100, cherries: 64,  dates: 40, oranges: 115, grapes: 45}},
+    {month: new Date(2018, 5, 1), fruitSales: {apples: 100, bananas: 250 , cherries: 86,  dates: 40, oranges: 225, grapes: 50}},
+    {month: new Date(2018, 6, 1), fruitSales: {apples: 150, bananas: 125, cherries: 96,  dates: 40, oranges: 200, grapes: 15}},
+    {month: new Date(2018, 7, 1), fruitSales: {apples: 100, bananas:  75, cherries: 106, dates: 40, oranges: 210, grapes: 10}}
+];
+
+var xScale = d3.scaleTime().domain([data[0].month, data[data.length - 1].month]).range([50,275]);
+var yScale = d3.scaleLinear().domain([0,1000]).range([275,25]);
+var colorScale = d3.scaleOrdinal()
+  .domain(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
+  .range(["red", "yellow", "pink", "brown", "orange", "purple"]);
+
+var stack1 = d3.stack() 
+  .keys(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
+  .value((d, key) => d.fruitSales[key])
+  .order(d3.stackOrderNone)
+  .offset(d3.stackOffsetSilhouette);
+        
+var stackedSeries1 = stack1(data);
+
+var stack2 = d3.stack()
+  .keys(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
+  .value((d, key) => d.fruitSales[key])
+  .order(d3.stackOrderInsideOut)
+  .offset(d3.stackOffsetWiggle);
+  
+var stackedSeries2 = stack2(data);
+
+var area = d3.area()
+  .x((d) => xScale(d.data.month))
+  .y0((d) => yScale(d[0]))
+  .y1((d) => yScale(d[1]))
+  .curve(d3.curveBasis);
+
+addAreas(d3.select("#demo9s")
+  .select("#stack9s"), stackedSeries1, area, "translate(0, -150)"); // Areas to stackOffsetSilhouette
+  
+addAreas(d3.select("#demo9w")
+  .select("#stack9w"), stackedSeries2, area); // Areas to stackOrderReverse // Areas to stackOffsetWiggle
+
+addLabels(d3.select("#demo9s")
+  .select("#stack9s")
+  .append("g")
+  .attr("transform", "translate(0, -150)"), stackedSeries1, area); 
+
+addLabels(d3.select("#demo9w")
+  .select("#stack9w"), stackedSeries2, area);
+
+//Adds the baseline the Silhouette
+d3.select("#baseline9s")
+  .append("path")
+  .attr("d", "M 25 " + yScale(0) + " l 325 0")
+  .attr("stroke-dasharray", "10,5")
+  .attr("stroke", "black")
+  .attr("stroke-width", "2px");
+
+d3.select("#baseline9s")
+  .append("text")
+  .attr("x", 0)
+  .attr("y", yScale(0) - 10)
+  .text("Baseline");
+    
+  d3.select("#baseline9w")
+  .append("path")
+  .attr("d", "M 25 " + yScale(0) + " l 325 0")
+  .attr("stroke-dasharray", "10,5")
+  .attr("stroke", "black")
+  .attr("stroke-width", "2px");
+  
+  d3.select("#baseline9w")
+  .append("text")
+  .attr("x", 0)
+  .attr("y", yScale(0) - 10)
+  .text("Baseline");
 </script>
 
 <svg id="demo9s" width="300" height="300">
@@ -827,93 +1011,164 @@ By setting the `.offset([offset])` we can control the baselines that our stacks 
 </svg>
 <svg id="demo9w" width="300" height="300">
   <g id="stack9w"></g>
+  <g id="baseline9w")></g>
 </svg>
 ```
-<figure class="sandbox"><figcaption>Figure 10. . </figcaption></figure>
+<figure class="sandbox"><figcaption>Figure 11. Stacks using d3.stackOffsetSilhouette (left) and d3.stackOffsetWiggle (right). </figcaption></figure>
 
-#### Axis Code
+The last offset function is `d3.stackOffsetExpand` which positions the series so that the bottom series is bounded below by *y=0* and the top series is bounded above by *y=1*.
 
-Below is the function `addAxis` which is used to determine the scales and add axis to some stacks on this page. If you need a refresher see [axis](./04_03_axis.html). It may seem complex at first, but the function checks for `null` frequently so that we can only use what we need.
++ [d3.stackOffsetExpand(series, order)](https://github.com/d3/d3-shape#stackOffsetExpand) - Normalizes every point to be within the range `[`0,1`]`.
 
 ```
 <script>
-//This is the function that adds the axis to some of the stacks
+var data = [
+    {month: new Date(2018, 0, 1), fruitSales: {apples: 400, bananas: 200, cherries: 96,  dates: 40, oranges: 250, grapes: 20}},
+    {month: new Date(2018, 1, 1), fruitSales: {apples: 160, bananas: 150, cherries: 96,  dates: 40, oranges: 200, grapes: 25}},
+    {month: new Date(2018, 2, 1), fruitSales: {apples:  64, bananas:  96, cherries: 64,  dates: 40, oranges: 150, grapes: 30}},
+    {month: new Date(2018, 3, 1), fruitSales: {apples:  32, bananas:  48, cherries: 64,  dates: 40, oranges: 100, grapes: 20}},
+    {month: new Date(2018, 4, 1), fruitSales: {apples:  40, bananas: 100, cherries: 64,  dates: 40, oranges: 115, grapes: 45}},
+    {month: new Date(2018, 5, 1), fruitSales: {apples: 100, bananas: 250, cherries: 86,  dates: 40, oranges: 225, grapes: 50}},
+    {month: new Date(2018, 6, 1), fruitSales: {apples: 150, bananas: 125, cherries: 96,  dates: 40, oranges: 200, grapes: 15}},
+    {month: new Date(2018, 7, 1), fruitSales: {apples: 100, bananas:  75, cherries: 106, dates: 40, oranges: 210, grapes: 10}}
+];
 
-function addAxis(svgSel, d, xscale, yscale, firstStack){
-	let dates, maxPValues, maxNValues, blankAxis;
-	
-	if(d){
-      dates = d.map( (d) => d.month );
-      if(firstStack){
-        maxPValues = d.map( (d) => {
-            let sum = 0;
-            for(let [key, value] of Object.entries(d)){ sum += key != "month" ? value : 0; }
-            return sum;
-         });
-        maxNValues = [0,0]; 
-      }
-      else {
-      	maxPValues = d.map( (d) => {
-            let sum = 0;
-            for(let [key, value] of Object.entries(d.fruitSales)){ sum += key != "month" ? (value > 0 ? value : 0): 0; }
-            return sum;
-         });
-        maxPValues.push(0);
+var xScale = d3.scaleTime().domain([data[0].month, data[data.length - 1].month]).range([50,275]);
+var yScaleNone = d3.scaleLinear().domain([0,1000]).range([275,25]);
+var yScaleExpand = d3.scaleLinear().domain([0,1]).range([275,25]);
+var colorScale = d3.scaleOrdinal()
+  .domain(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
+  .range(["red", "yellow", "pink", "brown", "orange", "purple"]);
+
+var stack2 = d3.stack()
+  .keys(["apples", "bananas", "cherries", "dates", "oranges", "grapes"])
+  .value((d, key) => d.fruitSales[key])
+  .order(d3.stackOrderNone)
+  .offset(d3.stackOffsetExpand);
         
-        maxNValues = d.map( (d) => {
-            let sum = 0;
-            for(let [key, value] of Object.entries(d.fruitSales)){ sum += key != "month" ? (value < 0 ? value : 0 ): 0; }
-            return sum;
-         });
-        maxNValues.push(0);
-        }
-    }
-    else{
-    	dates = [0,0];
-    	blankAxis = true;
-        maxPValues = [0,0];
-        maxNValues = [0,0];
-    }
+var stackedSeries2 = stack2(data);
     
-    if(xscale){
-        xscale.domain([dates[0], dates[dates.length - 1]]);
-        // Add xAxis
-        let xAxis = d3.axisBottom(xscale)
-        	.tickValues(blankAxis ? [] : dates)
-        	.tickFormat(d3.timeFormat("%b"));
-        svgSel.append("g")
-            .attr("transform", "translate(0, 275)")
-            .call(xAxis);
+var areaExpanding = d3.area()
+  .x((d) => xScale(d.data.month))
+  .y0((d) => yScaleExpand(d[0]))
+  .y1((d) => yScaleExpand(d[1]))
+  .curve(d3.curveBasis);
+
+addAreas(d3.select("#demo12").select("#stack"), stackedSeries2, areaExpanding);
+addLabels(d3.select("#demo12").select("#stack"), stackedSeries2, areaExpanding);
+</script>
+
+<svg id="demo12" width="300" height="300">
+  <g id="stack"></g>
+  <g id="baseline">
+  		<text x="" y="290">Baseline</text>
+        <text x="290" y="270">0</text>
+        <text x="290" y="40">1</text>
+        <path d="M 25 25 l 325 0" stroke="black" stroke-dasharray="10,5" stroke-width="2px"></path>
+        <path d="M 25 275 l 325 0" stroke="black" stroke-dasharray="10,5" stroke-width="2px"></path>
+  </g>
+</svg>
+```
+<figure class="sandbox"><figcaption>Figure 12. A stack using d3.stackOffsetExpand. </figcaption></figure>
+
+<aside>
+  
+  ## In case you were wondering ...
+
+The following function was used to create the areas for the ordering examples.
+
+```
+<script>
+    function addAreas(selection, data, area, customTransform){ //customTransform not neccesary
+        selection.selectAll(".areas")
+            .data(data)
+            .join("path")
+            .attr("d", area)
+            .attr("fill", (d) => colorScale(d.key))
+            .attr("transform" , customTransform);
     }
-    if(yscale){
-        yDomain = d3.extent(maxPValues.concat(maxNValues));
-        yscale.domain(yDomain);
-        // Add yAxis
-        let yAxis = d3.axisLeft(yscale)
-            .ticks(8);
-        svgSel.append("g")
-            .attr("transform", "translate(49, 0)")
-            .call(yAxis);
+</script>
+<code>addAreas(selection, data, area, customTransform)</code>
+```
+
+The function `addAxis`, shown below, is used to determine the scales and add axis to some stacks on this page. If you need a refresher on axis, please see [axis](./04_03_axis.html). It may seem complex at first, but the function checks for `null` frequently so that we can only use what we need.
+
+```
+<script>
+function addAxis(svgSel, d, xscale, yscale, firstStack){
+  let dates, maxPValues, maxNValues, blankAxis;
+  
+  if(d){
+    dates = d.map( (d) => d.month );
+    if(firstStack){
+      maxPValues = d.map( (d) => {
+        let sum = 0;
+        for(let [key, value] of Object.entries(d)){ sum += key != "month" ? value : 0; }
+        return sum;
+       });
+      maxNValues = [0,0]; 
     }
+    else {
+      maxPValues = d.map( (d) => {
+        let sum = 0;
+        for(let [key, value] of Object.entries(d.fruitSales)){ sum += key != "month" ? (value > 0 ? value : 0): 0; }
+        return sum;
+       });
+      maxPValues.push(0);
+      
+      maxNValues = d.map( (d) => {
+        let sum = 0;
+        for(let [key, value] of Object.entries(d.fruitSales)){ sum += key != "month" ? (value < 0 ? value : 0 ): 0; }
+        return sum;
+       });
+      maxNValues.push(0);
+      }
+  }
+  else{
+    dates = [0,0];
+    blankAxis = true;
+    maxPValues = [0,0];
+    maxNValues = [0,0];
+  }
+  
+  if(xscale){
+    xscale.domain([dates[0], dates[dates.length - 1]]);
+    // Add xAxis
+    let xAxis = d3.axisBottom(xscale)
+      .tickValues(blankAxis ? [] : dates)
+      .tickFormat(d3.timeFormat("%b"));
+    svgSel.append("g")
+      .attr("transform", "translate(0, 275)")
+      .call(xAxis);
+  }
+  if(yscale){
+    yDomain = d3.extent(maxPValues.concat(maxNValues));
+    yscale.domain(yDomain);
+    // Add yAxis
+    let yAxis = d3.axisLeft(yscale)
+      .ticks(8);
+    svgSel.append("g")
+      .attr("transform", "translate(49, 0)")
+      .call(yAxis);
+  }
 }
 </script>
+<code>addAxis(svgSel, d, xscale, yscale, firstStack)</code>
 ```
-<figure class="sandbox"><figcaption>Figure 11. . </figcaption></figure>
 
-## d3-area-label
-
-Below is the function `addLabel` which is used to add text labels to our areas. If you need a refresher see the previous section [areas](./05_04_areas.html)
+Below is the function `addLabel` which is used to add text labels to our areas. If you need a refresher on areas see the previous section [areas](./05_04_areas.html).
 
 ```
 <script>
-    //This function is used to add labels to all the areas
-    function addLabels(selection, data, area){
-        selection.selectAll(".label")
-            .data(data)
-            .join("text")
-            .text((d) => d.key)
-            .attr("transform", d3.areaLabel(area).minHeight(9.5))
-            .attr("fill", "blaack");
-    }
+function addLabels(selection, data, area){
+  selection.selectAll(".label")
+    .data(data)
+    .join("text")
+    .text((d) => d.key)
+    .attr("transform", d3.areaLabel(area).minHeight(9.5))
+    .attr("fill", "blaack");
+}
 </script>
+<code>addLabels(selection, data, area)</code>
 ```
+</aside>
