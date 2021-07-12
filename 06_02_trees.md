@@ -716,7 +716,7 @@ After calling the layout function we create circles for each node and initially 
   .attr('cy', d => -d.y)
 </pre>
 
-We then rotate each circle about the origin so that it's angle is equal to the x-coordinate computed by the layout function, a value between 0 and 360 degrees.
+We then rotate each circle about the origin so that its angle is equal to the x-coordinate computed by the layout function, a value between 0 and 360 degrees.
 
 <pre>
   .attr("transform", d => `rotate(${d.x}, 0, 0)`);

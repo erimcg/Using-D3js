@@ -59,7 +59,7 @@ The node object has various methods that return either an array of associated li
 + [node.links()](https://github.com/d3/d3-hierarchy/blob/master/README.md#node_links) - returns the links to the children of this object; each link object has a source and a target field that hold references to nodes
 + [node.ancestors()](https://github.com/d3/d3-hierarchy/blob/master/README.md#node_ancestors) - returns an array of nodes from this node up to the root
 + [node.path(target_node)](https://github.com/d3/d3-hierarchy/blob/master/README.md#node_path) - returns the shortest path from this node to the target node
-+ [node.descendants()](https://github.com/d3/d3-hierarchy/blob/master/README.md#node_descendants) - returns an array of all descendent nodes in topological order
++ [node.descendants()](https://github.com/d3/d3-hierarchy/blob/master/README.md#node_descendants) - returns an array of all descendant nodes in topological order
 + [node.leaves()](https://github.com/d3/d3-hierarchy/blob/master/README.md#node_descendants) - returns the array of leaf nodes
 
 ## Copy

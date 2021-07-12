@@ -8,7 +8,7 @@
 
 When the dataset used for a visualization changes, we may need to update the visual elements to reflect the new data, possibly adding or removing visual elements, and changing the visual characteristics of elements. 
 
-If the data is held in an array, then the position of the new data in the array, may affect the rendering speed and appearance of the visualization as the following examples shows.
+If the data is held in an array, then the position of the new data in the array, may affect the rendering speed and appearance of the visualization as the following examples show.
 
 The two visualizations below use buttons to incrementally add data to an array.  The elements in the array are then bound to the elements in the visualization (appending elements when necessary) and the bound data is then used to change the appearance of the elements.
 
@@ -203,7 +203,7 @@ The [selection.data([data[, key]])](https://github.com/d3/d3-selection/blob/mast
 
 When a key function is passed to the `data` method, the key function is called for each data element in the selection (producing a string for each element) and the key function is called for each datum in the array (producing a string for each datum).   If a datum's key string matches an element's key string, the datum is bound to the element.  
 
-This matching mechanism allows an element in the DOM to maintain the data that is bound to it regardless of the data's position in the data array.  In example 1, when data is prepended to the array and the array is passed to `data` without a key function, the new data at index `0` is bound to an preexisting rectangle requiring the appearance (width) of the element to be modified.  The data that used to be bound to that element must be bound to a different element (perhaps a new one) and it's appearance modified.  This cascading affect of moving the data bound to the existing elements causes all of the existing elements to be recomputed and rerendered.
+This matching mechanism allows an element in the DOM to maintain the data that is bound to it regardless of the data's position in the data array.  In example 1, when data is prepended to the array and the array is passed to `data` without a key function, the new data at index `0` is bound to an preexisting rectangle requiring the appearance (width) of the element to be modified.  The data that used to be bound to that element must be bound to a different element (perhaps a new one) and its appearance modified.  This cascading effect of moving the data bound to the existing elements causes all of the existing elements to be recomputed and rerendered.
 
 In the second example, the key function ensures that the data bound to the existing elements is never changed and so only the location of the elements might have to be changed.
 
