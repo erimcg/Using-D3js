@@ -233,7 +233,7 @@ renderLine("demo3c", line.curve(d3.curveBasisOpen));
 
 ## Bundle Curve
 
-The bundle curve interpolators create straightened [cubic basis splines](https://en.wikipedia.org/wiki/B-spline).  The degree to which the spline is straightened is determined by the interpolator's `beta` value.  Valid `beta` value range between 0 an 1. At the extremes, when `beta` is `1` the curve resembles the curve produced by `d3.curveBasis` and when `beta` is `0` the curve is a straight line between the first and last control points.  By default, the `beta` value is `0.85`.  This curve is not intended for use with `d3.area`, only `d3.line`.
+The bundle curve interpolators create straightened [cubic basis splines](https://en.wikipedia.org/wiki/B-spline).  The degree to which the spline is straightened is determined by the interpolator's `beta` value.  Valid `beta` values range between 0 and 1. At the extremes, when `beta` is `1` the curve resembles the curve produced by `d3.curveBasis` and when `beta` is `0` the curve is a straight line between the first and last control points.  By default, the `beta` value is `0.85`.  This curve is not intended for use with `d3.area`, only `d3.line`.
 
 + [d3.curveBundle(context)](https://github.com/d3/d3-shape#curveBundle)
 + [d3.curveBundle.beta(beta)](https://github.com/d3/d3-shape#curveBundle_beta) - returns a bundle curve interpolator with the specified `beta`.
@@ -304,7 +304,7 @@ renderLine("demo5", line.curve(d3.curveNatural));
 
 ## Cardinal Curves
 
-The cardinal curve interpolators produce [cubic cardinal splines](https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Cardinal_spline). The spline's tension can be altered using `cardinal.tension`.  Tension values range between 0 an 1 and by default, the tension is set to 0.  When the tension is set to 0, the curve resembles the natural curve and when the tension is set to 1, the curve resembles the linear curve.
+The cardinal curve interpolators produce [cubic cardinal splines](https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Cardinal_spline). The spline's tension can be altered using `cardinal.tension`.  Tension values range between 0 and 1 and by default, the tension is set to 0.  When the tension is set to 0, the curve resembles the natural curve and when the tension is set to 1, the curve resembles the linear curve.
 
 + [d3.curveCardinal(context)](https://github.com/d3/d3-shape#curveCardinal)
 + [d3.curveCardinalClosed(context)](https://github.com/d3/d3-shape#curveCardinalClosed)
@@ -351,7 +351,7 @@ for(o of variations) {
 
 ## Catmull-Rom Curves
 
-The Catmull-Rom curve interpolators produce [cubic Catmull-Rom splines](https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Cardinal_spline). The spline's alpha parameter can be set using `catmullRom.alpha`.  Alpha values range between 0 an 1 and by default, the value is set to 0.5.
+The Catmull-Rom curve interpolators produce [cubic Catmull-Rom splines](https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Cardinal_spline). The spline's alpha parameter can be set using `catmullRom.alpha`.  Alpha values range between 0 and 1 and by default, the value is set to 0.5.
 
 + [d3.curveCatmullRom(context)](https://github.com/d3/d3-shape#curveCatmullRom)
 + [d3.curveCatmullRomClosed(context)](https://github.com/d3/d3-shape#curveCatmullRomClosed)
