@@ -412,7 +412,7 @@ This module is not apart of the main D3.js files so we will have to separately a
 var areaLabel = d3.areaLabel().area(areaGen);
 </pre>
 
-+ [d3.areaLabel([area])](https://github.com/curran/d3-area-label#area-label) - Constructs an area label generator and calls `areaLabal.area(area)`.
++ [d3.areaLabel([area])](https://github.com/curran/d3-area-label#area-label) - Constructs an area label generator and calls `areaLabel.area(area)`.
 + [areaLabel.area(area)](https://github.com/curran/d3-area-label#area) - Sets the `x`, `y0`, and `y1` accessors of the areaLabel to be the same as an instance of `d3.area`.
 + [areaLabel(data)](https://github.com/curran/d3-area-label#_areaLabel) - Calls the area label generator with the passed in data. Note that this data should be in the form [`area1`, `area2`, ...] where each `area#` is all the data points for an area. For example when working with a single area: `areaLabel([areaData])`.
 
@@ -466,7 +466,7 @@ In Figure 8 we apply a label with the text "Area" to the same are awe have been 
 ```
 <figure class="sandbox"><figcaption>Figure 8 - An area with the label "Area" added with d3.areaLabel.  </figcaption></figure>
 
-For most cases we will already have an instance of a `d3.area` generator so we can use `d3.areaLabal([area])`, however if for some reason we do not have an area generator, need to redefine an accessor, or get an accessor `d3.areaLabel` provides us with the following additional methods:
+For most cases we will already have an instance of a `d3.area` generator so we can use `d3.areaLabel([area])`, however if for some reason we do not have an area generator, need to redefine an accessor, or get an accessor `d3.areaLabel` provides us with the following additional methods:
 
 + [areaLabel.x(x)](https://github.com/curran/d3-area-label#x) - If `x` is specified, sets the areaLabel's `x` accessor to the value/function of `x`. Otherwise returns the current `x` accessor.
 + [areaLabel.y0(y0)](https://github.com/curran/d3-area-label#y0) - If `y0` is specified, sets the areaLabel's `y0` accessor to the value/function of `y0`. Otherwise returns the current `y0` accessor.
