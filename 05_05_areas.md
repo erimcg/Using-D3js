@@ -129,7 +129,7 @@ In Figure 2 we set `y0` to be one-third of `y1`.
 ### Setting `x0` and `x1`
 
 
-Setting `x`, `y0`, and `y1` is useful for creating left-to-right orientated areas, but to create a bottom-to-top orientated area we use different accessors. 
+Setting `x`, `y0`, and `y1` is useful for creating left-to-right oriented areas, but to create a bottom-to-top oriented area we use different accessors.
 
 The new accessors `y`, `x0`, and `x1` work very similarly to the previous accessors. 
 Instead of `y0` and `y1` being the lower/upper bounds, we now have `x0` and `x1` to be our right/left bounds.
