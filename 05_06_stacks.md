@@ -779,7 +779,7 @@ Here we see that the series are sorted in the following order: oranges, apples, 
 ```
 <figure class="sandbox"><figcaption>Figure 8. Stacks using the default order (left) and d3.stackOrderInsideOut (right). </figcaption></figure>
 
-Note that `d3.stackOrderInsideOut` can be used to make steamgraphs as we do in Figure 8. When doing so we also set the `offset` to `d3.stackOffsetWiggle`.  For more information, please see the section on stack offsets below.
+Note that `d3.stackOrderInsideOut` can be used to make streamgraphs as we do in Figure 8. When doing so we also set the `offset` to `d3.stackOffsetWiggle`.  For more information, please see the section on stack offsets below.
 
 For more information on the orderings used by `d3.stackOrderAppearance` and `d3.stackOrderInsideOut` please see [Stacked Graphs—Geometry & Aesthetics](http://leebyron.com/streamgraph/stackedgraphs_byron_wattenberg.pdf) by Byron & Wattenberg.
 
