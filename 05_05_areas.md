@@ -473,23 +473,23 @@ For most cases we will already have an instance of a `d3.area` generator so we c
 + [areaLabel.y1(y1)](https://github.com/curran/d3-area-label#y1) - If `y1` is specified, sets the areaLabel's `y1` accessor to the value/function of `y1`. Otherwise returns the current `y1` accessor.
 
 ### Format
-When working with many areas (such as in the next section [stacks](./05_06_stacks.html)) we may have areas that are very thin. Applying a label to these thin areas is not always the best idea since we will not be able to actually read them. We can use `areaLabel.minHeight` to exclude labels that are smaller than a specified height.
+When working with many areas (such as in the next section on [stacks](./05_06_stacks.html)) we may have areas that are very thin. Applying a label to these thin areas is not always the best idea since we will not be able to actually read them. We can use `areaLabel.minHeight` to exclude labels that are smaller than a specified height.
 
 + [areaLabel.minHeight(minHeight)](https://github.com/curran/d3-area-label#minHeight) - Excludes labels that are smaller than `minHeight`. Defaults at 2.
 
-An example `areaLabel.minHeight` can be seen in the next section, [stacks](./05_06_stacks.html).
+An example of `areaLabel.minHeight` can be seen in the next section, [stacks](./05_06_stacks.html).
 
 ### Accuracy
 
 Sometimes `d3.areaLabel` may output unoptimized or inaccurate positions/scales. In these cases `d3.areaLabel` provides us with additional accessors to adjust how the placement and positioning is found.
 
-When finding the maximum size rectangle, `d3.areaLabel` looks at a set amount of `x` values as leftmost side for the rectangle and goes right from this `x` position to find the largest rectangle. We can set what `x` values `d3.areaLabel` looks at if the default values produce innaccurate positions or if our visualizations take too long to load.
+When finding the maximum size rectangle, `d3.areaLabel` looks at a set number of `x` values as the leftmost side of the rectangle and goes right from this `x` position to find the largest rectangle. We can set what `x` values `d3.areaLabel` looks at if the default values produce inaccurate positions or if our visualizations take too long to load.
 
 [areaLabel.interpolate(interpolate)](https://github.com/curran/d3-area-label#interpolate) takes a boolean value and determines whether or not the area label generator will use linear interpolation to compute label positions.
 
 If set to `false`, the only `x` positions that will be used as a left-most side of a rectangle will be the `x` values in the data set. If we have a large amount of evenly spaced `x` values in our data set, setting this to `false` works well.
 
-If set to `true`, the area label generator will use a linear interpolation over the data sets `x` positions to find a set amount (`interpolateResolution`) of coordinates. 
+If set to `true`, the area label generator will use a linear interpolation over the data sets `x` positions to find a set number (`interpolateResolution`) of coordinates.
 
 For instance if we have the `x` values `[1, 2, 3, 4, 5]` in our data set and we set `interpolateResolution` to `10` then our area generator will try to find the maximum size rectangle with the left side of the rectangle at positions: `[1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5]`
 
