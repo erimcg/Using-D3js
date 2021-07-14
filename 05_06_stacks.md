@@ -576,7 +576,7 @@ Take for example the dataset shown below containing sales data for 4 fruits over
 <tr><td class="orange">8</td><td>1</td><td>1</td><td class="orange">25</td><td>1</td></tr>
 <tr><td>9</td><td>1</td><td>1</td><td>10</td><td>1</td></tr>
 <tr><td>10</td><td>1</td><td>10</td><td>1</td><td>1</td></tr>
-<tr><td class="yellow">11</td><td>1</td><td lass="yellow">25</td><td>1</td><td>1</td></tr>
+<tr><td class="yellow">11</td><td>1</td><td class="yellow">25</td><td>1</td><td>1</td></tr>
 <tr><td>12</td><td>1</td><td>10</td><td>1</td><td>1</td></tr>
 <tr><td>13</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
 <tr>
