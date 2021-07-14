@@ -507,7 +507,7 @@ Setting `areaLabel.interpolate` to `true` helps smaller data sets have better po
 
 ### Padding
 
-We can apply a padding to each of the sides of the text within its' bounding box. When applying a padding, we should make sure to not use large paddings that make the label hard to read. It is also important to remember that each padding should be set to a value from 0 to 1; larger values will technically work still, but will result in text labels usually too small to read. The default value for each padding is 0.
+We can apply a padding to each of the sides of the text within its bounding box. When applying a padding, we should make sure to not use large paddings that make the label hard to read. It is also important to remember that each padding should be set to a value from 0 to 1; larger values will technically still work, but will result in text labels usually too small to read. The default value for each padding is 0.
 
 <pre>
 var areaLabel = d3.areaLabel([area1]).paddingLeft(5);
