@@ -17,7 +17,7 @@ D3 provides [d3.area()](https://github.com/d3/d3-shape#area), a method that retu
 An area is a path that can be thought of as the enclosure between two lines. 
 These two "lines" are created by setting an `x` value, which is the same for each point on the lines, and two `y` values, `y0` and `y1`, which are the bottom lines `y` position and the top lines `y` position respectively. 
 
-Like [lines](./05_02_lines.html), we have an area generator, [d3.area()](https://github.com/d3/d3-shape#area) which has a accessors we can call to set how the area is generated.
+Like [lines](./05_02_lines.html), we have an area generator, [d3.area()](https://github.com/d3/d3-shape#area) which has accessors we can call to set how the area is generated.
 We pass data into an area generator and it returns back a `string` that can be used inside a `path` `d` attribute. 
 + [area(data)](https://github.com/d3/d3-shape#_area) - Invokes the area generator using the array of data passed into it, returns back a `string` that can be used by the `d` attribute of a `path`.
 
