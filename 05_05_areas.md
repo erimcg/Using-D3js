@@ -427,7 +427,7 @@ selection
     .attr("transform", areaLabel([dataSet]);
 </pre>
 
-In Figure 8 we apply a label with the text "Area" to the same are awe have been using above. Try changing the text to see how `d3.areaLabel` dynamically changes the positioning and size.
+In Figure 8 we apply a label with the text "Area" to the same area we have been using above. Try changing the text to see how `d3.areaLabel` dynamically changes the positioning and size.
 
 ```
 <script>
