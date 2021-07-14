@@ -691,7 +691,7 @@ Here we see that the series are sorted in the following order: apples, grapes, o
 ```
 <figure class="sandbox"><figcaption>Figure 7. Stacks using the default order (left) and d3.stackOrderAppearance (right). </figcaption></figure>
 
-+ [d3.stackOrderInsideOut(series)](https://github.com/d3/d3-shape#stackOrderInsideOut) - orders the series, from the inside out, with the series having the earliest maximum value (i.e. series with its maximum value at the lowest index)positioned in the middle, and the series having the latest maximum value positioned on the outside.
++ [d3.stackOrderInsideOut(series)](https://github.com/d3/d3-shape#stackOrderInsideOut) - orders the series, from the inside out, with the series having the earliest maximum value (i.e. series with its maximum value at the lowest index) positioned in the middle, and the series having the latest maximum value positioned on the outside.
 
 Here we see that the series are sorted in the following order: oranges, apples, grapes, and bananas.
 
