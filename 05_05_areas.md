@@ -234,7 +234,7 @@ D3.js also has an area radial generator that works like line radial.
 
 + [d3.areaRadial()](https://github.com/d3/d3-shape#areaRadial) - returns an area radial generator for creating radial lines.
 
-Since `d3.areaRadial` is an area, it can still be thought of as being the enclosure between two line radials. These line radials will have identical angles (formerly `x`) for each of there respective points, and now instead of `y0` and `y1` separating our lines, `innerRadius` and `outerRadius` will.
+Since `d3.areaRadial` is an area, it can still be thought of as being the enclosure between two line radials. These line radials will have identical angles (formerly `x`) for each of their respective points, and now instead of `y0` and `y1` separating our lines, `innerRadius` and `outerRadius` will.
 
 + [areaRadial.angle([angle])](https://github.com/d3/d3-shape#areaRadial_angle) - Considered to be a radian (0 to 2π). Equivalent to the x() accessor from d3.area().
 <!--
