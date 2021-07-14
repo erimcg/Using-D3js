@@ -418,7 +418,7 @@ var areaLabel = d3.areaLabel().area(areaGen);
 
 `d3.areaLabel` works by first finding the bounding box or aspect ratio around a particular `text` element. 
 Next, `d3.areaLabel` will use a [bisection method](https://en.wikipedia.org/wiki/Bisection_method#Algorithm) to find the maximum size rectangle with the same aspect ratio as the text that fits within an area.
- Finally, `d3.areaLabel` modifies the `transform` attribute of a `text` element, so it returns a string that can be used when modifying the `transorm` that properly places the label where it should be.
+ Finally, `d3.areaLabel` modifies the `transform` attribute of a `text` element, so it returns a string that can be used when modifying the `transform` that properly places the label where it should be.
 
 <pre>
 selection
