@@ -334,7 +334,7 @@ Figure 6 is identical to Figure 5 except that a curve is applied and the fifth p
 ```
 <figure class="sandbox"><figcaption>Figure 6 - An area radial with the fifth element removed and a curve applied.  </figcaption></figure>
 
-## Cavnasses
+## Canvasses
 
 Our examples in the section all use an `SVG` as the graphic medium. If we want to work with a Canvas instead, we just pass in the `context` of a canvas into the `.context()` accessor of area or areaRadial.
 
