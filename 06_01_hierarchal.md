@@ -66,7 +66,7 @@ The node object has various methods that return either an array of associated li
 
 The node object also has a copy method.
 
-+ [node.copy()](https://github.com/d3/d3-hierarchy/blob/master/README.md#node_copy) - returns a deep copy of the subtee that has a root at this *node*
++ [node.copy()](https://github.com/d3/d3-hierarchy/blob/master/README.md#node_copy) - returns a deep copy of the subtree that has a root at this *node*.
 
 ## Applying a Function to Each Node in a Subtree
 
