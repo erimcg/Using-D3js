@@ -141,7 +141,7 @@ Figure 1 shows a quick example of each:
 ```
 <figure class="sandbox"><figcaption>Figure 1 - A vertical link (left), a horizontal link (center), and a radial link (right).</figcaption></figure>
 
-A link generator needs an object with a source and a target, whichin each should be an array with two numbers representing the `x` and `y` values of where the link should start and end.
+A link generator needs an object with a source and a target; within each should be an array with two numbers representing the `x` and `y` values of where the link should start and end.
 
 An example of a single link object and a default horizontal link generator:
 <pre>
