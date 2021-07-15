@@ -107,7 +107,7 @@ In the example below we have a hierarchal object consisting of 6 nodes.  Each no
 
 The `sum` and `count` methods are used to set each descendant node's *value* property.  This property is used by some layout methods like [d3.treemap](https://github.com/d3/d3-hierarchy#treemap).
 
-+ [node.sum(value function)](https://github.com/d3/d3-hierarchy/blob/master/README.md#node_sum) - takes a function as an argument and returns the node on which it is called.  The function argument takes an object as an argument and returns an non-negative number.
++ [node.sum(value function)](https://github.com/d3/d3-hierarchy/blob/master/README.md#node_sum) - takes a function as an argument and returns the node on which it is called.  The passed function must take an object as an argument and return a non-negative number.
 
 The sum method is an accumulator method.  It traverses the subtree, rooted at the node on which the method is invoked, in *postorder* traversal order.  This ensures that all child nodes are traversed before a parent node.  When a node is traversed, the function argument is called and the object in the current node's *data* property is passed to the function.  The nodes *value* property is then set to the arithmetic sum of the number returned by the value_function and the numbers in its children's *value* properties.
 
