@@ -210,7 +210,7 @@ In Figure 2, we create a single link from one object and then multiple links fro
 
 ### `link.source()` and `link.target()`
 In most situations, the source and target are not going to be separate and easily accessible from our data like they are in the previous examples. 
-For these times the `.source()` and `.target()` can be manuelly changed to fit whatever data is being used.
+For these times the `.source()` and `.target()` can be manually changed to fit whatever data is being used.
 
 Let's use the following data:
 <pre>
