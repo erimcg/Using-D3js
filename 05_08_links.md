@@ -511,7 +511,7 @@ Our `circle` and `text` nodes will no longer be at the right point without chang
     .attr("cy", d => d3.pointRadial(xScale(d.position[0]), yScale(d.position[1]) )[1] )
 </pre>
 
-In Figure 6, we use `d3.linkRaidal` to display our chart radially instead.
+In Figure 6, we use `d3.linkRadial` to display our chart radially instead.
     
 ```
 <script>
