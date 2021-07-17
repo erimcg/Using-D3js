@@ -12,7 +12,7 @@ In this section we discuss `d3.dispatch`.
 
 ## Dispatches
 
-A "dispatch" can be thought of as an event that can be called from anywhere in your code. Each dispatch instance has different "types" of events that we can assign callback functions to and then invoke a types event whenever we want.
+A "dispatch" can be thought of as an event that can be called from anywhere in your code. Each dispatch instance has different "types" of events that we can assign callback functions to and then invoke a typed event whenever we want.
 
 To create a dispatch we call `d3.dispatch` and pass in the `types` of events that we want the dispatch to handle. Each `type` is a string. 
 
