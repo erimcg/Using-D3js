@@ -55,7 +55,7 @@ In Figure 1 we have a function `printTime` which displays in a `div` the string 
 
 ## d3.interval
 
-Running a function every animation frame with `d3.timer` can be taxing on our computers which can result in visual studders or timing issues if we use too many. To remedy this for less important functions, we can use a timer that is not called every animation frame, but instead every `delay` milliseconds. D3.js provides us `d3.interval` as a solution to this problem.
+Running a function every animation frame with `d3.timer` can be taxing on our computers which can result in visual stutters or timing issues if we use too many. To remedy this for less important functions, we can use a timer that is not called every animation frame, but instead every `delay` milliseconds. D3.js provides us `d3.interval` as a solution to this problem.
 
 Like `d3.timer`, `d3.interval` calls a callback function that we supply or define and passes into it the elapsed time.
 
