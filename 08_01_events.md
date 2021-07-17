@@ -205,7 +205,7 @@ d3.select("#demoMouseMove")
      <path d="M0,0 L200,0 L200,200 L0,200 Z" stroke="black" stroke-width="5px" fill="none"></path>>
 </svg>
 ```
-<figure class="sandbox"><figcaption>Figure 5 - An SVG with an onmousemove event that adds a circle whenever the mouse is moved. The event was added ny selection.on from D3.js. </figcaption></figure>
+<figure class="sandbox"><figcaption>Figure 5 - An SVG with an onmousemove event that adds a circle whenever the mouse is moved. The event was added by selection.on from D3.js. </figcaption></figure>
 
 ## d3.clientPoint
 
