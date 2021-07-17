@@ -37,7 +37,7 @@ dispatchEx.on("end", <i>callback function</i>);
 
 All that is left now is to call our dispatch events. To do this we can use `dispatch.call` on our instance of `d3.dispatch`. For this method we first pass in the event of that dispatch we want to invoke; following this is by what we want `this` to refer to within the dispatch events callback function; finally we add any arguments we want to pass into the callback function.
 
-For example, to call `start` and `ende` when a `circle` has its `mouseenter` and `mouseout` events invoked.
+For example, to call `start` and `end` when a `circle` has its `mouseenter` and `mouseout` events invoked.
 Recall that within the callback function of `selection.on` `this` refers to the node that called the event:
 
 <pre>
