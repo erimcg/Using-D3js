@@ -24,7 +24,7 @@ var dispatchEx = d3.dispatch("start", "end");
 
 + [d3.dispatch(types...)](https://github.com/d3/d3-dispatch#dispatch) - Creates a new dispatch for the specified event types.
 
-Next, we need to define what the custom events `start` and `end` do. To do this we call `dispatch.on` where is `dispatch` is instance of a dispatch created in the method above. To use `dispatch.onn` we pass in the string of the type of the event and then the callback function that will be invoked when the dispatch is called.
+Next, we need to define what the custom events `start` and `end` do. To do this we call `dispatch.on` where is `dispatch` is instance of a dispatch created in the method above. To use `dispatch.on` we pass in the string of the type of the event and then the callback function that will be invoked when the dispatch is called.
 
 For example, to define what the `start` and `end` events do:
 
