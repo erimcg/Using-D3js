@@ -177,7 +177,7 @@ d3.select("#circleTime")
 
 ## d3.mouse
 
-One situation we may run into is needing to know where an event is triggered. `d3.event` contains the fields `event.pathX` and `event.pathY` which tell us the position of the mouse when the event was triggered, but this position is in relation to the *entire HTML document*. So while it may help us in some situations, it wont help us figure out where the mouse is within our visualizations. To aid in this scenario D3.js provides us with `d3.mouse(container)`.
+One situation we may run into is needing to know where an event is triggered. `d3.event` contains the fields `event.pathX` and `event.pathY` which tell us the position of the mouse when the event was triggered, but this position is in relation to the *entire HTML document*. So while it may help us in some situations, it won't help us figure out where the mouse is within our visualizations. To aid in this scenario D3.js provides us with `d3.mouse(container)`.
 
 When we call `d3.mouse(container)` we pass in the node that we want to have our event position related to. `d3.mouse` will return back an array of the `x` and `y` positions of where the current event was triggered. In many cases, we will pass in the `svg` node that our visualizations lie in. 
 
@@ -205,7 +205,7 @@ d3.select("#demoMouseMove")
      <path d="M0,0 L200,0 L200,200 L0,200 Z" stroke="black" stroke-width="5px" fill="none"></path>>
 </svg>
 ```
-<figure class="sandbox"><figcaption>Figure 5 - An SVG with an onmousemove event that adds a circle whenever the mouse is moved. The event was added ny selection.on from D3.js. </figcaption></figure>
+<figure class="sandbox"><figcaption>Figure 5 - An SVG with an onmousemove event that adds a circle whenever the mouse is moved. The event was added by selection.on from D3.js. </figcaption></figure>
 
 ## d3.clientPoint
 

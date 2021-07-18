@@ -141,7 +141,7 @@ Figure 1 shows a quick example of each:
 ```
 <figure class="sandbox"><figcaption>Figure 1 - A vertical link (left), a horizontal link (center), and a radial link (right).</figcaption></figure>
 
-A link generator needs an object with a source and a target, whichin each should be an array with two numbers representing the `x` and `y` values of where the link should start and end.
+A link generator needs an object with a source and a target; within each should be an array with two numbers representing the `x` and `y` values of where the link should start and end.
 
 An example of a single link object and a default horizontal link generator:
 <pre>
@@ -210,7 +210,7 @@ In Figure 2, we create a single link from one object and then multiple links fro
 
 ### `link.source()` and `link.target()`
 In most situations, the source and target are not going to be separate and easily accessible from our data like they are in the previous examples. 
-For these times the `.source()` and `.target()` can be manuelly changed to fit whatever data is being used.
+For these times the `.source()` and `.target()` can be manually changed to fit whatever data is being used.
 
 Let's use the following data:
 <pre>
@@ -511,7 +511,7 @@ Our `circle` and `text` nodes will no longer be at the right point without chang
     .attr("cy", d => d3.pointRadial(xScale(d.position[0]), yScale(d.position[1]) )[1] )
 </pre>
 
-In Figure 6, we use `d3.linkRaidal` to display our chart radially instead.
+In Figure 6, we use `d3.linkRadial` to display our chart radially instead.
     
 ```
 <script>

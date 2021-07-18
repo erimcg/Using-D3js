@@ -181,7 +181,7 @@ var legend = d3.legendColor()
 
 ## Setting Label Text
 
-We can also format the label text and provide a title for the legend using the lableFormat and title methods respectively.  Below we remove the mantissa digits (digits after the decimal point) and add "Legend" as the title of the legend.
+We can also format the label text and provide a title for the legend using the labelFormat and title methods respectively.  Below we remove the mantissa digits (digits after the decimal point) and add "Legend" as the title of the legend.
 
 <pre>
 var legend = d3.legendColor()

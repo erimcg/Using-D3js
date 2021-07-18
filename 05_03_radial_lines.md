@@ -275,7 +275,7 @@ d3.select("#demo5")
 
 We can render the line in a `canvas` element's `context` by using [lineRadial.context([context])](https://github.com/d3/d3-shape/blob/v1.3.4/README.md#lineRadial_context).
 
-If no argument is passed to `lineRadial.context`, the method returns the current context, which by default is null.  If, however, a context is passed to `lineRadial.context`, the line will be rendered in the context when the line generator is invoke.
+If no argument is passed to `lineRadial.context`, the method returns the current context, which by default is null.  If, however, a context is passed to `lineRadial.context`, the line will be rendered in the context when the line generator is invoked.
 
 In Figure 6, we retrieve the context of the canvas element, then create the line generator and call `line.context` to set the context.
 
