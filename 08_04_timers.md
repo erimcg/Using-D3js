@@ -128,7 +128,7 @@ For `d3.timer` and `d3.timeout`, invoking `timer.restart` stops the old timer im
 
 `d3.interval` ***is not*** compatible with `timer.restart`. If you call `timer.restart` on an instance of `d3.interval`, the interval will be converted to an intance of `d3.timer` instead, running every frame.
 
-+ [timer.restart(callback[, delay[, time]]](https://github.com/d3/d3-timer#timer_restart) - Equivalent to calling `timer.stop` on a timer and creating a new timer with the specified parameters. Only works on `d3.timer` and `d3.timeout`. Calling on `d3.interval` turns the `d3.interval` into a `d3.timer`.
++ [timer.restart(callback[, delay[, time]])](https://github.com/d3/d3-timer#timer_restart) - Equivalent to calling `timer.stop` on a timer and creating a new timer with the specified parameters. Only works on `d3.timer` and `d3.timeout`. Calling on `d3.interval` turns the `d3.interval` into a `d3.timer`.
 
 In Figure 5 we have a timer and `printTime` function similar to Figure 1. We then have a `d3.timeout` which calls the function `restartTimers` after 2.5 seconds. `restartTimers` then restarts both the timer and the timeout with their original parameters.
 
