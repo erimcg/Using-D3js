@@ -17,7 +17,7 @@ D3 provides [d3.area()](https://github.com/d3/d3-shape#area), a method that retu
 An area is a path that can be thought of as the enclosure between two lines. 
 These two "lines" are created by setting an `x` value, which is the same for each point on the lines, and two `y` values, `y0` and `y1`, which are the bottom lines `y` position and the top lines `y` position respectively. 
 
-Like [lines](./05_02_lines.html), we have an area generator, [d3.area()](https://github.com/d3/d3-shape#area) which has a accessors we can call to set how the area is generated.
+Like [lines](./05_02_lines.html), we have an area generator, [d3.area()](https://github.com/d3/d3-shape#area) which has accessors we can call to set how the area is generated.
 We pass data into an area generator and it returns back a `string` that can be used inside a `path` `d` attribute. 
 + [area(data)](https://github.com/d3/d3-shape#_area) - Invokes the area generator using the array of data passed into it, returns back a `string` that can be used by the `d` attribute of a `path`.
 
@@ -129,7 +129,7 @@ In Figure 2 we set `y0` to be one-third of `y1`.
 ### Setting `x0` and `x1`
 
 
-Setting `x`, `y0`, and `y1` is useful for creating left-to-right orientated areas, but to create a bottom-to-top orientated area we use different accessors. 
+Setting `x`, `y0`, and `y1` is useful for creating left-to-right oriented areas, but to create a bottom-to-top oriented area we use different accessors.
 
 The new accessors `y`, `x0`, and `x1` work very similarly to the previous accessors. 
 Instead of `y0` and `y1` being the lower/upper bounds, we now have `x0` and `x1` to be our right/left bounds.
@@ -232,9 +232,9 @@ var area = d3.area()
 
 D3.js also has an area radial generator that works like line radial. 
 
-+ [d3.areaRadial()](https://github.com/d3/d3-shape#areaRadial) - returns a area radial generator for creating radial lines. 
++ [d3.areaRadial()](https://github.com/d3/d3-shape#areaRadial) - returns an area radial generator for creating radial lines.
 
-Since `d3.areaRadial` is an area, it can still be thought of as being the enclosure between two line radials. These line radials will have identical angles (formerly `x`) for each of there respective points, and now instead of `y0` and `y1` separating our lines, `innerRadius` and `outerRadius` will.
+Since `d3.areaRadial` is an area, it can still be thought of as being the enclosure between two line radials. These line radials will have identical angles (formerly `x`) for each of their respective points, and now instead of `y0` and `y1` separating our lines, `innerRadius` and `outerRadius` will.
 
 + [areaRadial.angle([angle])](https://github.com/d3/d3-shape#areaRadial_angle) - Considered to be a radian (0 to 2π). Equivalent to the x() accessor from d3.area().
 <!--
@@ -334,7 +334,7 @@ Figure 6 is identical to Figure 5 except that a curve is applied and the fifth p
 ```
 <figure class="sandbox"><figcaption>Figure 6 - An area radial with the fifth element removed and a curve applied.  </figcaption></figure>
 
-## Cavnasses
+## Canvasses
 
 Our examples in the section all use an `SVG` as the graphic medium. If we want to work with a Canvas instead, we just pass in the `context` of a canvas into the `.context()` accessor of area or areaRadial.
 
@@ -412,13 +412,13 @@ This module is not apart of the main D3.js files so we will have to separately a
 var areaLabel = d3.areaLabel().area(areaGen);
 </pre>
 
-+ [d3.areaLabel([area])](https://github.com/curran/d3-area-label#area-label) - Constructs an area label generator and calls `areaLabal.area(area)`.
++ [d3.areaLabel([area])](https://github.com/curran/d3-area-label#area-label) - Constructs an area label generator and calls `areaLabel.area(area)`.
 + [areaLabel.area(area)](https://github.com/curran/d3-area-label#area) - Sets the `x`, `y0`, and `y1` accessors of the areaLabel to be the same as an instance of `d3.area`.
 + [areaLabel(data)](https://github.com/curran/d3-area-label#_areaLabel) - Calls the area label generator with the passed in data. Note that this data should be in the form [`area1`, `area2`, ...] where each `area#` is all the data points for an area. For example when working with a single area: `areaLabel([areaData])`.
 
 `d3.areaLabel` works by first finding the bounding box or aspect ratio around a particular `text` element. 
 Next, `d3.areaLabel` will use a [bisection method](https://en.wikipedia.org/wiki/Bisection_method#Algorithm) to find the maximum size rectangle with the same aspect ratio as the text that fits within an area.
- Finally, `d3.areaLabel` modifies the `transform` attribute of a `text` element, so it returns a string that can be used when modifying the `transorm` that properly places the label where it should be.
+ Finally, `d3.areaLabel` modifies the `transform` attribute of a `text` element, so it returns a string that can be used when modifying the `transform` that properly places the label where it should be.
 
 <pre>
 selection
@@ -427,7 +427,7 @@ selection
     .attr("transform", areaLabel([dataSet]);
 </pre>
 
-In Figure 8 we apply a label with the text "Area" to the same are awe have been using above. Try changing the text to see how `d3.areaLabel` dynamically changes the positioning and size.
+In Figure 8 we apply a label with the text "Area" to the same area we have been using above. Try changing the text to see how `d3.areaLabel` dynamically changes the positioning and size.
 
 ```
 <script>
@@ -466,30 +466,30 @@ In Figure 8 we apply a label with the text "Area" to the same are awe have been 
 ```
 <figure class="sandbox"><figcaption>Figure 8 - An area with the label "Area" added with d3.areaLabel.  </figcaption></figure>
 
-For most cases we will already have an instance of a `d3.area` generator so we can use `d3.areaLabal([area])`, however if for some reason we do not have an area generator, need to redefine an accessor, or get an accessor `d3.areaLabel` provides us with the following additional methods:
+For most cases we will already have an instance of a `d3.area` generator so we can use `d3.areaLabel([area])`, however if for some reason we do not have an area generator, need to redefine an accessor, or get an accessor `d3.areaLabel` provides us with the following additional methods:
 
 + [areaLabel.x(x)](https://github.com/curran/d3-area-label#x) - If `x` is specified, sets the areaLabel's `x` accessor to the value/function of `x`. Otherwise returns the current `x` accessor.
 + [areaLabel.y0(y0)](https://github.com/curran/d3-area-label#y0) - If `y0` is specified, sets the areaLabel's `y0` accessor to the value/function of `y0`. Otherwise returns the current `y0` accessor.
 + [areaLabel.y1(y1)](https://github.com/curran/d3-area-label#y1) - If `y1` is specified, sets the areaLabel's `y1` accessor to the value/function of `y1`. Otherwise returns the current `y1` accessor.
 
 ### Format
-When working with many areas (such as in the next section [stacks](./05_06_stacks.html)) we may have areas that are very thin. Applying a label to these thin areas is not always the best idea since we will not be able to actually read them. We can use `areaLabel.minHeight` to exclude labels that are smaller than a specified height.
+When working with many areas (such as in the next section on [stacks](./05_06_stacks.html)) we may have areas that are very thin. Applying a label to these thin areas is not always the best idea since we will not be able to actually read them. We can use `areaLabel.minHeight` to exclude labels that are smaller than a specified height.
 
 + [areaLabel.minHeight(minHeight)](https://github.com/curran/d3-area-label#minHeight) - Excludes labels that are smaller than `minHeight`. Defaults at 2.
 
-An example `areaLabel.minHeight` can be seen in the next section, [stacks](./05_06_stacks.html).
+An example of `areaLabel.minHeight` can be seen in the next section, [stacks](./05_06_stacks.html).
 
 ### Accuracy
 
 Sometimes `d3.areaLabel` may output unoptimized or inaccurate positions/scales. In these cases `d3.areaLabel` provides us with additional accessors to adjust how the placement and positioning is found.
 
-When finding the maximum size rectangle, `d3.areaLabel` looks at a set amount of `x` values as leftmost side for the rectangle and goes right from this `x` position to find the largest rectangle. We can set what `x` values `d3.areaLabel` looks at if the default values produce innaccurate positions or if our visualizations take too long to load.
+When finding the maximum size rectangle, `d3.areaLabel` looks at a set number of `x` values as the leftmost side of the rectangle and goes right from this `x` position to find the largest rectangle. We can set what `x` values `d3.areaLabel` looks at if the default values produce inaccurate positions or if our visualizations take too long to load.
 
 [areaLabel.interpolate(interpolate)](https://github.com/curran/d3-area-label#interpolate) takes a boolean value and determines whether or not the area label generator will use linear interpolation to compute label positions.
 
 If set to `false`, the only `x` positions that will be used as a left-most side of a rectangle will be the `x` values in the data set. If we have a large amount of evenly spaced `x` values in our data set, setting this to `false` works well.
 
-If set to `true`, the area label generator will use a linear interpolation over the data sets `x` positions to find a set amount (`interpolateResolution`) of coordinates. 
+If set to `true`, the area label generator will use a linear interpolation over the data sets `x` positions to find a set number (`interpolateResolution`) of coordinates.
 
 For instance if we have the `x` values `[1, 2, 3, 4, 5]` in our data set and we set `interpolateResolution` to `10` then our area generator will try to find the maximum size rectangle with the left side of the rectangle at positions: `[1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5]`
 
@@ -507,7 +507,7 @@ Setting `areaLabel.interpolate` to `true` helps smaller data sets have better po
 
 ### Padding
 
-We can apply a padding to each of the sides of the text within its' bounding box. When applying a padding, we should make sure to not use large paddings that make the label hard to read. It is also important to remember that each padding should be set to a value from 0 to 1; larger values will technically work still, but will result in text labels usually too small to read. The default value for each padding is 0.
+We can apply a padding to each of the sides of the text within its bounding box. When applying a padding, we should make sure to not use large paddings that make the label hard to read. It is also important to remember that each padding should be set to a value from 0 to 1; larger values will technically still work, but will result in text labels usually too small to read. The default value for each padding is 0.
 
 <pre>
 var areaLabel = d3.areaLabel([area1]).paddingLeft(5);

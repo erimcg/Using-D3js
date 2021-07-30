@@ -12,7 +12,7 @@ In this section we discuss `d3.dispatch`.
 
 ## Dispatches
 
-A "dispatch" can be thought of as an event that can be called from anywhere in your code. Each dispatch instance has different "types" of events that we can assign callback functions to and then invoke a types event whenever we want.
+A "dispatch" can be thought of as an event that can be called from anywhere in your code. Each dispatch instance has different "types" of events that we can assign callback functions to and then invoke a typed event whenever we want.
 
 To create a dispatch we call `d3.dispatch` and pass in the `types` of events that we want the dispatch to handle. Each `type` is a string. 
 
@@ -24,7 +24,7 @@ var dispatchEx = d3.dispatch("start", "end");
 
 + [d3.dispatch(types...)](https://github.com/d3/d3-dispatch#dispatch) - Creates a new dispatch for the specified event types.
 
-Next, we need to define what the custom events `start` and `end` do. To do this we call `dispatch.on` where is `dispatch` is instance of a dispatch created in the method above. To use `dispatch.onn` we pass in the string of the type of the event and then the callback function that will be invoked when the dispatch is called.
+Next, we need to define what the custom events `start` and `end` do. To do this we call `dispatch.on` where is `dispatch` is instance of a dispatch created in the method above. To use `dispatch.on` we pass in the string of the type of the event and then the callback function that will be invoked when the dispatch is called.
 
 For example, to define what the `start` and `end` events do:
 
@@ -37,7 +37,7 @@ dispatchEx.on("end", <i>callback function</i>);
 
 All that is left now is to call our dispatch events. To do this we can use `dispatch.call` on our instance of `d3.dispatch`. For this method we first pass in the event of that dispatch we want to invoke; following this is by what we want `this` to refer to within the dispatch events callback function; finally we add any arguments we want to pass into the callback function.
 
-For example, to call `start` and `ende` when a `circle` has its `mouseenter` and `mouseout` events invoked.
+For example, to call `start` and `end` when a `circle` has its `mouseenter` and `mouseout` events invoked.
 Recall that within the callback function of `selection.on` `this` refers to the node that called the event:
 
 <pre>
