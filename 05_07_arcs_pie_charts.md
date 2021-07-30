@@ -32,7 +32,7 @@ It is in these `g` elements that we'll render our shapes.
 
 Recall from the [tutorial on Paths](http://www.n0code.net/wp/csci240/the-path-element/) that the `path` element can be used to create lines, polylines, polygons, arcs, circles, ellipses, and other more complex shapes.  Recall also that the `d` attribute defines the shape of the path.
 
-`D3.arc()` returns a generator that when called automatically generates and returns a string of characters that can be assigned to the `d` attribute of a `path` element to define an arc, circle, or annulus.  To create an arc generator simply call `d3.arc()`.
+`d3.arc()` returns a generator that when called automatically generates and returns a string of characters that can be assigned to the `d` attribute of a `path` element to define an arc, circle, or annulus.  To create an arc generator simply call `d3.arc()`.
 
 <pre>
 var arcGen = d3.arc();

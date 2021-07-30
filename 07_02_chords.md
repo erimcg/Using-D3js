@@ -143,7 +143,7 @@ The original example was contrived so that the default chord layout would create
 The first visualization shows what is rendered when no methods are used.
 The second rendering includes padding.
 The third sorts the nodes (groups) so that they are rendered according to total weight of edges flowing out from the node, clockwise from largest to smallest.
-The forth sorts the chords of each node (subgroup) according to their weight, clockwise from smallest to largest.
+The fourth sorts the chords of each node (subgroup) according to their weight, clockwise from smallest to largest.
 The last sets the z-order of the chords so that the larger weighted chords are rendered above smaller weighted chords.
 
 ```

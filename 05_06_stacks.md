@@ -576,7 +576,7 @@ Take for example the dataset shown below containing sales data for 4 fruits over
 <tr><td class="orange">8</td><td>1</td><td>1</td><td class="orange">25</td><td>1</td></tr>
 <tr><td>9</td><td>1</td><td>1</td><td>10</td><td>1</td></tr>
 <tr><td>10</td><td>1</td><td>10</td><td>1</td><td>1</td></tr>
-<tr><td class="yellow">11</td><td>1</td><td lass="yellow">25</td><td>1</td><td>1</td></tr>
+<tr><td class="yellow">11</td><td>1</td><td class="yellow">25</td><td>1</td><td>1</td></tr>
 <tr><td>12</td><td>1</td><td>10</td><td>1</td><td>1</td></tr>
 <tr><td>13</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
 <tr>
@@ -691,7 +691,7 @@ Here we see that the series are sorted in the following order: apples, grapes, o
 ```
 <figure class="sandbox"><figcaption>Figure 7. Stacks using the default order (left) and d3.stackOrderAppearance (right). </figcaption></figure>
 
-+ [d3.stackOrderInsideOut(series)](https://github.com/d3/d3-shape#stackOrderInsideOut) - orders the series, from the inside out, with the series having the earliest maximum value (i.e. series with its maximum value at the lowest index)positioned in the middle, and the series having the latest maximum value positioned on the outside.
++ [d3.stackOrderInsideOut(series)](https://github.com/d3/d3-shape#stackOrderInsideOut) - orders the series, from the inside out, with the series having the earliest maximum value (i.e. series with its maximum value at the lowest index) positioned in the middle, and the series having the latest maximum value positioned on the outside.
 
 Here we see that the series are sorted in the following order: oranges, apples, grapes, and bananas.
 
@@ -779,7 +779,7 @@ Here we see that the series are sorted in the following order: oranges, apples, 
 ```
 <figure class="sandbox"><figcaption>Figure 8. Stacks using the default order (left) and d3.stackOrderInsideOut (right). </figcaption></figure>
 
-Note that `d3.stackOrderInsideOut` can be used to make steamgraphs as we do in Figure 8. When doing so we also set the `offset` to `d3.stackOffsetWiggle`.  For more information, please see the section on stack offsets below.
+Note that `d3.stackOrderInsideOut` can be used to make streamgraphs as we do in Figure 8. When doing so we also set the `offset` to `d3.stackOffsetWiggle`.  For more information, please see the section on stack offsets below.
 
 For more information on the orderings used by `d3.stackOrderAppearance` and `d3.stackOrderInsideOut` please see [Stacked Graphs—Geometry & Aesthetics](http://leebyron.com/streamgraph/stackedgraphs_byron_wattenberg.pdf) by Byron & Wattenberg.
 

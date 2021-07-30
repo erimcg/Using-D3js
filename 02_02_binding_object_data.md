@@ -19,7 +19,7 @@
 
 We are not limited to binding primitive type values to the elements in a visualization.  We can also bind objects (and arrays).  Take for example, the following array containing estimates for the homeless population in five U.S. states in January of 2018 provided by the [United States Interagency Council on Homelessness](https://www.usich.gov/tools-for-action/map/#fn[]=1400&fn[]=2900&fn[]=6000&fn[]=9900&fn[]=13500).
 
-The data consists of an array of object where each object has a `state` and a `population` property.
+The data consists of an array of objects where each object has a `state` and a `population` property.
 
 <pre>
 var homeless = [

@@ -10,7 +10,7 @@ D3's <a href="https://github.com/d3/d3-hierarchy">hierarchy</a> module provides 
 
 The  [d3.hierarchy(data[,children])](https://github.com/d3/d3-hierarchy#hierarchy) method builds a model of hierarchal data in memory. The method has two parameters, the first one is an object containing hierarchal data and the second is an optional function that takes an object as an argument and returns an array of *child* objects.
 
-When the `d3.hierarchal` method is called, it considers the first argument as the *root* object and creates a node for it.  If a second function argument is passed to the method, it is called with the root object as an argument so that it can determine the children of the root node.  If the second argument is omitted,  the following default function is used to determine the children of the root.
+When the `d3.hierarchy` method is called, it considers the first argument as the *root* object and creates a node for it.  If a second function argument is passed to the method, it is called with the root object as an argument so that it can determine the children of the root node.  If the second argument is omitted,  the following default function is used to determine the children of the root.
 
 <pre>
 function children(obj) {
@@ -66,7 +66,7 @@ The node object has various methods that return either an array of associated li
 
 The node object also has a copy method.
 
-+ [node.copy()](https://github.com/d3/d3-hierarchy/blob/master/README.md#node_copy) - returns a deep copy of the subtee that has a root at this *node*
++ [node.copy()](https://github.com/d3/d3-hierarchy/blob/master/README.md#node_copy) - returns a deep copy of the subtree that has a root at this *node*.
 
 ## Applying a Function to Each Node in a Subtree
 
@@ -107,7 +107,7 @@ In the example below we have a hierarchal object consisting of 6 nodes.  Each no
 
 The `sum` and `count` methods are used to set each descendant node's *value* property.  This property is used by some layout methods like [d3.treemap](https://github.com/d3/d3-hierarchy#treemap).
 
-+ [node.sum(value function)](https://github.com/d3/d3-hierarchy/blob/master/README.md#node_sum) - takes a function as an argument and returns the node on which it is called.  The function argument takes an object as an argument and returns an non-negative number.
++ [node.sum(value function)](https://github.com/d3/d3-hierarchy/blob/master/README.md#node_sum) - takes a function as an argument and returns the node on which it is called.  The passed function must take an object as an argument and return a non-negative number.
 
 The sum method is an accumulator method.  It traverses the subtree, rooted at the node on which the method is invoked, in *postorder* traversal order.  This ensures that all child nodes are traversed before a parent node.  When a node is traversed, the function argument is called and the object in the current node's *data* property is passed to the function.  The nodes *value* property is then set to the arithmetic sum of the number returned by the value_function and the numbers in its children's *value* properties.
 
