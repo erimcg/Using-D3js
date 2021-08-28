@@ -22,7 +22,8 @@
 
 # Creating Selection
 
-When creating data visualizations we often need to appy a set of visual changes to a set of elements in the DOM.  Sometimes we can retrieve the set we need by calling `getElementsByClassName`, `getElementsByTagName`, and `getElementById`.  But often times, these are insufficient.   D3.js has an incredibly useful and versatile module named [Selections](https://github.com/d3/d3-selection/blob/master/README.md#selection) that allow us to select sets of elements from the DOM using CSS selectors and user-defined functions.
+When creating data visualizations we often need to apply a set of visual
+changes to a set of elements in the DOM.  Sometimes we can retrieve the set we need by calling `getElementsByClassName`, `getElementsByTagName`, and `getElementById`.  But often times, these are insufficient.   D3.js has an incredibly useful and versatile module named [Selections](https://github.com/d3/d3-selection/blob/master/README.md#selection) that allow us to select sets of elements from the DOM using CSS selectors and user-defined functions.
 
 The D3 API has 3 initial methods that can be used to select sets of elements from the DOM.  These are:
 
