@@ -1,4 +1,5 @@
 {{meta {docid: creating_selections}}}
+{{meta {description: ""}}}
 
 <style>
   svg {
@@ -17,7 +18,7 @@
   }
 </style>
 
-<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 
 
 # Creating Selection

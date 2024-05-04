@@ -1,4 +1,5 @@
 {{meta {docid: quantize_scales}}}
+{{meta {description: ""}}}
 
 <style>
     svg { background-color: lightblue; }

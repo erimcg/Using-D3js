@@ -1,4 +1,5 @@
 {{meta {docid: timers}}}
+{{meta {description: "A tutorial on using D3.js timers"}}}
 
 <style>
 

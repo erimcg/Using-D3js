@@ -1,4 +1,7 @@
-<script src="https://d3js.org/d3.v4.min.js"></script>
+{{meta {docid: introduction}}}
+{{meta {description: "An introduction to our D3.js tutorial"}}}
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
 
 # Introduction
 
@@ -6,7 +9,7 @@
 
 <style>
   #button {
-    display: block;
+    display: block;{}
     position: relative;
     top: 10px;
     left: 10px;
@@ -136,5 +139,5 @@ The code examples are provided in interactive *sandboxes* like the one below.
 To get started, you must [download](https://github.com/d3/d3/zipball/master) the latest version of the D3.js library from the GitHub or use the CDN link to the latest release of the library as shown below.
 
 <pre>
-&lt;script src="https://d3js.org/d3.v5.min.js">&lt;/script>
+&lt;script src="https://d3js.org/d3.v7.min.js">&lt;/script>
 </pre>

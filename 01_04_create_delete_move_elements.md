@@ -1,5 +1,5 @@
-
 {{meta {docid: create_delete_move_elements}}}
+{{meta {description: ""}}}
 
 <style>
     button{
@@ -43,7 +43,7 @@
         background-color: aquamarine;
     }
 </style>
-<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 
 # Creating, Deleting, and Moving Elements
 

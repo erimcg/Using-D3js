@@ -1,5 +1,5 @@
-
 {{meta {docid: sequential_scales}}}
+{{meta {description: ""}}}
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="//d3js.org/d3-scale-chromatic.v0.3.min.js"></script>

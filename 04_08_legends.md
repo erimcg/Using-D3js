@@ -1,4 +1,5 @@
 {{meta {docid: legends}}}
+{{meta {description: ""}}}
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>

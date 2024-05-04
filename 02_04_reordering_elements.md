@@ -1,4 +1,5 @@
 {{meta {docid: sorting_elements}}}
+{{meta {description: ""}}}
 
 <style>
     button{
@@ -45,7 +46,7 @@
 
 </style>
 
-<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 
 # Reordering Elements
 
