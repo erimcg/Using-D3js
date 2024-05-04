@@ -1,0 +1,398 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Legends</title>
+  <link rel="canonical" href="http://using-d3js.com/04_08_legends.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 04;</script></head>
+
+<article>
+<nav><a href="04_07_ordinal_scales.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_01_paths.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 04</span>Legends</h1><script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+<style>
+  .label { font-size: 12px; }
+</style>
+
+
+<p><a class="p_ident" id="p_qa1yrp418a" href="#p_qa1yrp418a" tabindex="-1" role="presentation"></a>D3 doesn’t have built-in support for legends, however, Susie Lu has developed a module named d3-legend that can be used to easily create legends.  Here user documentation can be found at <a href="http://d3-legend.susielu.com">d3-legend.susielu.com</a>.</p>
+
+<p><a class="p_ident" id="p_2Ea149BJ5F" href="#p_2Ea149BJ5F" tabindex="-1" role="presentation"></a>The latest version of the module can be imported into a script using the <a href="https://cdnjs.com/libraries/d3-legend">CDN</a> as shown below:</p><pre>
+&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"&gt;&lt;/script&gt;
+</pre>
+
+
+<p><a class="p_ident" id="p_BqPVqxD85L" href="#p_BqPVqxD85L" tabindex="-1" role="presentation"></a>D3-legend provides 3 types of legends: color legend, size legend, and symbol legend.  We can construct legend generators using the following methods:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_2SuWlnBBom" href="#p_2SuWlnBBom" tabindex="-1" role="presentation"></a><a href="">d3.legendColor()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_I9JqqiyRtV" href="#p_I9JqqiyRtV" tabindex="-1" role="presentation"></a><a href="">d3.legendSize()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_Zi/IGDGlUD" href="#p_Zi/IGDGlUD" tabindex="-1" role="presentation"></a><a href="">d3.legendSymbol()</a></p></li></ul>
+
+<h2><a class="h_ident" id="h_jqyRtoQDk5" href="#h_jqyRtoQDk5" tabindex="-1" role="presentation"></a>Color Legend</h2>
+
+<p><a class="p_ident" id="p_/uDsZRelpV" href="#p_/uDsZRelpV" tabindex="-1" role="presentation"></a>The example below construct a plot and legend in a svg element.</p><pre>
+&lt;svg id="demo1" width="580" height="120"&gt;&lt;/svg&gt;
+</pre>
+
+
+<p><a class="p_ident" id="p_k/VTOgGOzG" href="#p_k/VTOgGOzG" tabindex="-1" role="presentation"></a>The plot consists of 8 circle elements with data joined to them and their fill properties set using a color scale created using <code>scaleLinear</code>.</p><pre>
+var colorScale = d3.scaleLinear()
+    .domain([0,2500])
+    .range(["red", "blue"]);
+</pre>
+
+
+<p><a class="p_ident" id="p_ASiqoKN4vW" href="#p_ASiqoKN4vW" tabindex="-1" role="presentation"></a>The color scale is also used to create a legend.  Below we create a color legend using the <code>legendColor</code> generator and the <code>scale</code> functions to set the scale.</p><pre>
+var legend = d3.legendColor()
+    .scale(colorScale);
+</pre>
+
+
+<p><a class="p_ident" id="p_8a7NApoVHg" href="#p_8a7NApoVHg" tabindex="-1" role="presentation"></a>We then create a group element, shift it down and to the right, and draw the legend within the group element.</p><pre>
+svg.append("g")
+    .attr("transform", "translate(500,10)")
+    .call(legend);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_pdirnuoQS6" href="#c_pdirnuoQS6" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">style</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag">svg</span> { <span class="cm-property">background-color</span>: <span class="cm-keyword">pink</span>; }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">style</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;120&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1&quot;</span>);
+
+  <span class="cm-comment">/*** Draw X-Axis ***/</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+    .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">9</span>])
+    .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">475</span>]);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>);
+
+  <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,80)&quot;</span>)
+    .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+
+  <span class="cm-comment">/*** Create color scale ***/</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">colorScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+    .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">2500</span>])
+    .<span class="cm-property">range</span>([<span class="cm-string">&quot;red&quot;</span>, <span class="cm-string">&quot;blue&quot;</span>]);
+
+  <span class="cm-comment">/*** Draw data points using color scale ***/</span>
+
+  <span class="cm-variable">svg</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">data</span>([<span class="cm-number">300</span>, <span class="cm-number">580</span>, <span class="cm-number">900</span>, <span class="cm-number">1200</span>, <span class="cm-number">1500</span>, <span class="cm-number">1800</span>, <span class="cm-number">2100</span>, <span class="cm-number">2400</span>])
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">i</span><span class="cm-operator">+</span><span class="cm-number">1</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-number">50</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">13</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">colorScale</span>(<span class="cm-variable-2">d</span>));
+
+  <span class="cm-keyword">var</span> <span class="cm-def">legend</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">legendColor</span>()
+    .<span class="cm-property">scale</span>(<span class="cm-variable">colorScale</span>);
+
+  <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(500,10)&quot;</span>)
+    .<span class="cm-property">call</span>(<span class="cm-variable">legend</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_SoH8sJ002w" href="#p_SoH8sJ002w" tabindex="-1" role="presentation"></a>There are various methods that can be called on a legend function object returned by the d3.legendColor generator.  You can find information on each of these below and at <a href="http://d3-legend.susielu.com">http://d3-legend.susielu.com</a>.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_9WBXNZKDWY" href="#p_9WBXNZKDWY" tabindex="-1" role="presentation"></a>legendColor.cells(arg) - set the number of symbol/label pairs in the legend or specify the intervals for which symbol/label pairs are drawn.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_+AJU/u+E+O" href="#p_+AJU/u+E+O" tabindex="-1" role="presentation"></a>legendColor.cellFilter(function) - specify a function to exclude certain symbol/label pairs from the legend.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_r/1At//N3E" href="#p_r/1At//N3E" tabindex="-1" role="presentation"></a>legendColor.orient(string) - specify if the legend should be “vertical” or “horizontal”.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_jvhi71KSFw" href="#p_jvhi71KSFw" tabindex="-1" role="presentation"></a>legendColor.ascending(boolean) - sets the order of the scale.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_CKBpW3up1j" href="#p_CKBpW3up1j" tabindex="-1" role="presentation"></a>legendColor.shape(string [,path]) - specify the shape of the symbols.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_ndCV/RVhY4" href="#p_ndCV/RVhY4" tabindex="-1" role="presentation"></a>legendColor.shapeWidth(number) - set the width of “rect” or “line” shape symbols.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_P1IrG/6xg/" href="#p_P1IrG/6xg/" tabindex="-1" role="presentation"></a>legendColor.shapeHeight(number) - set the height of “rect” shape symbols.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_XrkhNNcgvj" href="#p_XrkhNNcgvj" tabindex="-1" role="presentation"></a>legendColor.shapePadding(number) - set the spacing between legend symbols.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_h352nx4QfD" href="#p_h352nx4QfD" tabindex="-1" role="presentation"></a>legendOffset(number) - set the spacing between symbols and labels.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_sdQUzvrN9K" href="#p_sdQUzvrN9K" tabindex="-1" role="presentation"></a>legendColor.useClass(boolean) - if true, sets the symbol’s class to the value returned by the scale function.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_ygbYMPSV53" href="#p_ygbYMPSV53" tabindex="-1" role="presentation"></a>legendColor.classPrefix(string) - adds string to each class name???</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_O8olbEhRfj" href="#p_O8olbEhRfj" tabindex="-1" role="presentation"></a>legendColor.title(string) - sets the title for the legend.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_/jzPEeV4lr" href="#p_/jzPEeV4lr" tabindex="-1" role="presentation"></a>legendColor.titleWidth(number) - width of each title line.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_EuaXnRJure" href="#p_EuaXnRJure" tabindex="-1" role="presentation"></a>legendColor.labels([strings] | function) - explicitly set the labels.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_hB1aBTFLYs" href="#p_hB1aBTFLYs" tabindex="-1" role="presentation"></a>legendColor.labelAlign(string) - sets label alignment to “start”, “middle” or “end” for horizontally oriented legends.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_XiXI0O3UaE" href="#p_XiXI0O3UaE" tabindex="-1" role="presentation"></a>legendColor.labelFormat(d3.format) - set format of labels.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_UScaAuEbtU" href="#p_UScaAuEbtU" tabindex="-1" role="presentation"></a>legendColor.locale(d3.format locale) - set label format locale.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_HnnajqjHKK" href="#p_HnnajqjHKK" tabindex="-1" role="presentation"></a>legendColor.labelDelimiter(string) - replace “to” text when using quantize scale.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_v8UIxkV/EP" href="#p_v8UIxkV/EP" tabindex="-1" role="presentation"></a>legendColor.labelWrap(number) - set max width of a line of a label.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_jRKitY3aKU" href="#p_jRKitY3aKU" tabindex="-1" role="presentation"></a>legendColor.on(string, function) - set event handler for “cellover”, “cellout”, or “cellclick”.</p></li></ul>
+
+<h2><a class="h_ident" id="h_mczoiHju94" href="#h_mczoiHju94" tabindex="-1" role="presentation"></a>Setting the Number of Symbol/Label Pairs</h2>
+
+<p><a class="p_ident" id="p_bOxs0FvY/f" href="#p_bOxs0FvY/f" tabindex="-1" role="presentation"></a>Below we set the number of symbol/label pairs to 3.</p><pre>
+var legend = d3.legendColor()
+    .scale(colorScale)
+    .cells(3);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_6gk9yyevfs" href="#c_6gk9yyevfs" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;120&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo2&quot;</span>);
+
+  <span class="cm-comment">/*** Draw X-Axis ***/</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+    .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">9</span>])
+    .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">475</span>]);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>);
+
+  <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,80)&quot;</span>)
+    .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+
+  <span class="cm-comment">/*** Create color scale ***/</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">colorScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+    .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">2500</span>])
+    .<span class="cm-property">range</span>([<span class="cm-string">&quot;red&quot;</span>, <span class="cm-string">&quot;blue&quot;</span>]);
+
+  <span class="cm-comment">/*** Draw data points using color scale ***/</span>
+
+  <span class="cm-variable">svg</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">data</span>([<span class="cm-number">300</span>, <span class="cm-number">580</span>, <span class="cm-number">900</span>, <span class="cm-number">1200</span>, <span class="cm-number">1500</span>, <span class="cm-number">1800</span>, <span class="cm-number">2100</span>, <span class="cm-number">2400</span>])
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">i</span><span class="cm-operator">+</span><span class="cm-number">1</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-number">50</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">13</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">colorScale</span>(<span class="cm-variable-2">d</span>));
+
+  <span class="cm-comment">/*** Create and draw the legend ***/</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">legend</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">legendColor</span>()
+    .<span class="cm-property">scale</span>(<span class="cm-variable">colorScale</span>)
+    .<span class="cm-property">cells</span>(<span class="cm-number">3</span>);
+
+  <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(500,10)&quot;</span>)
+    .<span class="cm-property">call</span>(<span class="cm-variable">legend</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_TwUhabvCSr" href="#h_TwUhabvCSr" tabindex="-1" role="presentation"></a>Setting Label Text</h2>
+
+<p><a class="p_ident" id="p_Nli32wOO8Q" href="#p_Nli32wOO8Q" tabindex="-1" role="presentation"></a>We can also format the label text and provide a title for the legend using the labelFormat and title methods respectively.  Below we remove the mantissa digits (digits after the decimal point) and add “Legend” as the title of the legend.</p><pre>
+var legend = d3.legendColor()
+    .scale(colorScale)
+    .labelFormat(d3.format(".0f"))
+    .title("Legend");
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_ggwtKqDy5z" href="#c_ggwtKqDy5z" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo4&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;120&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo4&quot;</span>);
+
+  <span class="cm-comment">/*** Draw X-Axis ***/</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+    .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">9</span>])
+    .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">475</span>]);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>);
+
+  <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,80)&quot;</span>)
+    .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+
+  <span class="cm-comment">/*** Create color scale ***/</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">colorScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+    .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">2500</span>])
+    .<span class="cm-property">range</span>([<span class="cm-string">&quot;red&quot;</span>, <span class="cm-string">&quot;blue&quot;</span>]);
+
+  <span class="cm-comment">/*** Draw data points using color scale ***/</span>
+
+  <span class="cm-variable">svg</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">data</span>([<span class="cm-number">300</span>, <span class="cm-number">580</span>, <span class="cm-number">900</span>, <span class="cm-number">1200</span>, <span class="cm-number">1500</span>, <span class="cm-number">1800</span>, <span class="cm-number">2100</span>, <span class="cm-number">2400</span>])
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">i</span><span class="cm-operator">+</span><span class="cm-number">1</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-number">50</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">13</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">colorScale</span>(<span class="cm-variable-2">d</span>));
+
+  <span class="cm-comment">/*** Create and draw the legend ***/</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">legend</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">legendColor</span>()
+    .<span class="cm-property">scale</span>(<span class="cm-variable">colorScale</span>)
+    .<span class="cm-property">cells</span>(<span class="cm-number">3</span>)
+    .<span class="cm-property">labelFormat</span>(<span class="cm-variable">d3</span>.<span class="cm-property">format</span>(<span class="cm-string">&quot;.0f&quot;</span>))
+    .<span class="cm-property">title</span>(<span class="cm-string">&quot;Legend&quot;</span>);
+
+  <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(500,20)&quot;</span>)
+    .<span class="cm-property">call</span>(<span class="cm-variable">legend</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_XckojCiPGl" href="#h_XckojCiPGl" tabindex="-1" role="presentation"></a>Using Classes</h2>
+
+<p><a class="p_ident" id="p_shnZf4L2ka" href="#p_shnZf4L2ka" tabindex="-1" role="presentation"></a>In the example below we have defined 4 CSS classes in a CSS stylesheet.</p><pre>
+.one { fill: red;}
+.two { fill: orange;}
+.three { fill: green;}
+.four { fill: blue;}
+</pre>
+
+
+<p><a class="p_ident" id="p_VOBx3CUmQf" href="#p_VOBx3CUmQf" tabindex="-1" role="presentation"></a>We also have a quantize scale that uniformly segments a continuous domain into 4 segments and maps each segment to one of 4 strings (the names of the above classes).</p><pre>
+var colorScale = d3.scaleQuantize()
+    .domain([0,2500])
+    .range(["one", "two", "three", "four"]);
+</pre>
+
+
+<p><a class="p_ident" id="p_35VnkrPq4U" href="#p_35VnkrPq4U" tabindex="-1" role="presentation"></a>We’re going to use the color scale in two ways.  First to assign classes to circle elements so that their fill properties will be set to an appropriate color.  Second, to determine the number of symbol/label pairs in the legend and to define the fill of each of the symbols.</p>
+
+<p><a class="p_ident" id="p_Fr+zp4nhVh" href="#p_Fr+zp4nhVh" tabindex="-1" role="presentation"></a>We can set the class name for each circle drawn by using the <code>each</code> method on the selection of circles after the circles are created.</p><pre>
+svg.selectAll("circle")
+    .each((d, i, nodes) =&gt; {
+        nodes[i].classList.add(colorScale(d));
+    });
+</pre>
+
+
+<p><a class="p_ident" id="p_QCLjyOn86O" href="#p_QCLjyOn86O" tabindex="-1" role="presentation"></a>By default the legend creates rect elements and fills them with a color returned by the scale.  In our case, the scale doesn’t return a color, but rather the name of a class.  By calling useClass, each symbol in the legend is assigned one of the class names returned by the scale - thus setting the fill color.</p><pre>
+var legend = d3.legendColor()
+    .scale(colorScale)
+    .useClass(true);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_N77bq7OtBN" href="#c_N77bq7OtBN" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">style</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-qualifier">.one</span> { <span class="cm-property">fill</span>: <span class="cm-keyword">red</span>;}
+<span class="cm-qualifier">.two</span> { <span class="cm-property">fill</span>: <span class="cm-keyword">orange</span>;}
+<span class="cm-qualifier">.three</span> { <span class="cm-property">fill</span>: <span class="cm-keyword">green</span>;}
+<span class="cm-qualifier">.four</span> { <span class="cm-property">fill</span>: <span class="cm-keyword">blue</span>;}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">style</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo3&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;700&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;120&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo3&quot;</span>);
+
+  <span class="cm-comment">/*** Draw X-Axis ***/</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+    .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">9</span>])
+    .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">475</span>]);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>);
+
+  <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,80)&quot;</span>)
+    .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+
+  <span class="cm-comment">/*** Create color scale ***/</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">colorScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleQuantize</span>()
+    .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">2500</span>])
+    .<span class="cm-property">range</span>([<span class="cm-string">&quot;one&quot;</span>, <span class="cm-string">&quot;two&quot;</span>, <span class="cm-string">&quot;three&quot;</span>, <span class="cm-string">&quot;four&quot;</span>]);
+
+  <span class="cm-comment">/*** Draw data points using color scale ***/</span>
+
+  <span class="cm-variable">svg</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">data</span>([<span class="cm-number">300</span>, <span class="cm-number">580</span>, <span class="cm-number">900</span>, <span class="cm-number">1200</span>, <span class="cm-number">1500</span>, <span class="cm-number">1800</span>, <span class="cm-number">2100</span>, <span class="cm-number">2400</span>])
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">i</span><span class="cm-operator">+</span><span class="cm-number">1</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-number">50</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">13</span>);
+
+  <span class="cm-variable">svg</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">each</span>((<span class="cm-def">d</span>, <span class="cm-def">i</span>, <span class="cm-def">nodes</span>) <span class="cm-operator">=&gt;</span> {
+        <span class="cm-variable-2">nodes</span>[<span class="cm-variable-2">i</span>].<span class="cm-property">classList</span>.<span class="cm-property">add</span>(<span class="cm-variable">colorScale</span>(<span class="cm-variable-2">d</span>));
+  });
+
+  <span class="cm-comment">/*** Create and draw the legend ***/</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">legend</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">legendColor</span>()
+    .<span class="cm-property">scale</span>(<span class="cm-variable">colorScale</span>)
+    .<span class="cm-property">useClass</span>(<span class="cm-atom">true</span>);
+
+  <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(500,10)&quot;</span>)
+    .<span class="cm-property">call</span>(<span class="cm-variable">legend</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre><nav><a href="04_07_ordinal_scales.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_01_paths.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

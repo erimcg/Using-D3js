@@ -1,0 +1,371 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Using D3-fetch</title>
+  <link rel="canonical" href="http://using-d3js.com/03_01_d3_fetch.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 03;</script></head>
+
+<article>
+<nav><a href="02_04_reordering_elements.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_01_scaling_functions.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 03</span>Using D3-fetch</h1><style>
+    .lightblue {
+        background-color: lightblue;
+        display: block;
+        margin: 5px;
+    }
+</style>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://d3js.org/d3-fetch.v1.min.js"></script>
+<script>
+    function drawText(id, data) {
+        d3.select(id)
+            .selectAll("text")
+            .data(data)
+            .enter()
+            .append("text")
+            .attr("y", (d,i) => i * 20 + 20)
+            .attr("x", 10)
+            .text((d) => d.letter + " " + d.number + " " + d.color);
+    }
+</script>
+
+
+<p><a class="p_ident" id="p_DNGT0D77+i" href="#p_DNGT0D77+i" tabindex="-1" role="presentation"></a>The <a href="https://github.com/d3/d3-fetch">d3-fetch</a> module provides various convenience methods that are built on top of the <a href="https://fetch.spec.whatwg.org">Fetch</a> data transfer standard.</p><pre>
+&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>https://d3js.org/d3-fetch.v1.min.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
+</pre>
+
+
+<p><a class="p_ident" id="p_BkzAdbMrtb" href="#p_BkzAdbMrtb" tabindex="-1" role="presentation"></a>The <a href="https://github.com/d3/d3-fetch">d3-fetch</a> convenience methods are shown below.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_CSjHPPiXRr" href="#p_CSjHPPiXRr" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-fetch#dsv">d3.dsv(delimiter, input[, init][, row])</a> - returns an array of objects, one for each row</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_mT9dJCcbXY" href="#p_mT9dJCcbXY" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-fetch#csv">d3.csv(input[, init][, row])</a> - returns an array of objects, one for each row</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_AhW5BgMbzY" href="#p_AhW5BgMbzY" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-fetch#tsv">d3.tsv(input[, init][, row])</a> - returns an array of objects, one for each row</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_qy5Otbw1fm" href="#p_qy5Otbw1fm" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-fetch#json">d3.json(input[, init])</a> - returns a single object</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_OE3djAHx8V" href="#p_OE3djAHx8V" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-fetch#xml">d3.xml(input[, init])</a> - returns a XML document node</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_+sUenDeFGY" href="#p_+sUenDeFGY" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-fetch#html">d3.html(input[, init])</a> - returns a HTML document node</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_Snc/ijsjV6" href="#p_Snc/ijsjV6" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-fetch#text">d3.text(input[, init])</a> - returns a string</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_3LZ5o04Pki" href="#p_3LZ5o04Pki" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-fetch#svg">d3.svg(input[, init])</a> - returns a SVG node</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_X15LkzK8NL" href="#p_X15LkzK8NL" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-fetch#image">d3.image(input[, init])</a> - returns an image element</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_1sWx+cAnr6" href="#p_1sWx+cAnr6" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-fetch#blob">d3.blob(input[, init])</a> - returns a Blob</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_KPsYeX2Wje" href="#p_KPsYeX2Wje" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-fetch#buffer">d3.buffer(input[, init])</a> - returns an ArrayBuffer</p></li></ul>
+
+<p><a class="p_ident" id="p_2cMCQErgP8" href="#p_2cMCQErgP8" tabindex="-1" role="presentation"></a>Below are examples on how to use all but the last 2 methods.</p>
+
+<p><a class="p_ident" id="p_7VQs2OLKQr" href="#p_7VQs2OLKQr" tabindex="-1" role="presentation"></a>When calling the dsv, csv, tsv, json, xml, html, and text download functions, you’ll find a call to <code>then</code> chained to the download function call as shown below. The code in the function passed to <code>then</code> is executed <em>after</em> the file is downloaded and the data within the file is ready to be used.</p><pre>
+d3.dsv(delimiter, fileName)
+    .<strong>then</strong>(function(data) {
+    // download has completed - do something with data
+});
+
+// may be executed before the code passed to then() is executed!
+</pre>
+
+
+<p><a class="p_ident" id="p_81Fk+ivnc1" href="#p_81Fk+ivnc1" tabindex="-1" role="presentation"></a>This pattern is necessary because the browser does not wait for the data to be downloaded.  Instead, the browser will request the download and continue with the rest of the code in the JavaScript file.  When the download has finished, the browser will jump to the code within the call to <code>then</code> and execute it.</p>
+
+<p><a class="p_ident" id="p_ZHEYxkvUGe" href="#p_ZHEYxkvUGe" tabindex="-1" role="presentation"></a>To be clear, any code that relies on the data in the downloaded file must be executed <em>after</em> the file has been downloaded and is usually included in the function passed to <code>then</code>. Second, any code that is written after the <code>then</code> call, <em>may be</em> executed before the file has been downloaded and before the function passed to <code>then</code> is executed.</p>
+
+<p><a class="p_ident" id="p_4uBrEb7lMv" href="#p_4uBrEb7lMv" tabindex="-1" role="presentation"></a>In the examples below we use the d3-fetch functions to retrieve the contents of various data files that we have on our server.  All of the files store similar information, just in different formats.  In each examples, we pass a function to <code>then</code> that converts the data that is returned by the helper functions to an array of objects, each having the properties letter, number, and color (if it is not already in that format).  We then pass the id of an svg element and the array of objects to <code>drawText</code> (shown below) which writes the text contained in the objects of the array to the svg element.</p><pre>
+function drawText(id, data) {
+    d3.select(id)
+      .selectAll("text")
+      .data(data)
+      .enter()
+      .append("text")
+      .attr("y", (d,i) =&gt; i * 20 + 20)
+      .attr("x", 10)
+      .text((d) =&gt; d.letter + " " + d.number + " " + d.color);
+ }
+ </pre>
+
+
+<h2><a class="h_ident" id="h_kDSmmtGS/C" href="#h_kDSmmtGS/C" tabindex="-1" role="presentation"></a>d3.dsv</h2>
+
+<p><a class="p_ident" id="p_41Z4DLbtDh" href="#p_41Z4DLbtDh" tabindex="-1" role="presentation"></a>The code fragment below fetches a file named sample.dsv which contains the following text.</p><pre>
+letter|number|color
+A|1|red
+B|2|blue
+</pre>
+
+
+<p><a class="p_ident" id="p_ZOW4/kX05h" href="#p_ZOW4/kX05h" tabindex="-1" role="presentation"></a>Here is the code to read the dsv file.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_GE5WlTUadA" href="#c_GE5WlTUadA" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">dsv</span>(<span class="cm-string">&quot;|&quot;</span>, <span class="cm-string">&quot;samples/sample.dsv&quot;</span>)
+      .<span class="cm-property">then</span>(<span class="cm-keyword">function</span>(<span class="cm-def">data</span>) {
+
+          <span class="cm-variable">drawText</span>(<span class="cm-string">&quot;#dsvDemo&quot;</span>, <span class="cm-variable-2">data</span>);
+       });
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;dsvDemo&quot;</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;50&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_mNb47zmJvP" href="#h_mNb47zmJvP" tabindex="-1" role="presentation"></a>d3.csv</h2>
+
+<p>The code fragment below fetches a file named sample.csv which contains the following text.</p><pre>
+letter,number,color
+A,1,red
+B,2,blue
+</pre>
+
+
+<p><a class="p_ident" id="p_ESEEJv14HB" href="#p_ESEEJv14HB" tabindex="-1" role="presentation"></a>Here is the code to read the csv file.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_KriMJ90V00" href="#c_KriMJ90V00" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">csv</span>(<span class="cm-string">&quot;samples/sample.csv&quot;</span>)
+      .<span class="cm-property">then</span>(<span class="cm-keyword">function</span>(<span class="cm-def">data</span>) {
+
+          <span class="cm-variable">drawText</span>(<span class="cm-string">&quot;#csvDemo&quot;</span>, <span class="cm-variable-2">data</span>);
+       });
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;csvDemo&quot;</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;50&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_QEta/CAPwS" href="#h_QEta/CAPwS" tabindex="-1" role="presentation"></a>d3.tsv</h2>
+
+<p>The code fragment below fetches a file named sample.tsv which contains the following text.</p><pre>
+letter  number  color
+A   1   red
+B   2   blue
+</pre>
+
+
+<p><a class="p_ident" id="p_+6xNndH9l7" href="#p_+6xNndH9l7" tabindex="-1" role="presentation"></a>Here is the code to read the tsv file.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_IAqS3yL5my" href="#c_IAqS3yL5my" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">tsv</span>(<span class="cm-string">&quot;samples/sample.tsv&quot;</span>)
+      .<span class="cm-property">then</span>(<span class="cm-keyword">function</span>(<span class="cm-def">data</span>) {
+
+          <span class="cm-variable">drawText</span>(<span class="cm-string">&quot;#tsvDemo&quot;</span>, <span class="cm-variable-2">data</span>);
+       });
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;tsvDemo&quot;</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;50&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_wpQ35XKqFG" href="#h_wpQ35XKqFG" tabindex="-1" role="presentation"></a>d3.json</h2>
+
+<p>The code fragment below fetches a file named sample.json which contains the following text.</p><pre>
+{
+  "0":{
+    "letter": "A",
+    "number": 1,
+    "color": "red"
+    },
+  "1": {
+    "letter": "B",
+    "number": 2,
+    "color": "blue"
+    }
+}
+</pre>
+
+
+<p><a class="p_ident" id="p_92CA2GdBkH" href="#p_92CA2GdBkH" tabindex="-1" role="presentation"></a>Here is the code to read the json file.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_Dkg2h2Hi4E" href="#c_Dkg2h2Hi4E" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">json</span>(<span class="cm-string">&quot;samples/sample.json&quot;</span>)
+      .<span class="cm-property">then</span>(<span class="cm-keyword">function</span>(<span class="cm-def">data</span>) {
+
+          <span class="cm-comment">// data is an object, convert to array.</span>
+          <span class="cm-variable-2">data</span> <span class="cm-operator">=</span> [<span class="cm-variable-2">data</span>[<span class="cm-number">0</span>], <span class="cm-variable-2">data</span>[<span class="cm-number">1</span>]];
+
+          <span class="cm-variable">drawText</span>(<span class="cm-string">&quot;#jsonDemo&quot;</span>, <span class="cm-variable-2">data</span>);
+       });
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;jsonDemo&quot;</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;50&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_WZ3272stFb" href="#h_WZ3272stFb" tabindex="-1" role="presentation"></a>d3.xml</h2>
+
+<p>The code fragment below fetches a file named sample.xml which contains the following text.</p><pre>
+&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;data&gt;
+  &lt;item&gt;
+      &lt;letter&gt;A&lt;/letter&gt;
+      &lt;number&gt;1&lt;/number&gt;
+      &lt;color&gt;red&lt;/color&gt;
+  &lt;/item&gt;
+  &lt;item&gt;
+      &lt;letter&gt;B&lt;/letter&gt;
+      &lt;number&gt;2&lt;/number&gt;
+      &lt;color&gt;blue&lt;/color&gt;
+  &lt;/item&gt;
+&lt;/data&gt;
+</pre>
+
+
+<p><a class="p_ident" id="p_B2onBksejp" href="#p_B2onBksejp" tabindex="-1" role="presentation"></a>Here is the code to read the xml file.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_+IDsVopeKR" href="#c_+IDsVopeKR" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">xml</span>(<span class="cm-string">&quot;samples/sample.xml&quot;</span>)
+      .<span class="cm-property">then</span>(<span class="cm-keyword">function</span>(<span class="cm-def">data</span>) {
+
+          <span class="cm-comment">// data is an XML document, parse document</span>
+          <span class="cm-variable-2">data</span> <span class="cm-operator">=</span> [].<span class="cm-property">map</span>.<span class="cm-property">call</span>(<span class="cm-variable-2">data</span>.<span class="cm-property">querySelectorAll</span>(<span class="cm-string">&quot;item&quot;</span>), <span class="cm-keyword">function</span>(<span class="cm-def">item</span>) {
+
+              <span class="cm-keyword">return</span> {
+                  <span class="cm-property">letter</span>: <span class="cm-variable-2">item</span>.<span class="cm-property">querySelector</span>(<span class="cm-string">&quot;letter&quot;</span>).<span class="cm-property">textContent</span>,
+                  <span class="cm-property">number</span>: <span class="cm-variable-2">item</span>.<span class="cm-property">querySelector</span>(<span class="cm-string">&quot;number&quot;</span>).<span class="cm-property">textContent</span>,
+                  <span class="cm-property">color</span>: <span class="cm-variable-2">item</span>.<span class="cm-property">querySelector</span>(<span class="cm-string">&quot;color&quot;</span>).<span class="cm-property">textContent</span>
+              };
+          });
+
+          <span class="cm-variable">drawText</span>(<span class="cm-string">&quot;#xmlDemo&quot;</span>, <span class="cm-variable-2">data</span>);
+
+       });
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;xmlDemo&quot;</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;50&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_uO9AfPUiPZ" href="#h_uO9AfPUiPZ" tabindex="-1" role="presentation"></a>d3.html</h2>
+
+<p>The code fragment below fetches a file named sample.html which contains the following text.</p><pre>
+&lt;html&gt;
+  &lt;body&gt;
+    &lt;p&gt;A 1 red&lt;/p&gt;
+    &lt;p&gt;B 2 blue&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+
+<p><a class="p_ident" id="p_9YUViRf6Dd" href="#p_9YUViRf6Dd" tabindex="-1" role="presentation"></a>Here is the code to read the html file.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_uPgd/EesyB" href="#c_uPgd/EesyB" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">html</span>(<span class="cm-string">&quot;samples/sample.html&quot;</span>)
+      .<span class="cm-property">then</span>(<span class="cm-keyword">function</span>(<span class="cm-def">data</span>) {
+
+          <span class="cm-comment">// data is an HTML document, parse document</span>
+          <span class="cm-variable-2">data</span> <span class="cm-operator">=</span> [].<span class="cm-property">map</span>.<span class="cm-property">call</span>(<span class="cm-variable-2">data</span>.<span class="cm-property">querySelectorAll</span>(<span class="cm-string">&quot;p&quot;</span>), <span class="cm-keyword">function</span>(<span class="cm-def">node</span>) {
+
+              <span class="cm-keyword">let</span> <span class="cm-def">tokens</span> <span class="cm-operator">=</span> <span class="cm-variable-2">node</span>.<span class="cm-property">textContent</span>.<span class="cm-property">split</span>(<span class="cm-string">&quot; &quot;</span>);
+
+              <span class="cm-keyword">return</span> {
+                  <span class="cm-property">letter</span>: <span class="cm-variable-2">tokens</span>[<span class="cm-number">0</span>],
+                  <span class="cm-property">number</span>: <span class="cm-variable-2">tokens</span>[<span class="cm-number">1</span>],
+                  <span class="cm-property">color</span>: <span class="cm-variable-2">tokens</span>[<span class="cm-number">2</span>]
+              };
+          });
+
+          <span class="cm-variable">drawText</span>(<span class="cm-string">&quot;#htmlDemo&quot;</span>, <span class="cm-variable-2">data</span>);
+       });
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;htmlDemo&quot;</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;50&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_RrIKiLKSEJ" href="#p_RrIKiLKSEJ" tabindex="-1" role="presentation"></a>##d3.text</p>
+
+<p>The code fragment below fetches a file named sample.txt which contains the following text.</p><pre>
+A 1 red
+B 2 blue
+</pre>
+
+
+<p><a class="p_ident" id="p_bhaNt8CRVf" href="#p_bhaNt8CRVf" tabindex="-1" role="presentation"></a>Here is the code to read the text file.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_7zGxCo4jCt" href="#c_7zGxCo4jCt" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">text</span>(<span class="cm-string">&quot;samples/sample.txt&quot;</span>)
+      .<span class="cm-property">then</span>(<span class="cm-keyword">function</span>(<span class="cm-def">data</span>) {
+
+          <span class="cm-comment">// data is a string</span>
+          <span class="cm-variable-2">data</span> <span class="cm-operator">=</span> <span class="cm-variable-2">data</span>.<span class="cm-property">split</span>(<span class="cm-string">&quot;\n&quot;</span>);
+
+          <span class="cm-variable-2">data</span> <span class="cm-operator">=</span> <span class="cm-variable-2">data</span>.<span class="cm-property">map</span>((<span class="cm-def">str</span>) <span class="cm-operator">=&gt;</span> {
+              <span class="cm-keyword">let</span> <span class="cm-def">tokens</span> <span class="cm-operator">=</span> <span class="cm-variable-2">str</span>.<span class="cm-property">split</span>(<span class="cm-string">&quot; &quot;</span>);
+
+              <span class="cm-keyword">return</span> {
+                  <span class="cm-property">letter</span>: <span class="cm-variable-2">tokens</span>[<span class="cm-number">0</span>],
+                  <span class="cm-property">number</span>: <span class="cm-variable-2">tokens</span>[<span class="cm-number">1</span>],
+                  <span class="cm-property">color</span>: <span class="cm-variable-2">tokens</span>[<span class="cm-number">2</span>]
+              };
+          });
+
+          <span class="cm-variable">drawText</span>(<span class="cm-string">&quot;#textDemo&quot;</span>, <span class="cm-variable-2">data</span>);
+       });
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;textDemo&quot;</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;50&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_FL0/8Ko7/l" href="#h_FL0/8Ko7/l" tabindex="-1" role="presentation"></a>d3.svg</h2>
+
+<p>The code fragment below fetches a file named sample.svg which contains the following text.</p><pre>
+&lt;svg id="svgDemo" xmlns="http://www.w3.org/2000/svg" version="1.1" baseProfile="full" width="64" height="64" &gt;
+    &lt;rect width="100%" height="100%" fill="green" /&gt;
+    &lt;circle cx="40" cy="40" r="40" fill="blue" /&gt;
+&lt;/svg&gt;
+</pre>
+
+
+<p><a class="p_ident" id="p_3MYQVQazWY" href="#p_3MYQVQazWY" tabindex="-1" role="presentation"></a>Here is the code to read the svg file.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_J8QFBISEoS" href="#c_J8QFBISEoS" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">svg</span>(<span class="cm-string">&quot;samples/sample.svg&quot;</span>)
+      .<span class="cm-property">then</span>(<span class="cm-keyword">function</span>(<span class="cm-def">data</span>) {
+
+         <span class="cm-keyword">var</span> <span class="cm-def">oldChild</span> <span class="cm-operator">=</span> <span class="cm-variable">document</span>.<span class="cm-property">getElementById</span>(<span class="cm-string">&quot;svgDemo&quot;</span>);
+         <span class="cm-variable">document</span>.<span class="cm-property">getElementById</span>(<span class="cm-string">&quot;svgDemo&quot;</span>).<span class="cm-property">parentNode</span>.<span class="cm-property">replaceChild</span>(<span class="cm-variable-2">data</span>.<span class="cm-property">documentElement</span>, <span class="cm-variable-2">oldChild</span>);
+       });
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;svgDemo&quot;</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;50&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_WuG/a0MSt7" href="#h_WuG/a0MSt7" tabindex="-1" role="presentation"></a>d3.image</h2>
+
+<p><a class="p_ident" id="p_QfOxtPpGZJ" href="#p_QfOxtPpGZJ" tabindex="-1" role="presentation"></a>The code fragment below fetches a file named sample.png which contains a png that was created by exporting the above svg to a file with the png format.</p>
+
+<p><a class="p_ident" id="p_a6B+KtzFdj" href="#p_a6B+KtzFdj" tabindex="-1" role="presentation"></a>Here is the code to read the png file.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_F6uYDP3uid" href="#c_F6uYDP3uid" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">image</span>(<span class="cm-string">&quot;samples/sample.png&quot;</span>)
+      .<span class="cm-property">then</span>(<span class="cm-keyword">function</span>(<span class="cm-def">data</span>) {
+
+         <span class="cm-keyword">let</span> <span class="cm-def">canvas</span> <span class="cm-operator">=</span> <span class="cm-variable">document</span>.<span class="cm-property">getElementById</span>(<span class="cm-string">&quot;imageDemo&quot;</span>);
+         <span class="cm-keyword">let</span> <span class="cm-def">ctx</span> <span class="cm-operator">=</span> <span class="cm-variable-2">canvas</span>.<span class="cm-property">getContext</span>(<span class="cm-string">'2d'</span>);
+         <span class="cm-variable-2">ctx</span>.<span class="cm-property">drawImage</span>(<span class="cm-variable-2">data</span>, <span class="cm-number">0</span>,<span class="cm-number">0</span>);
+       });
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">canvas</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;imageDemo&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;64px&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;64px&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">canvas</span><span class="cm-tag cm-bracket">&gt;</span></pre><nav><a href="02_04_reordering_elements.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_01_scaling_functions.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

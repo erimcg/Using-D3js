@@ -1,0 +1,203 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Dispatches</title>
+  <link rel="canonical" href="http://using-d3js.com/08_02_dispatches.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 08;</script></head>
+
+<article>
+<nav><a href="08_01_events.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="08_03_require.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 08</span>Dispatches</h1><style>
+
+</style>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+
+
+<p><a class="p_ident" id="p_W/+Iyff2kk" href="#p_W/+Iyff2kk" tabindex="-1" role="presentation"></a>In this section we discuss <code>d3.dispatch</code>.</p>
+
+<h2><a class="h_ident" id="h_fkn/iFImIv" href="#h_fkn/iFImIv" tabindex="-1" role="presentation"></a>Dispatches</h2>
+
+<p><a class="p_ident" id="p_tRfvDMJSjH" href="#p_tRfvDMJSjH" tabindex="-1" role="presentation"></a>A “dispatch” can be thought of as an event that can be called from anywhere in your code. Each dispatch instance has different “types” of events that we can assign callback functions to and then invoke a typed event whenever we want.</p>
+
+<p><a class="p_ident" id="p_OCFj4Z3jJT" href="#p_OCFj4Z3jJT" tabindex="-1" role="presentation"></a>To create a dispatch we call <code>d3.dispatch</code> and pass in the <code>types</code> of events that we want the dispatch to handle. Each <code>type</code> is a string.</p>
+
+<p><a class="p_ident" id="p_hguBJSmnmW" href="#p_hguBJSmnmW" tabindex="-1" role="presentation"></a>For example, to create a dispatch that handles custom events “start” and “end”:</p><pre>
+var dispatchEx = d3.dispatch("start", "end");
+</pre>
+
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_A/sW8KmLXU" href="#p_A/sW8KmLXU" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-dispatch#dispatch">d3.dispatch(types...)</a> - Creates a new dispatch for the specified event types.</p></li></ul>
+
+<p><a class="p_ident" id="p_Cq3Tp6Ol+S" href="#p_Cq3Tp6Ol+S" tabindex="-1" role="presentation"></a>Next, we need to define what the custom events <code>start</code> and <code>end</code> do. To do this we call <code>dispatch.on</code> where is <code>dispatch</code> is instance of a dispatch created in the method above. To use <code>dispatch.on</code> we pass in the string of the type of the event and then the callback function that will be invoked when the dispatch is called.</p>
+
+<p><a class="p_ident" id="p_xxdYFdB2VQ" href="#p_xxdYFdB2VQ" tabindex="-1" role="presentation"></a>For example, to define what the <code>start</code> and <code>end</code> events do:</p><pre>
+dispatchEx.on("start", <i>callback function</i>);
+dispatchEx.on("end", <i>callback function</i>);
+</pre>
+
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_9vHWZEXo78" href="#p_9vHWZEXo78" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-dispatch#dispatch_on">dispatch.on(typenames[, callback])</a> - Sets the callback function for the types if a function is passed in. Removes the callback function if <code>null</code> is passed in. Returns the callback function if nothing is passed into the callback function.</p></li></ul>
+
+<p><a class="p_ident" id="p_ZFLQ8EgWJo" href="#p_ZFLQ8EgWJo" tabindex="-1" role="presentation"></a>All that is left now is to call our dispatch events. To do this we can use <code>dispatch.call</code> on our instance of <code>d3.dispatch</code>. For this method we first pass in the event of that dispatch we want to invoke; following this is by what we want <code>this</code> to refer to within the dispatch events callback function; finally we add any arguments we want to pass into the callback function.</p>
+
+<p><a class="p_ident" id="p_ClwCep8itY" href="#p_ClwCep8itY" tabindex="-1" role="presentation"></a>For example, to call <code>start</code> and <code>end</code> when a <code>circle</code> has its <code>mouseenter</code> and <code>mouseout</code> events invoked. Recall that within the callback function of <code>selection.on</code> <code>this</code> refers to the node that called the event:</p><pre>
+circleSelection
+  .on("mouseenter", function(){
+    dispatchEx.call("start", this, arguments...);
+    //Passes in the node that called the event as 'this'
+  })
+  .on("mouseout", function(){
+    dispatchEx.call("start", d3.select(this), arguments...);
+    //Passes in a selection of the node that call the event as 'this'
+  });
+</pre>
+
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_A1kWwcT1QU" href="#p_A1kWwcT1QU" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-dispatch#dispatch_call">dispatch.call(type[, that[, arguments...]])</a> - Similar to <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call">function.call</a>. Invokes the callback function of <code>type</code>. Can pass in what we want <code>this</code> to refer to within the callback function followed by any arguments to the function.</p></li></ul>
+
+<p><a class="p_ident" id="p_jl1Hl1nGtY" href="#p_jl1Hl1nGtY" tabindex="-1" role="presentation"></a>In Figure 1 we create a dispatch with the types <code>start</code> and <code>end</code>. We then set <code>start</code> and <code>end</code> to change the color of <code>this</code> (which is passed in) to green and red respectively. In <code>start</code>, <code>this</code> is a node, and in <code>end</code>, <code>this</code> is a selection. We then append a <code>circle</code> and set its <code>mouseenter</code> and <code>mouseout</code> events to call the dispatches <code>start</code> and <code>end</code> respectively.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_dmLWChTBHb" href="#c_dmLWChTBHb" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">dispatch1</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">dispatch</span>(<span class="cm-string">&quot;start&quot;</span>, <span class="cm-string">&quot;end&quot;</span>);
+
+<span class="cm-variable">dispatch1</span>.<span class="cm-property">on</span>(<span class="cm-string">&quot;start&quot;</span>, <span class="cm-keyword">function</span>() {
+	<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-keyword">this</span>).<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;green&quot;</span>);
+});
+<span class="cm-variable">dispatch1</span>.<span class="cm-property">on</span>(<span class="cm-string">&quot;end&quot;</span>, <span class="cm-keyword">function</span>() {
+	<span class="cm-keyword">this</span>.<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+});
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-number">100</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-number">100</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">80</span>)
+    .<span class="cm-property">on</span>(<span class="cm-string">&quot;mouseenter&quot;</span>, <span class="cm-keyword">function</span>(){
+        <span class="cm-variable">dispatch1</span>.<span class="cm-property">call</span>(<span class="cm-string">&quot;start&quot;</span>, <span class="cm-keyword">this</span>);
+    })
+    .<span class="cm-property">on</span>(<span class="cm-string">&quot;mouseout&quot;</span>, <span class="cm-keyword">function</span>(){
+        <span class="cm-variable">dispatch1</span>.<span class="cm-property">call</span>(<span class="cm-string">&quot;end&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-keyword">this</span>));
+    });
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">200</span> <span class="cm-attribute">height</span>=<span class="cm-string">200</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 1 - A circle with mouseenter and mouseout events that are handled by a dispatch.  </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_4Jao3pyDKl" href="#h_4Jao3pyDKl" tabindex="-1" role="presentation"></a>Subtypes</h2>
+
+<p><a class="p_ident" id="p_BM+PhPslcm" href="#p_BM+PhPslcm" tabindex="-1" role="presentation"></a>When assigning callback functions in <code>dispatch.on</code> we can use subtypes of any type defined in <code>d3.dispatch</code>. To create a subtype we name the type followed by a <code>.</code> and the subtype name. Whenever we call a dispatches type all of its subtypes will also be invoked. This is useful for when we have separate events that may need to be called at the same time.</p>
+
+<p><a class="p_ident" id="p_eXJGHGPjcj" href="#p_eXJGHGPjcj" tabindex="-1" role="presentation"></a>For example, to define the subtypes <code>start.foo</code> and <code>start.boo</code>:</p><pre>
+var dispatchEx = d3.dispatch("start", "end");
+
+dispatchEx.on("show.foo", <i>callback function</i>);
+dispatchEx.on("show.boo", <i>callback function</i>);
+</pre>
+
+
+<p><a class="p_ident" id="p_Nr5csTdEce" href="#p_Nr5csTdEce" tabindex="-1" role="presentation"></a>Now, whenever we call <code>dispatchEx.<wbr>call(&quot;start&quot;)</code> <code>start.foo</code> and <code>start.boo</code> will also be invoked.</p>
+
+<p><a class="p_ident" id="p_zTEcT+xMTH" href="#p_zTEcT+xMTH" tabindex="-1" role="presentation"></a>An example of this can be seen in Figure 2.</p>
+
+<h2><a class="h_ident" id="h_r3T3xTYqru" href="#h_r3T3xTYqru" tabindex="-1" role="presentation"></a>Copy</h2>
+
+<p><a class="p_ident" id="p_UfS2gDqqEv" href="#p_UfS2gDqqEv" tabindex="-1" role="presentation"></a>D3.js supplies us with <code>dispatch.copy</code> to create a deep copy of a dispatch. The new dispatch retains all events and callbacks that the original dispatch had. The new dispatch does not contain any references to the previous, so after creating a copy changing either will not change the other.</p><pre>
+var dispatchEx = d3.dispatch("start", "end");
+var dispatchEx2 = dispatchEx.copy();
+</pre>
+
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_zTyTKneEXH" href="#p_zTyTKneEXH" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-dispatch#dispatch_copy">dispatch.copy()</a> - Returns a deep copy of a dispatch. The copy does not contain any references to the original.</p></li></ul>
+
+<h2><a class="h_ident" id="h_RZShBtFA79" href="#h_RZShBtFA79" tabindex="-1" role="presentation"></a>Call vs Apply</h2>
+
+<p><a class="p_ident" id="p_DnbuJXiyZX" href="#p_DnbuJXiyZX" tabindex="-1" role="presentation"></a>While we can use <a href="https://github.com/d3/d3-dispatch#dispatch_call">dispatch.call</a> for many situations, it requires us to individually pass any arguments we want to use.</p>
+
+<p><a class="p_ident" id="p_UDppTY8/7x" href="#p_UDppTY8/7x" tabindex="-1" role="presentation"></a>Sometimes, a faster way of doing this is to pass in an array containing the arguements we want to pass in. For this case we can use <code>dispatch.apply</code>. Like with the previous option, we pass into <code>dispatch.apply</code> the type we want to invoke. Following this is again what we want <code>this</code> to refer to within the callback function. Now instead of a list of the arguments, we pass in an array that contains all the arguments we want to pass in. <code>dispatch.apply</code> is most useful when we have a preexisting array of arguments to use.</p><pre>
+dispatchEx.on(<i>type</i>, function (arg1, arg2, arg3)) {...});
+
+var arr ["1", "2", "3"];
+dispatchEx.apply(<i>type</i>, <i>this</i>, arr);
+</pre>
+
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_b1EZRnqpFM" href="#p_b1EZRnqpFM" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-dispatch#dispatch_apply">dispatch.apply(type[, that[,arguments]])</a> - Similar to <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply">function.apply</a>. Invokes the callback function of <code>type</code>. Can pass in what we want <code>this</code> to refer to within the callback function followed by <em>an array containing arguments</em> for the function.</p></li></ul>
+
+<p><a class="p_ident" id="p_0zo32zfsXl" href="#p_0zo32zfsXl" tabindex="-1" role="presentation"></a>In Figure 2 we join data to five newly created circles. We then set the <code>onclick</code> event of each of the circle to call <code>dispatch.apply</code> where we pass in the type <code>update</code>, a selection of that circle, and the data of that circle. Notice that <code>update</code> has two subtypes: <code>update.color</code> and <code>update.name</code>, which are both called and passed the same arguments. There is also a <code>dispatch.call</code> commented out to show how the two differ in their structure.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_Ru1SzYmUru" href="#c_Ru1SzYmUru" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">people</span> <span class="cm-operator">=</span> [
+    [<span class="cm-string">&quot;John&quot;</span>, <span class="cm-string">&quot;Smith&quot;</span>, <span class="cm-string">&quot;Doctor&quot;</span>],
+    [<span class="cm-string">&quot;Rose&quot;</span>, <span class="cm-string">&quot;Tyler&quot;</span>, <span class="cm-string">&quot;Retailer&quot;</span>],
+    [<span class="cm-string">&quot;Jack&quot;</span>, <span class="cm-string">&quot;Harkness&quot;</span>, <span class="cm-string">&quot;Soldier&quot;</span>],
+    [<span class="cm-string">&quot;Clara&quot;</span>, <span class="cm-string">&quot;Oswald&quot;</span>, <span class="cm-string">&quot;Teacher&quot;</span>],
+    [<span class="cm-string">&quot;Yasmin&quot;</span>, <span class="cm-string">&quot;Khan&quot;</span>, <span class="cm-string">&quot;Police Officer&quot;</span>]
+];
+
+<span class="cm-keyword">var</span> <span class="cm-def">dispatchPeople</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">dispatch</span>(<span class="cm-string">&quot;show&quot;</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">previousCircle</span>;
+<span class="cm-keyword">var</span> <span class="cm-def">textSelection</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo2&quot;</span>).<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;text&quot;</span>); 
+
+<span class="cm-variable">dispatchPeople</span>.<span class="cm-property">on</span>(<span class="cm-string">&quot;show.color&quot;</span>, <span class="cm-keyword">function</span>(<span class="cm-def">first</span>, <span class="cm-def">last</span>, <span class="cm-def">occupation</span>){
+    <span class="cm-keyword">if</span> (<span class="cm-variable">previousCircle</span>)
+    	<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-variable">previousCircle</span>).<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;black&quot;</span>);
+    <span class="cm-keyword">this</span>.<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;#003B6F&quot;</span>);
+    <span class="cm-variable">previousCircle</span> <span class="cm-operator">=</span> <span class="cm-keyword">this</span>.<span class="cm-property">node</span>();
+});
+<span class="cm-variable">dispatchPeople</span>.<span class="cm-property">on</span>(<span class="cm-string">&quot;show.name&quot;</span>, <span class="cm-keyword">function</span>(<span class="cm-def">first</span>, <span class="cm-def">last</span>, <span class="cm-def">occupation</span>){
+	<span class="cm-variable">textSelection</span>
+   		.<span class="cm-property">data</span>([<span class="cm-string">&quot;Name: &quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">first</span> <span class="cm-operator">+</span> <span class="cm-string">&quot; &quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">last</span>, <span class="cm-string">&quot;Occupation: &quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">occupation</span>])
+   		.<span class="cm-property">text</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>);
+});
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo2&quot;</span>)
+    .<span class="cm-property">selectAll</span>()
+    .<span class="cm-property">data</span>(<span class="cm-variable">people</span>)
+    .<span class="cm-property">join</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">40</span> <span class="cm-operator">+</span> <span class="cm-number">20</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-number">50</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">15</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+    .<span class="cm-property">on</span>(<span class="cm-string">&quot;click&quot;</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>){
+    	<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo2&quot;</span>).<span class="cm-property">attr</span>(<span class="cm-string">&quot;height&quot;</span>, <span class="cm-number">200</span>);
+        <span class="cm-comment">//dispatchPeople.call(&quot;show&quot;, d3.select(this), d[0], d[1], d[2]);</span>
+        <span class="cm-variable">dispatchPeople</span>.<span class="cm-property">apply</span>(<span class="cm-string">&quot;show&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-keyword">this</span>), <span class="cm-variable-2">d</span>);
+    });
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">demo2</span> <span class="cm-attribute">width</span>=<span class="cm-string">200</span> <span class="cm-attribute">height</span>=<span class="cm-string">100</span><span class="cm-tag cm-bracket">&gt;</span>
+	<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">text</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2TextName&quot;</span> <span class="cm-attribute">x</span>=<span class="cm-string">100</span> <span class="cm-attribute">y</span>=<span class="cm-string">125</span> <span class="cm-attribute">text-anchor</span>=<span class="cm-string">&quot;middle&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">text</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">text</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2TextOccupation&quot;</span> <span class="cm-attribute">x</span>=<span class="cm-string">100</span> <span class="cm-attribute">y</span>=<span class="cm-string">150</span> <span class="cm-attribute">text-anchor</span>=<span class="cm-string">&quot;middle&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">text</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 2 - Five circles with onclick events handled by dispatch.apply.  </figcaption></figure><nav><a href="08_01_events.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="08_03_require.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

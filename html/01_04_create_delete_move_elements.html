@@ -1,0 +1,349 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Creating, Deleting, and Moving Elements</title>
+  <link rel="canonical" href="http://using-d3js.com/01_04_create_delete_move_elements.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 01;</script></head>
+
+<article>
+<nav><a href="01_03_modifying_elements.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="01_05_selection_call.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 01</span>Creating, Deleting, and Moving Elements</h1><style>
+    button{
+        display: inline;
+        vertical-align: middle;
+    }
+    svg {
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .lightblue {
+        fill: lightblue;
+    }
+    .pink {
+        fill: pink;
+    }
+    #pink {
+        fill: pink;
+    }
+    .box {
+        display: inline-block;
+        vertical-align: middle;
+        width: 50px;
+        height: 50px;
+        text-align: center;
+        line-height: 50px;
+        margin: 15px;
+        border: 0;
+        padding: 0;
+    }
+    .circle {
+        border-radius: 25px;
+    }
+    .blue-box {
+        background-color: lightblue;
+    }
+    .pink-box {
+        background-color: pink;
+    }
+    .aqua-box {
+        background-color: aquamarine;
+    }
+</style>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+
+<p><a class="p_ident" id="p_ylfTiIR574" href="#p_ylfTiIR574" tabindex="-1" role="presentation"></a>D3.js has a number of <code>selection</code> methods that add, remove, and reposition elements in the DOM.  They include the following:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_dHg+K11GcZ" href="#p_dHg+K11GcZ" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_append">selection.append(type)</a> - create, append, and select new elements</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_JaCGelVc6w" href="#p_JaCGelVc6w" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_insert">selection.insert(type[, selector])</a> - create, insert and select new elements</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_zX5m4YqYqS" href="#p_zX5m4YqYqS" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_clone">selection.clone([deep])</a> - insert clones of selected elements</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_9iyHu9Zy94" href="#p_9iyHu9Zy94" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_remove">selection.remove()</a> - remove elements from the document</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_UYSIHzBmpB" href="#p_UYSIHzBmpB" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_raise">selection.raise()</a> - reinsert selected elements into the DOM as the last child of their respective parents</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_jAF0PuYBlv" href="#p_jAF0PuYBlv" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_lower">selection.lower()</a> - reinsert selection elements into the DOM as the last child of their respective parents</p></li></ul>
+
+<p><a class="p_ident" id="p_5GjCrGr1ir" href="#p_5GjCrGr1ir" tabindex="-1" role="presentation"></a>D3.js also includes two methods that create elements that are unattached to the DOM.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_Jo3D2lvNV8" href="#p_Jo3D2lvNV8" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/v1.4.0/README.md#create">d3.create(name)</a> - creates and returns an unattached element in the current document</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_K0NRmVrhzY" href="#p_K0NRmVrhzY" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/v1.4.0/README.md#creator">d3.creator(name)</a> - creates and returns a function that creates unattached elements in the current document.</p></li></ul>
+
+<h2><a class="h_ident" id="h_mHxMjchlPy" href="#h_mHxMjchlPy" tabindex="-1" role="presentation"></a>Selection.append</h2>
+
+<p><a class="p_ident" id="p_etuxgiEGDc" href="#p_etuxgiEGDc" tabindex="-1" role="presentation"></a>The <code>selection.<wbr>append(type)</code> method takes as an argument a string holding the name of an element or a function that returns a node.   The method creates a new element node for each element in the selection and adds it as the <em>last child</em> of each element in the selection.  The method returns a selection containing the new elements.</p>
+
+<p><a class="p_ident" id="p_DyYZx3boR5" href="#p_DyYZx3boR5" tabindex="-1" role="presentation"></a>If the argument is a string then an element of that type is created.  The string is considered in the same namespace as its parent unless it has a namespace prefix such as <code>svg:circle</code>.</p>
+
+<p><a class="p_ident" id="p_tqdptMI0c/" href="#p_tqdptMI0c/" tabindex="-1" role="presentation"></a>In the example below, we append a circle element to the svg element.  Since the selected element is an svg element in the svg namespace, we don’t need to add the <code>svg:</code> prefix to the element type name (<code>circle</code>) when calling the <code>append</code> method.  Since <code>append</code> returns a selection containing only the elements that were appended, the subsequent calls to <code>attr</code> only affect the new elements.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_NRPpy2r6fP" href="#c_NRPpy2r6fP" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">function</span> <span class="cm-def">appendElement</span>() {
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#appendElement&quot;</span>)
+      .<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">25</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>,<span class="cm-def">nodes</span>) <span class="cm-operator">=&gt;</span> {
+        <span class="cm-keyword">return</span> <span class="cm-operator">+</span><span class="cm-variable-2">nodes</span>[<span class="cm-variable-2">i</span>].<span class="cm-property">previousElementSibling</span>.<span class="cm-property">getAttribute</span>(<span class="cm-string">&quot;cx&quot;</span>) <span class="cm-operator">+</span> <span class="cm-number">75</span>;
+       })
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-number">50</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;lightblue&quot;</span>);
+  }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;appendElement()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Append<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;appendElement&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;600&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;125&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_QyCOlrdwIn" href="#p_QyCOlrdwIn" tabindex="-1" role="presentation"></a>The argument to <code>append</code> can also be a function that returns an element node.  The function named <code>createCircle</code>, given below, creates a circle and sets its attributes.  Since the circle element that is created is in the svg namespace we have to use <code>createElementNS</code> method to create the element and pass to the method the namespace URI and the element name.  We can then pass <code>createCircle</code> to the <code>append</code> method to append a circle to the selection.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_ZTYzWIvPCb" href="#c_ZTYzWIvPCb" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">function</span> <span class="cm-def">createCircle</span>() {
+    <span class="cm-keyword">var</span> <span class="cm-def">ns</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;http://www.w3.org/2000/svg&quot;</span>;
+    <span class="cm-keyword">var</span> <span class="cm-def">circle</span> <span class="cm-operator">=</span> <span class="cm-variable">document</span>.<span class="cm-property">createElementNS</span>(<span class="cm-variable-2">ns</span>, <span class="cm-string">&quot;circle&quot;</span>);
+    <span class="cm-variable-2">circle</span>.<span class="cm-property">setAttribute</span>(<span class="cm-string">&quot;r&quot;</span>,<span class="cm-number">25</span>);
+    <span class="cm-keyword">return</span> <span class="cm-variable-2">circle</span>;
+  }
+  
+  <span class="cm-keyword">function</span> <span class="cm-def">appendWithFunction</span>() {
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#appendWithFunction&quot;</span>)
+      .<span class="cm-property">append</span>(<span class="cm-variable">createCircle</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>,<span class="cm-def">nodes</span>) <span class="cm-operator">=&gt;</span> {
+        <span class="cm-keyword">return</span> <span class="cm-operator">+</span><span class="cm-variable-2">nodes</span>[<span class="cm-variable-2">i</span>].<span class="cm-property">previousElementSibling</span>.<span class="cm-property">getAttribute</span>(<span class="cm-string">&quot;cx&quot;</span>) <span class="cm-operator">+</span> <span class="cm-number">75</span>;
+       })
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-number">50</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>);
+  }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;appendWithFunction()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Append<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;appendWithFunction&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;600&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;125&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_Guot4XeQxR" href="#p_Guot4XeQxR" tabindex="-1" role="presentation"></a>In the example below we have an outer div that contains three inner divs (pink boxes).  We can rotate the pink boxes by selecting the first pink box and appending it to the outer div.  Note that <code>selection.node()</code> returns the first non-null element in the selection.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_luKCJLX3Qq" href="#c_luKCJLX3Qq" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">function</span> <span class="cm-def">rotate</span>() {
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#moveContainer&quot;</span>)
+      .<span class="cm-property">append</span>(() <span class="cm-operator">=&gt;</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#moveContainer &gt; :first-child&quot;</span>).<span class="cm-property">node</span>());
+  }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;rotate()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Rotate<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;moveContainer&quot;</span> <span class="cm-attribute">style</span>=<span class="cm-string">&quot;display: inline&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span>1<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span>2<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span>3<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_suimTn81dd" href="#h_suimTn81dd" tabindex="-1" role="presentation"></a>Selection.insert</h2>
+
+<p><a class="p_ident" id="p_I9x4WrJYhQ" href="#p_I9x4WrJYhQ" tabindex="-1" role="presentation"></a>The <code>selection.insert</code> method inserts a new node element as a child, before an existing child, if specified.  If not specified, the new child will be appended to the selected element’s children.</p>
+
+<p><a class="p_ident" id="p_CMvkLsBn3L" href="#p_CMvkLsBn3L" tabindex="-1" role="presentation"></a>Like <code>selection.append</code>, the <code>selection.<wbr>insert(type [, selector])</code> method takes as its first argument either a string containing an element name or a function that returns a new element node.  The second optional argument is either a CSS selector or a function that returns returns a <em>child element</em> before which the new element will be inserted.  The <code>insert</code> method returns a new selection containing the newly inserted elements.</p>
+
+<p><a class="p_ident" id="p_LSMBN2z+RZ" href="#p_LSMBN2z+RZ" tabindex="-1" role="presentation"></a>In the example below we have an outer div with its id set to <code>insertBox</code>.  Nested within the outer div are 3 div elements that have their background color set to pink.  We can insert additional boxes by selecting the outer div and inserting new div elements before the outer div’s first child.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_j5epqnrH0H" href="#c_j5epqnrH0H" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">function</span> <span class="cm-def">insertBox</span>() {
+        <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#insertBox&quot;</span>)
+          .<span class="cm-property">insert</span>(<span class="cm-string">&quot;div&quot;</span>, <span class="cm-string">&quot;:first-child&quot;</span>)
+          .<span class="cm-property">classed</span>(<span class="cm-string">&quot;box aqua-box&quot;</span>, <span class="cm-atom">true</span>)
+          .<span class="cm-property">html</span>(<span class="cm-string">&quot;X&quot;</span>);
+    }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;insertBox()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Insert<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;insertBox&quot;</span> <span class="cm-attribute">style</span>=<span class="cm-string">&quot;display: inline-block;&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_ZBYa0ki/XQ" href="#p_ZBYa0ki/XQ" tabindex="-1" role="presentation"></a>The <code>insert</code> method inserts a new element for each element in the selection.  In the example below we create a selection containing the 3 blue boxes and call <code>insert</code> on it.  The <code>insert</code> method creates 3 new pink boxes and appends each of them as a child of a different blue box.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_4B+L0U8WPz" href="#c_4B+L0U8WPz" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">function</span> <span class="cm-def">insertBox2</span>() {
+        <span class="cm-variable">d3</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;#insertBox2 &gt; div&quot;</span>)
+          .<span class="cm-property">insert</span>(<span class="cm-string">&quot;div&quot;</span>)
+          .<span class="cm-property">classed</span>(<span class="cm-string">&quot;box pink-box&quot;</span>, <span class="cm-atom">true</span>)
+          .<span class="cm-property">html</span>(<span class="cm-string">&quot;X&quot;</span>);
+    }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;insertBox2()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Insert<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;insertBox2&quot;</span> <span class="cm-attribute">style</span>=<span class="cm-string">&quot;display: inline-block;&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box blue-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box blue-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box blue-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_2t8FbVeqDj" href="#h_2t8FbVeqDj" tabindex="-1" role="presentation"></a>Selection.clone</h2>
+
+<p><a class="p_ident" id="p_tsh2gy29/9" href="#p_tsh2gy29/9" tabindex="-1" role="presentation"></a>The <code>selection.<wbr>clone([deep])</code> method clones all of the selected elements and inserts them immediately after each of the selected elements.  If <code>true</code> is passed to <code>clone</code>, all of the descendant nodes of the selected elements will be cloned as well. A selection containing the newly created cloned nodes is returned.</p>
+
+<p><a class="p_ident" id="p_kfC0PLela4" href="#p_kfC0PLela4" tabindex="-1" role="presentation"></a>In the example below we select all of the box divs, clone them, and change their background color to lightblue.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_qOg146Dt7q" href="#c_qOg146Dt7q" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">function</span> <span class="cm-def">cloneBoxes</span>() {
+        <span class="cm-variable">d3</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;#cloneBoxes div&quot;</span>)
+          .<span class="cm-property">clone</span>(<span class="cm-atom">false</span>)
+          .<span class="cm-property">style</span>(<span class="cm-string">&quot;background-color&quot;</span>, <span class="cm-string">&quot;lightblue&quot;</span>)
+          .<span class="cm-property">html</span>(<span class="cm-string">&quot;X&quot;</span>);
+    }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;cloneBoxes()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Clone<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;cloneBoxes&quot;</span> <span class="cm-attribute">style</span>=<span class="cm-string">&quot;display: inline-block;&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_G1KYWfoH21" href="#h_G1KYWfoH21" tabindex="-1" role="presentation"></a>Selection.remove</h2>
+
+<p><a class="p_ident" id="p_uIRLWlWbUR" href="#p_uIRLWlWbUR" tabindex="-1" role="presentation"></a>The <code>selection.<wbr>remove()</code> method removes the elements in the selection from the DOM and returns the original selection.  Below we select the pink boxes and remove them.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_uBHdEzE0RN" href="#c_uBHdEzE0RN" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">function</span> <span class="cm-def">removeBoxes</span>() {
+        <span class="cm-variable">d3</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;#removeBoxes &gt; .pink-box&quot;</span>).<span class="cm-property">remove</span>();
+    }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;removeBoxes()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Remove<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;removeBoxes&quot;</span> <span class="cm-attribute">style</span>=<span class="cm-string">&quot;display: inline-block;&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box aqua-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box aqua-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box aqua-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_FGyNivrI/g" href="#h_FGyNivrI/g" tabindex="-1" role="presentation"></a>Selection.raise</h2>
+
+<p><a class="p_ident" id="p_vfCFKJ3FCn" href="#p_vfCFKJ3FCn" tabindex="-1" role="presentation"></a>The <a href="https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_raise">selection.raise()</a> method reinserts the elements in the selection into the DOM as the last child of their respective parents.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_hQIKRurU+w" href="#c_hQIKRurU+w" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">function</span> <span class="cm-def">raise</span>() {  
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#raiseSVG&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;#pink,#violet&quot;</span>)
+    .<span class="cm-property">raise</span>();
+    
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#raiseSVG&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-number">30</span> <span class="cm-operator">+</span> (<span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">60</span>));
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;raiseSVG&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;300&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;60&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;90&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;violet&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;150&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;violet&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;210&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;raise()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Raise<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_J08lqUuyyG" href="#h_J08lqUuyyG" tabindex="-1" role="presentation"></a>Selection.lower</h2>
+
+<p><a class="p_ident" id="p_fJvO+EvKlR" href="#p_fJvO+EvKlR" tabindex="-1" role="presentation"></a>The <a href="https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_lower">selection.lower()</a> method reinserts the elements in the selection into the DOM as the first child of their respective parents.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_C3Da5FkU9h" href="#c_C3Da5FkU9h" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>  
+<span class="cm-keyword">function</span> <span class="cm-def">lower</span>() {  
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#lowerSVG&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;#pink,#violet&quot;</span>)
+    .<span class="cm-property">lower</span>();
+    
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#lowerSVG&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-number">30</span> <span class="cm-operator">+</span> (<span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">60</span>)); 
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;lowerSVG&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;300&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;60&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;90&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;violet&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;150&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;violet&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;210&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;lower()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Lower<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_Zp5fiHvj/V" href="#h_Zp5fiHvj/V" tabindex="-1" role="presentation"></a>Creating Unattached Elements</h2>
+
+<p><a class="p_ident" id="p_1O6KO6mHFy" href="#p_1O6KO6mHFy" tabindex="-1" role="presentation"></a>D3.js contains a pair of functions that are used to create new elements that are not to the DOM.</p>
+
+<ul>
+
+<li>
+
+<p><a href="https://github.com/d3/d3-selection/blob/v1.4.0/README.md#create">d3.create(name)</a> - creates and returns an unattached element in the current document</p></li>
+
+<li>
+
+<p><a href="https://github.com/d3/d3-selection/blob/v1.4.0/README.md#creator">d3.creator(name)</a> - creates and returns a function that creates unattached elements in the current document.</p></li></ul>
+
+<p><a class="p_ident" id="p_JDb/eKNCxO" href="#p_JDb/eKNCxO" tabindex="-1" role="presentation"></a>Both <code>d3.create</code> and <code>d3.creator</code> take as an argument a string that specifies the type of element to create.  Both methods are able to create element in the svg, xhtml, xlink, xml, and xmlns namespaces.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_QkLHcn6ytO" href="#c_QkLHcn6ytO" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">circleGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">creator</span>(<span class="cm-string">&quot;circle&quot;</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#createSVG&quot;</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+  .<span class="cm-property">data</span>([<span class="cm-number">1</span>,<span class="cm-number">2</span>,<span class="cm-number">3</span>])
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-variable">circleGen</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">25</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span> <span class="cm-operator">*</span> <span class="cm-number">60</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-number">50</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;lightblue&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;createSVG&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;400&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;90&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><nav><a href="01_03_modifying_elements.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="01_05_selection_call.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

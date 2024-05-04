@@ -1,0 +1,888 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Paths</title>
+  <link rel="canonical" href="http://using-d3js.com/05_01_paths.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 05;</script></head>
+
+<article>
+<nav><a href="04_08_legends.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_02_lines.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 05</span>Paths</h1><script src="https://d3js.org/d3.v5.min.js"></script>
+<script>
+function addArcToOutline(point1, point2, point3, radius, selection){
+	//p3 => p2 = a
+	//p2 => p1 = b
+	//p1 => p3 = c
+    
+    //Finding lengths of sides
+    var a = Math.sqrt(Math.pow(point3[0] - point2[0],2) + Math.pow(point3[1] - point2[1],2) );
+    var b = Math.sqrt(Math.pow(point2[0] - point1[0],2) + Math.pow(point2[1] - point1[1],2) );
+    var c = Math.sqrt(Math.pow(point3[0] - point1[0],2) + Math.pow(point3[1] - point1[1],2) );
+    
+    //The angle C, or at p2
+    var theta = Math.acos((a*a + b*b - c*c) / (2*a*b));
+    
+    //Finding point for intercect line from C
+    var thetaB = Math.acos((a*a + c*c - b*b) / (2*a*c));
+    var theta2 = 3.14 - (theta/2) - thetaB;
+    var theta3 = 3.14 - theta2;
+    var yM = (Math.sin(theta/2) * a);
+    var xM = (Math.tan(theta3)* (1/yM));
+    var m = [point3[0] + xM, point3[1] + yM];
+    
+    //distance from p2 where center of circle lies
+    var disC = radius / Math.sin(theta/2);
+    
+	//distance from p2 to m
+    var disA = Math.sqrt(Math.pow(m[0] - point2[0],2) + Math.pow(m[1] - point2[1],2) );
+    
+	//Position of circle
+    var pos = [(point2[0] - (disC*(point2[0]-m[0]))/disA),(point2[1] - (disC*(point2[1]-m[1]))/disA)];
+    selection.append("circle")
+    	.attr("cx", pos[0])
+        .attr("cy", pos[1])
+        .attr("fill", "none")
+        .attr("stroke", "black")
+        .attr("stroke-width", "2px")
+        .attr("r", radius);
+     
+    //Adds in reference lines
+    selection.append("line")
+        .attr("x1", point2[0])
+        .attr("x2", point3[0])
+        .attr("y1", point2[1])
+        .attr("y2", point3[1])
+        .attr("stroke", "black")
+        .attr("stroke-width", "2px");
+    selection.append("line")
+        .attr("x1", point2[0])
+        .attr("x2", point1[0])
+        .attr("y1", point2[1])
+        .attr("y2", point1[1])
+        .attr("stroke", "black")
+        .attr("stroke-width", "2px");
+        
+    let points = [point1, point2, point3];
+    //Adds in reference points
+    selection.selectAll()
+        .data(points)
+        .join("circle")
+        .attr("cx", d => d[0])
+        .attr("cy", d => d[1])
+        .attr("r", 5);
+}
+
+function addArcOutline(center, radius, selection){
+    //Adds in the main circle
+    selection.append("circle")
+        .attr("cx", center[0])
+        .attr("cy", center[1])
+        .attr("r", radius)
+        .attr("stroke", "black")
+        .attr("stroke-width", "2px")
+        .attr("fill", "none");  
+    
+    var pointLabels = ["3π/2", "0", "π/2", "π"];
+    selection.selectAll()
+        .data(pointLabels)
+        .join("text")
+        .attr("text-anchor", "middle")
+        .attr("font-size", "15px")
+        .attr("x", (d, i) => d3.pointRadial( i * Math.PI / 2, radius + 15)[0])
+        .attr("y", (d, i) => d3.pointRadial( i * Math.PI / 2, radius + 15)[1])
+        .text( (d) => d)
+        .attr("transform", "translate(" + center[0] + "," + center[1] + ")" );
+}
+function addPathOutline(points, selection){
+	selection.selectAll()
+    	.data(points)
+        .join("circle")
+        .attr("cx", d => d[0])
+        .attr("cy", d => d[1])
+        .attr("r", (d,i) => i == 0 || i == 3 ? 6 : 4)
+        .attr("fill", (d,i) => i == 0 || i == 3 ? "blue" : "black");
+        
+    
+    selection.selectAll()
+    	.data(points.slice(0,points.length-1))
+        .join("line")
+        .attr("x1", (d) => d[0])
+        .attr("x2", (d, i) => i < points.length-1 ? points[i+1][0] : null)
+        .attr("y1", (d) => d[1])
+        .attr("y2", (d, i) => i < points.length-1 ? points[i+1][1] : null)
+    	.attr("stroke", (d,i) => i === 2 ? "blue" :"black")
+        .attr("stroke-width", "3px")
+        .attr("stroke-dasharray", (d,i) => i === 2 ? [3] : [])
+        .attr("marker-end", (d,i) => i === 2 ? "url(#markerArrowBlue)": "url(#markerArrow)");
+        
+	selection.append("line")
+    	.attr("x1", points[5][0])
+        .attr("x2", points[3][0])
+        .attr("y1", points[5][1])
+        .attr("y2", points[3][1])
+        .attr("stroke", "green")
+        .attr("stroke-width", "3px")
+        .attr("marker-end", "url(#markerArrowGreen)");
+    
+    selection.selectAll()
+    	.data(["moveTo","lineTo","closePath"])
+    	.join("text")
+    	.text((d) => d)
+        .attr("x", 20)
+        .attr("y", (d,i) => 150 + i*20);
+    selection.selectAll()
+    	.data(["blue","black","green"])
+       	.join("circle")
+        .attr("cx", 10)
+        .attr("cy", (d,i) => 145 + i*20)
+        .attr("r", 7.5)
+        .attr("fill", (d) => d);
+}
+
+function addCurveOutline(qControl, bControl1, bControl2, selection){
+    var qData = [[10,10], qControl, [190,10]];
+    var bData = [[10,190], bControl1, bControl2, [190,120]];
+    
+    var data = [ [qData[0],qData[1]], [qData[1],qData[2]], [bData[0],bData[1]], [bData[2],bData[3]] ];
+    
+    selection.selectAll()
+        .data(data)
+        .join("line")
+        .attr("x1", (d) => d[0][0])
+        .attr("x2", (d) => d[1][0])
+        .attr("y1", (d) => d[0][1])
+        .attr("y2", (d) => d[1][1])
+        .attr("stroke-dasharray", 4)
+        .attr("stroke", "red");
+        
+    selection.selectAll()
+        .data(qData.concat(bData))
+        .join("circle")
+        .attr("cx", (d) => d[0])
+        .attr("cy", (d) => d[1])
+        .attr("r", 5)
+        .attr("fill", "red");
+}
+function addRectOutline(origin, width, height, selection){
+	selection.append("circle")
+    	.attr("cx", origin[0])
+        .attr("cy", origin[1])
+        .attr("r", 5)
+        .attr("fill", "black");
+    selection.append("text")
+    	.attr("x", origin[0])
+        .attr("y", origin[1]-10)
+        .attr("text-anchor", "middle")
+        .text("Origin");
+    selection.append("line")
+    	.attr("x1", origin[0] + width*3/4)
+        .attr("x2", origin[0] + width*3/4)
+        .attr("y1", origin[1])
+        .attr("y2", origin[1] + height)
+        .attr("stroke", "black")
+        .attr("stroke-width", "3px")
+        .attr("marker-start", "url(#markerArrowStart)")
+        .attr("marker-end", "url(#markerArrowEnd)");
+    selection.append("line")
+    	.attr("x1", origin[0])
+        .attr("x2", origin[0] + width)
+        .attr("y1", origin[1] + height*3/4)
+        .attr("y2", origin[1] + height*3/4)
+        .attr("stroke", "black")
+        .attr("stroke-width", "3px")
+        .attr("marker-start", "url(#markerArrowStart)")
+        .attr("marker-end", "url(#markerArrowEnd)");
+    selection.append("text")
+    	.attr("x", origin[0] + width*3/4 - 10)
+        .attr("y", origin[1] + 25)
+        .text("h")
+        .attr("text-anchor", "middle");
+    selection.append("text")
+    	.attr("x", origin[0] + 25)
+        .attr("y", origin[1] + height*3/4 - 5)
+        .text("w")
+        .attr("text-anchor", "middle");
+}
+</script>
+
+
+<p><a class="p_ident" id="p_GezwwWHx4o" href="#p_GezwwWHx4o" tabindex="-1" role="presentation"></a>In this section we discuss <a href="https://github.com/d3/d3-path"><code>d3.path()</code></a>, a utility for creating strings that can be used to define <code>paths</code> in <code>svgs</code>.</p>
+
+<p><a class="p_ident" id="p_KCpAswjezj" href="#p_KCpAswjezj" tabindex="-1" role="presentation"></a><code>D3.path</code> can be used by itself to define the value of the <code>d</code> (path definition) attribute for a <code>path</code> element in an <code>svg</code>, as we show in this section, but is also used by all of the other shapes in this chapter to transform various input into path defininitions.</p>
+
+<h2><a class="h_ident" id="h_NWPJiWsj8U" href="#h_NWPJiWsj8U" tabindex="-1" role="presentation"></a>SVG Paths</h2>
+
+<p><a class="p_ident" id="p_pGkWfHELzK" href="#p_pGkWfHELzK" tabindex="-1" role="presentation"></a>SVG’s can contain <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element">various elements</a> to help create a visualization.  Of these elements, <code>lines</code> and <code>rects</code> are useful in creating some common data visualization patterns such as line graphs and bar graphs.  When requiring complex shapes we rely on the <code>path</code> element.</p>
+
+<p><a class="p_ident" id="p_ulhu3c7qWE" href="#p_ulhu3c7qWE" tabindex="-1" role="presentation"></a><code>Paths</code> can be appended to <code>svgs</code> like <code>lines</code> and <code>rects</code> and have similar attributes, such as <code>stroke</code> and <code>fill</code>. <code>Paths</code>, however, have a <code>d</code> attribute that defines its shape and position.</p>
+
+<p><a class="p_ident" id="p_YSiTLREsUe" href="#p_YSiTLREsUe" tabindex="-1" role="presentation"></a>The <code>d</code> attribute contains a string that specifies <em>commands</em> and numbers which define command parameters. Multiple commands can be chained together in a single string and are read from left to right.</p>
+
+<p><a class="p_ident" id="p_tiOdqwD0TZ" href="#p_tiOdqwD0TZ" tabindex="-1" role="presentation"></a>For example, to create a path that starts at the point <em>(25,25)</em>, draws a line to <em>(75,25)</em>, then draws a line to <em>(75,75)</em> and finally closes the path we can use the following path definition.</p><pre>
+"M 25 25 L 75 25 L 75 75 Z"
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_2rYtNMZl/X" href="#c_2rYtNMZl/X" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoSvgPath&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-string">&quot;M 25 25 L 75 25 L 75 75 Z&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoSvgPath&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;100&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 1. Triangle created by manually specifying the path description.</figcaption></figure>
+
+
+<p><a class="p_ident" id="p_/UroUMXpld" href="#p_/UroUMXpld" tabindex="-1" role="presentation"></a>The Mozilla documentation for all of the available SVG path commands can be found <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#Path_commands">here</a>.</p>
+
+<h2><a class="h_ident" id="h_rvwUvGrTBV" href="#h_rvwUvGrTBV" tabindex="-1" role="presentation"></a>D3.path</h2>
+
+<p><a class="p_ident" id="p_ygfmdhW3JR" href="#p_ygfmdhW3JR" tabindex="-1" role="presentation"></a>The <a href="https://github.com/d3/d3-path#d3-path"><code>d3.path()</code></a>  method is convenient for defining paths, allowing us to avoid manually writing strings for the <code>d</code> attribute of a <code>path</code>.  The <code>d3.path</code> method returns a path <em>serializer</em> that implements the methods in the <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D#Paths">CanvasPathMethods</a> interface.  Below we provide links to the D3.js documentation for each method along with links to their equivalent context method and their equivalent SVG command.  In the sections below we describe each method and provide examples of their usage.</p><table style="font-size: small; border: 0; margin: 0; padding: 0;">
+<tr>
+<td>Path Method</td>  
+<td>Context Method</td> 
+<td>SVG Command</td> 
+</tr>
+<tr>
+<td><a href="https://github.com/d3/d3-path#path_moveTo">moveTo(x, y)</a></td>
+<td><a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/moveTo">moveTo(x, y)</a></td>
+<td><a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#MoveTo_path_commands">M</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/d3/d3-path/blob/v1.0.7/README.md#path_lineTo">lineTo(x, y)</a></td>
+<td><a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineTo">lineTo(x, y)</a></td>
+<td><a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#LineTo_path_commands">L</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/d3/d3-path#path_closePath">closePath()</a></td>
+<td><a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/closePath">closePath()</a></td>
+<td><a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#ClosePath">Z, z</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/d3/d3-path/blob/v1.0.7/README.md#path_quadraticCurveTo">quadraticCurveTo(cpx, cpy, x, y)</a></td>
+<td><a href="https://www.w3.org/TR/2dcontext/#dom-context-2d-quadraticcurveto">quadraticCurveTo(cpx, cpy, x, y)</a></td>
+<td><a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#Quadratic_Bézier_Curve">Q</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/d3/d3-path/blob/v1.0.7/README.md#path_bezierCurveTo">bezierCurveTo(cpx1, cpy1, cpx2, cpy2, x, y)</a></td>
+<td><a href="https://www.w3.org/TR/2dcontext/#dom-context-2d-beziercurveto">bezierCurveTo(cpx1, cpy1, cpx2, cpy2, x, y)</a></td>
+<td><a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#Cubic_Bézier_Curve">C</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/d3/d3-path/blob/v1.0.7/README.md#path_arcTo">arcTo(x1, y1, x2, y2, radius)</a></td>
+<td><a href="https://www.w3.org/TR/2dcontext/#dom-context-2d-arcto">arcTo(x1, y1, x2, y2, radius)</a></td>
+<td><a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#Elliptical_Arc_Curve">A</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/d3/d3-path/blob/v1.0.7/README.md#path_arc">arc(x, y, radius, start, end[, anticlockwise])</a></td>
+<td><a href="https://www.w3.org/TR/2dcontext/#dom-context-2d-arc">arc(x, y, radius, start, end, anticlockwise)</a></td>
+<td><a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#Elliptical_Arc_Curve">A</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/d3/d3-path/blob/v1.0.7/README.md#path_rect">rect(x, y, w, h)</a></td>
+<td><a href="https://www.w3.org/TR/2dcontext/#dom-context-2d-rect">rect(x, y, w, h)</a></td>
+<td><a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#LineTo_path_commands"></a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/d3/d3-path/blob/v1.0.7/README.md#path_toString">toString()</a></td>
+<td><a href=""></a></td>
+<td><a href=""></a></td>
+</tr>
+</table>
+
+
+<h3><a class="i_ident" id="i_DiYZ1RXHsE" href="#i_DiYZ1RXHsE" tabindex="-1" role="presentation"></a>Setting an SVG’s Path</h3>
+
+<p><a class="p_ident" id="p_X6folvR6Y8" href="#p_X6folvR6Y8" tabindex="-1" role="presentation"></a>In order to create a triangle, similar to the one above, using the methods describe above, we first have to create a path serializer by calling <code>d3.path</code>:</p><pre>
+var path = d3.path();
+</pre>
+
+
+<p><a class="p_ident" id="p_SIsM4SSfyB" href="#p_SIsM4SSfyB" tabindex="-1" role="presentation"></a>We can then call the path methods on the seriarlizer object.</p><pre>
+path.moveTo(25,25);
+path.lineTo(75,25);
+path.lineTo(75,75);
+path.closePath();
+</pre>
+
+
+<p><a class="p_ident" id="p_KMWNnxTAbt" href="#p_KMWNnxTAbt" tabindex="-1" role="presentation"></a>We then retrive the SVG path definition string using <code>path.toString</code>.  This string is used as the value for an SVG <code>path's</code> <code>d</code> attribute.  As you can see from the console output in the example, the path is similar to the path used in the example above.  The only difference is the delimeter used between the command parameters.  When defining the path manually we used spaces, whereas <code>path.toString</code> uses commas.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_75scWkZwKY" href="#c_75scWkZwKY" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">path</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">path</span>()
+<span class="cm-variable">path</span>.<span class="cm-property">moveTo</span>(<span class="cm-number">25</span>,<span class="cm-number">25</span>)
+<span class="cm-variable">path</span>.<span class="cm-property">lineTo</span>(<span class="cm-number">75</span>,<span class="cm-number">25</span>)
+<span class="cm-variable">path</span>.<span class="cm-property">lineTo</span>(<span class="cm-number">75</span>,<span class="cm-number">75</span>)
+<span class="cm-variable">path</span>.<span class="cm-property">closePath</span>();
+  
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">path</span>.<span class="cm-property">toString</span>());
+    
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoPath0&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">path</span>.<span class="cm-property">toString</span>())
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoPath0&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;100&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 2. Triangle created using d3.path.</figcaption></figure>
+
+
+<p><a class="p_ident" id="p_tszlOKeITl" href="#p_tszlOKeITl" tabindex="-1" role="presentation"></a>When setting the <code>d</code> attribute for a <code>path</code> element, we can also simply pass the path serializer as the second argument of <code>selection.attr</code> as shown in the example below.</p><pre>
+d3.select("#demoPath1")
+  .append("path")
+  .attr("d", path)
+  .attr("stroke", "black")
+  .attr("fill", "red");
+</pre>
+
+
+<h2><a class="h_ident" id="h_+8qhmrplhh" href="#h_+8qhmrplhh" tabindex="-1" role="presentation"></a>Path.moveTo, Path.LineTo, and Path.close</h2>
+
+<p><a class="p_ident" id="p_C9Dy+8uI/+" href="#p_C9Dy+8uI/+" tabindex="-1" role="presentation"></a>In the example below, we use an array to define a set of six points and use a single <code>d3.path</code> serializer along with <code>path.moveTo</code>, <code>path.lineTo</code>, and <code>path.closePath</code> to create two separate triangles (left image).</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_Lz/uI3nnGe" href="#p_Lz/uI3nnGe" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-path#path_moveTo">path.moveTo(x, y)</a> - Ends the current subpath and moves to the given point (x,y) without drawing a line.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_KRd5WU2tRk" href="#p_KRd5WU2tRk" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-path/blob/v1.0.7/README.md#path_lineTo">path.lineTo(x, y)</a> - Draws a straight line from the current point to the given point (x,y).</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_FUG+8oLsmJ" href="#p_FUG+8oLsmJ" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-path#path_closePath">path.closePath()</a> - Draws a line to the starting point of the current subpath, then ends the subpath.</p></li></ul>
+
+<p><a class="p_ident" id="p_upYkK8RydH" href="#p_upYkK8RydH" tabindex="-1" role="presentation"></a>We are able to create two separately filled shapes using a single path serializer due to the serializer’s ability to maintain subpaths withing a path.  A subpath is a portion of a path that has a beginning and an end.  When we call <code>path.moveTo</code> or <code>path.closePath</code> we both end the current subpath and begin a new subpath.</p>
+
+<p><a class="p_ident" id="p_vOvZ9Vz6Ki" href="#p_vOvZ9Vz6Ki" tabindex="-1" role="presentation"></a>As can be seen, the top triangle is not closed and the bottom triangle is closed.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_aj12ebz6ii" href="#c_aj12ebz6ii" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-variable">points</span> <span class="cm-operator">=</span> [[<span class="cm-number">50</span>,<span class="cm-number">50</span>],[<span class="cm-number">150</span>,<span class="cm-number">125</span>],[<span class="cm-number">200</span>,<span class="cm-number">25</span>],[<span class="cm-number">200</span>,<span class="cm-number">150</span>],[<span class="cm-number">100</span>,<span class="cm-number">250</span>],[<span class="cm-number">250</span>,<span class="cm-number">275</span>]];
+
+<span class="cm-keyword">var</span> <span class="cm-def">path</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">path</span>();
+	<span class="cm-variable">path</span>.<span class="cm-property">moveTo</span>(<span class="cm-variable">points</span>[<span class="cm-number">0</span>][<span class="cm-number">0</span>], <span class="cm-variable">points</span>[<span class="cm-number">0</span>][<span class="cm-number">1</span>]); <span class="cm-comment">//(50,50)</span>
+    <span class="cm-variable">path</span>.<span class="cm-property">lineTo</span>(<span class="cm-variable">points</span>[<span class="cm-number">1</span>][<span class="cm-number">0</span>], <span class="cm-variable">points</span>[<span class="cm-number">1</span>][<span class="cm-number">1</span>]); <span class="cm-comment">//(150,125)</span>
+    <span class="cm-variable">path</span>.<span class="cm-property">lineTo</span>(<span class="cm-variable">points</span>[<span class="cm-number">2</span>][<span class="cm-number">0</span>], <span class="cm-variable">points</span>[<span class="cm-number">2</span>][<span class="cm-number">1</span>]); <span class="cm-comment">//(200,25)</span>
+    
+    <span class="cm-variable">path</span>.<span class="cm-property">moveTo</span>(<span class="cm-variable">points</span>[<span class="cm-number">3</span>][<span class="cm-number">0</span>], <span class="cm-variable">points</span>[<span class="cm-number">3</span>][<span class="cm-number">1</span>]); <span class="cm-comment">//(200,150)</span>
+    <span class="cm-variable">path</span>.<span class="cm-property">lineTo</span>(<span class="cm-variable">points</span>[<span class="cm-number">4</span>][<span class="cm-number">0</span>], <span class="cm-variable">points</span>[<span class="cm-number">4</span>][<span class="cm-number">1</span>]); <span class="cm-comment">//(100,250)</span>
+    <span class="cm-variable">path</span>.<span class="cm-property">lineTo</span>(<span class="cm-variable">points</span>[<span class="cm-number">5</span>][<span class="cm-number">0</span>], <span class="cm-variable">points</span>[<span class="cm-number">5</span>][<span class="cm-number">1</span>]); <span class="cm-comment">//(250,275)</span>
+    <span class="cm-variable">path</span>.<span class="cm-property">closePath</span>();
+    
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoPath2&quot;</span>)
+	.<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">path</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+    
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoPath2Outline&quot;</span>)
+	.<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">path</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+    
+<span class="cm-variable">addPathOutline</span>(<span class="cm-variable">points</span>, <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoPath2Outline&quot;</span>));
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoPath2&quot;</span> <span class="cm-attribute">width</span>= <span class="cm-string">&quot;300&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;300&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoPath2Outline&quot;</span> <span class="cm-attribute">width</span>= <span class="cm-string">&quot;300&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;300&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 3. Pairs of triangles created using path.moveTo, path.lineTo, and path.closePath.</figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_B8g7k6vws+" href="#h_B8g7k6vws+" tabindex="-1" role="presentation"></a>Curves</h2>
+
+<p><a class="p_ident" id="p_0zz3m3uN1v" href="#p_0zz3m3uN1v" tabindex="-1" role="presentation"></a>Below we draw Bézier curves using <code>path.<wbr>quadraticCurveTo</code> (top) and <code>path.<wbr>bezierCurveTo</code> (bottom).</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_DvTXF0GUUR" href="#p_DvTXF0GUUR" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-path/blob/v1.0.7/README.md#path_quadraticCurveTo">path.quadraticCurveTo(cpx, cpy, x, y)</a> - Draws a quadratic Bézier curve to (x,y) using the specified control point.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_wiz4Zl5znn" href="#p_wiz4Zl5znn" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-path/blob/v1.0.7/README.md#path_bezierCurveTo">path.bezierCurveTo(cpx1, cpy1, cpx2, cpy2, x, y)</a> - Draws a cubic Bézier curve to the specified point (x,y) using the specified control points.</p></li></ul>
+
+<p><a class="p_ident" id="p_8AqXdNoWHs" href="#p_8AqXdNoWHs" tabindex="-1" role="presentation"></a>The control points for the methods are depicted by the red dots that are positioned off of the curves.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_3oky8ajVYB" href="#c_3oky8ajVYB" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-comment">// path.quadraticCurveTo example</span>
+
+<span class="cm-keyword">var</span> <span class="cm-def">qCP</span> <span class="cm-operator">=</span> [<span class="cm-number">25</span>, <span class="cm-number">80</span>];
+
+<span class="cm-keyword">var</span> <span class="cm-def">qPath</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">path</span>();
+<span class="cm-variable">qPath</span>.<span class="cm-property">moveTo</span>(<span class="cm-number">10</span>,<span class="cm-number">10</span>);
+<span class="cm-variable">qPath</span>.<span class="cm-property">quadraticCurveTo</span>(<span class="cm-variable">qCP</span>[<span class="cm-number">0</span>],<span class="cm-variable">qCP</span>[<span class="cm-number">1</span>], <span class="cm-number">190</span>, <span class="cm-number">10</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoCurve&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">qPath</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>);
+
+<span class="cm-comment">// path.bezierCurveTo example</span>
+
+<span class="cm-keyword">var</span> <span class="cm-def">bCP1</span> <span class="cm-operator">=</span> [<span class="cm-number">25</span>, <span class="cm-number">120</span>];
+<span class="cm-keyword">var</span> <span class="cm-def">bCP2</span> <span class="cm-operator">=</span> [<span class="cm-number">175</span>, <span class="cm-number">190</span>];
+
+<span class="cm-keyword">var</span> <span class="cm-def">bPath</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">path</span>();
+<span class="cm-variable">bPath</span>.<span class="cm-property">moveTo</span>(<span class="cm-number">10</span>,<span class="cm-number">190</span>);
+<span class="cm-variable">bPath</span>.<span class="cm-property">bezierCurveTo</span>(<span class="cm-variable">bCP1</span>[<span class="cm-number">0</span>],<span class="cm-variable">bCP1</span>[<span class="cm-number">1</span>], <span class="cm-variable">bCP2</span>[<span class="cm-number">0</span>], <span class="cm-variable">bCP2</span>[<span class="cm-number">1</span>], <span class="cm-number">190</span>, <span class="cm-number">120</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoCurveOutline&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">qPath</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>);
+    
+<span class="cm-comment">// Draw control points and lines to control points</span>
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoCurve&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">bPath</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoCurveOutline&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">bPath</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>);
+    
+<span class="cm-variable">addCurveOutline</span>(<span class="cm-variable">qCP</span>, <span class="cm-variable">bCP1</span>, <span class="cm-variable">bCP2</span>, <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoCurveOutline&quot;</span>));
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoCurve&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoCurveOutline&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 4. Curves created using path.quadraticCurveTo (top) and path.bezierCurveTo (bottom).</figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_UQPLxBIJDe" href="#h_UQPLxBIJDe" tabindex="-1" role="presentation"></a>Arcs</h2>
+
+<p><a class="p_ident" id="p_1T51v44LcO" href="#p_1T51v44LcO" tabindex="-1" role="presentation"></a>The example below uses <code>path.arc</code> to draw the lower right quadrant of a circle.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_BqH2/g05S/" href="#p_BqH2/g05S/" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-path/blob/v1.0.7/README.md#path_arc">path.arc(x, y, radius, startAngle, endAngle[, anticlockwise])</a> - Draws a line from the current point to the start of an arc that is drawn about a circle centered at (x,y) whose radius is specified by <code>radius</code>.  The arc wraps around the circle from the angle specified in <code>startAngle</code> to the angle specified in <code>endAngle</code>. By default the arc is drawn <em>clockwise</em>. To draw the arc counterclockwise, we pass <code>true</code> as the final argument.</p></li></ul>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_jybg/PZ8k5" href="#c_jybg/PZ8k5" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">center</span> <span class="cm-operator">=</span> [<span class="cm-number">100</span>, <span class="cm-number">100</span>];
+<span class="cm-keyword">var</span> <span class="cm-def">radius</span> <span class="cm-operator">=</span> <span class="cm-number">75</span>;
+<span class="cm-keyword">var</span> <span class="cm-def">startAngle</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>;
+<span class="cm-keyword">var</span> <span class="cm-def">endAngle</span> <span class="cm-operator">=</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">/</span> <span class="cm-number">2</span>;
+
+<span class="cm-keyword">var</span> <span class="cm-def">arcPath</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">path</span>();
+	<span class="cm-variable">arcPath</span>.<span class="cm-property">moveTo</span>(<span class="cm-variable">center</span>[<span class="cm-number">0</span>], <span class="cm-variable">center</span>[<span class="cm-number">1</span>]);
+    <span class="cm-variable">arcPath</span>.<span class="cm-property">arc</span>(<span class="cm-variable">center</span>[<span class="cm-number">0</span>], <span class="cm-variable">center</span>[<span class="cm-number">1</span>], <span class="cm-variable">radius</span>, <span class="cm-variable">startAngle</span>, <span class="cm-variable">endAngle</span>)
+    <span class="cm-variable">arcPath</span>.<span class="cm-property">closePath</span>();
+    
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoArc&quot;</span>)
+	.<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">arcPath</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+    
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoArcOutline&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">arcPath</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+
+<span class="cm-variable">addArcOutline</span>(<span class="cm-variable">center</span>, <span class="cm-variable">radius</span>, <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoArcOutline&quot;</span>));
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoArc&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoArcOutline&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 5. Quadrant shape created using path.arc.</figcaption></figure>
+
+
+<p><a class="p_ident" id="p_6+feYH2itt" href="#p_6+feYH2itt" tabindex="-1" role="presentation"></a>Below we draw a shape using <code>path.arcTo</code>.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_j6TfYQ+RVn" href="#p_j6TfYQ+RVn" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-path/blob/v1.0.7/README.md#path_arcTo">path.arcTo(x1, y1, x2, y2, radius)</a> - Draws a line from the current point, (x0,y0), to the start of an arc that is drawn about a circle.  The circle about which the arc is drawn is defined as the circle whose radius is specified by <code>radius</code> and has a point that is tangent to the line between (x0,y0) and (x1,y1) and has a point that is that is tangent to the line between (x1,y1) and (x2,y2).  The start and end of the arc are defined by the tangent points.</p></li></ul>
+
+<p><a class="p_ident" id="p_eDl5xP0ocd" href="#p_eDl5xP0ocd" tabindex="-1" role="presentation"></a>In our example, the point at the bottom right corner of the shape (160,190) is the current point from which the initial line and arc are drawn.  We then draw a line from the end of the arc to the point at (185,25), and close the path which renders a line from (185,25) to our starting point (160,190).</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_bMregHBOGf" href="#c_bMregHBOGf" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">points</span> <span class="cm-operator">=</span> [[<span class="cm-number">160</span>,<span class="cm-number">190</span>],[<span class="cm-number">10</span>,<span class="cm-number">100</span>],[<span class="cm-number">185</span>,<span class="cm-number">25</span>]];
+<span class="cm-keyword">var</span> <span class="cm-def">radius</span> <span class="cm-operator">=</span> <span class="cm-number">30</span>;
+
+<span class="cm-keyword">var</span> <span class="cm-def">arcToPath</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">path</span>();
+<span class="cm-variable">arcToPath</span>.<span class="cm-property">moveTo</span>(<span class="cm-variable">points</span>[<span class="cm-number">0</span>][<span class="cm-number">0</span>], <span class="cm-variable">points</span>[<span class="cm-number">0</span>][<span class="cm-number">1</span>]);
+<span class="cm-variable">arcToPath</span>.<span class="cm-property">arcTo</span>(<span class="cm-variable">points</span>[<span class="cm-number">1</span>][<span class="cm-number">0</span>], <span class="cm-variable">points</span>[<span class="cm-number">1</span>][<span class="cm-number">1</span>], <span class="cm-variable">points</span>[<span class="cm-number">2</span>][<span class="cm-number">0</span>], <span class="cm-variable">points</span>[<span class="cm-number">2</span>][<span class="cm-number">1</span>], <span class="cm-variable">radius</span>)
+<span class="cm-variable">arcToPath</span>.<span class="cm-property">lineTo</span>(<span class="cm-variable">points</span>[<span class="cm-number">2</span>][<span class="cm-number">0</span>], <span class="cm-variable">points</span>[<span class="cm-number">2</span>][<span class="cm-number">1</span>])
+<span class="cm-variable">arcToPath</span>.<span class="cm-property">closePath</span>();
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoArcTo&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">arcToPath</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+    
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoArcToOutline&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">arcToPath</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+    
+<span class="cm-variable">addArcToOutline</span>(<span class="cm-variable">points</span>[<span class="cm-number">0</span>], <span class="cm-variable">points</span>[<span class="cm-number">1</span>], <span class="cm-variable">points</span>[<span class="cm-number">2</span>], <span class="cm-variable">radius</span>, <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoArcToOutline&quot;</span>));
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoArcTo&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoArcToOutline&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 6. Demonstration of path.arcTo.</figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_AXnJJyTV3X" href="#h_AXnJJyTV3X" tabindex="-1" role="presentation"></a>Rectangles</h2>
+
+<p><a class="p_ident" id="p_Bwb3xzUGMi" href="#p_Bwb3xzUGMi" tabindex="-1" role="presentation"></a>Below are examples of rectangles drawn using <code>path.rect</code>.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_adaKPs5/2p" href="#p_adaKPs5/2p" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-path/blob/v1.0.7/README.md#path_rect">path.rect(x, y, w, h)</a> - Creates a closed subpath, with width <code>w</code>, height <code>h</code>, and its bottom left point at (x,y).</p></li></ul>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_rkoi+ZXupb" href="#c_rkoi+ZXupb" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">origin</span> <span class="cm-operator">=</span> [<span class="cm-number">25</span>,<span class="cm-number">25</span>];
+<span class="cm-keyword">var</span> <span class="cm-def">width</span> <span class="cm-operator">=</span> <span class="cm-number">150</span>;
+<span class="cm-keyword">var</span> <span class="cm-def">height</span> <span class="cm-operator">=</span> <span class="cm-number">150</span>;
+
+<span class="cm-keyword">var</span> <span class="cm-def">path</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">path</span>();
+    <span class="cm-variable">path</span>.<span class="cm-property">rect</span>(<span class="cm-variable">origin</span>[<span class="cm-number">0</span>], <span class="cm-variable">origin</span>[<span class="cm-number">1</span>], <span class="cm-variable">width</span>, <span class="cm-variable">height</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoRect&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">path</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoRectOutline&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">path</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>);
+    
+<span class="cm-variable">addRectOutline</span>(<span class="cm-variable">origin</span>, <span class="cm-variable">width</span>, <span class="cm-variable">height</span>, <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoRectOutline&quot;</span>));
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoRect&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoRectOutline&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 7. Rectangles created using path.rect.</figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_4tOXoGGX6Z" href="#h_4tOXoGGX6Z" tabindex="-1" role="presentation"></a>Canvases</h2>
+
+<p><a class="p_ident" id="p_VhFKVHU9HG" href="#p_VhFKVHU9HG" tabindex="-1" role="presentation"></a>Since the <code>d3.path</code> serializer has the same methods as in the CanvasPathMethods interface, then any function that only uses the methods in the CanvasPathMethods interface and that takes a canvas object as an argument, can be passed a path serializer.</p>
+
+<p><a class="p_ident" id="p_AQpqIKGPRj" href="#p_AQpqIKGPRj" tabindex="-1" role="presentation"></a>Below we render a triangle twice, using the method named <code>draw</code>.  We first pass <code>d3.path</code> to the <code>draw</code> method to draw a triangle in an SVG <code>path</code> element and then draw a triangle in a <code>canvas</code> element by passing the <code>canvas'</code> 2D context to the <code>draw</code> method.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_/UvFTUn757" href="#c_/UvFTUn757" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">function</span> <span class="cm-def">draw</span>(<span class="cm-def">context</span>){
+  <span class="cm-variable-2">context</span>.<span class="cm-property">fillStyle</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;red&quot;</span>;
+  <span class="cm-variable-2">context</span>.<span class="cm-property">moveTo</span>(<span class="cm-number">25</span>,<span class="cm-number">25</span>);
+  <span class="cm-variable-2">context</span>.<span class="cm-property">lineTo</span>(<span class="cm-number">75</span>,<span class="cm-number">25</span>);
+  <span class="cm-variable-2">context</span>.<span class="cm-property">lineTo</span>(<span class="cm-number">75</span>,<span class="cm-number">75</span>);
+  <span class="cm-variable-2">context</span>.<span class="cm-property">closePath</span>();
+  <span class="cm-keyword">return</span> <span class="cm-variable-2">context</span>;
+}
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoFunctionSVG&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">draw</span>(<span class="cm-variable">d3</span>.<span class="cm-property">path</span>()))
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+    
+<span class="cm-keyword">var</span> <span class="cm-def">context</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoFunctionCanvas&quot;</span>).<span class="cm-property">node</span>().<span class="cm-property">getContext</span>(<span class="cm-string">&quot;2d&quot;</span>);
+<span class="cm-variable">draw</span>(<span class="cm-variable">context</span>).<span class="cm-property">fill</span>();
+<span class="cm-variable">context</span>.<span class="cm-property">stroke</span>();
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoFunctionSVG&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">100</span> <span class="cm-attribute">height</span>=<span class="cm-string">100</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">canvas</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoFunctionCanvas&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">100</span> <span class="cm-attribute">height</span>=<span class="cm-string">100</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">canvas</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox" class="sandbox"><figcaption>Figure 8. Two triangles.  One drawn on an SVG and the other drawn on a canvas.</figcaption></figure>
+<aside>
+
+
+<h2><a class="h_ident" id="h_N1sY1ommPg" href="#h_N1sY1ommPg" tabindex="-1" role="presentation"></a>In case you were wondering ...</h2>
+
+<p><a class="p_ident" id="p_xTCXAG2tN8" href="#p_xTCXAG2tN8" tabindex="-1" role="presentation"></a>In Figure 3 we used the following <code>addPathOutline</code> function to add in an illustration showing the how the path was rendered.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_Jm63hcT136" href="#c_Jm63hcT136" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">function</span> <span class="cm-def">addPathOutline</span>(<span class="cm-def">points</span>, <span class="cm-def">selection</span>){
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">selectAll</span>()
+    .<span class="cm-property">data</span>(<span class="cm-variable-2">points</span>)
+    .<span class="cm-property">join</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>[<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>[<span class="cm-number">1</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">==</span> <span class="cm-number">0</span> <span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-variable-2">i</span> <span class="cm-operator">==</span> <span class="cm-number">3</span> <span class="cm-operator">?</span> <span class="cm-number">6</span> : <span class="cm-number">4</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">==</span> <span class="cm-number">0</span> <span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-variable-2">i</span> <span class="cm-operator">==</span> <span class="cm-number">3</span> <span class="cm-operator">?</span> <span class="cm-string">&quot;blue&quot;</span> : <span class="cm-string">&quot;black&quot;</span>);
+    
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">selectAll</span>()
+    .<span class="cm-property">data</span>(<span class="cm-variable-2">points</span>.<span class="cm-property">slice</span>(<span class="cm-number">0</span>,<span class="cm-variable-2">points</span>.<span class="cm-property">length</span><span class="cm-operator">-</span><span class="cm-number">1</span>))
+    .<span class="cm-property">join</span>(<span class="cm-string">&quot;line&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x1&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>[<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x2&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">points</span>.<span class="cm-property">length</span><span class="cm-operator">-</span><span class="cm-number">1</span> <span class="cm-operator">?</span> <span class="cm-variable-2">points</span>[<span class="cm-variable-2">i</span><span class="cm-operator">+</span><span class="cm-number">1</span>][<span class="cm-number">0</span>] : <span class="cm-atom">null</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y1&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>[<span class="cm-number">1</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y2&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">points</span>.<span class="cm-property">length</span><span class="cm-operator">-</span><span class="cm-number">1</span> <span class="cm-operator">?</span> <span class="cm-variable-2">points</span>[<span class="cm-variable-2">i</span><span class="cm-operator">+</span><span class="cm-number">1</span>][<span class="cm-number">1</span>] : <span class="cm-atom">null</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">===</span> <span class="cm-number">2</span> <span class="cm-operator">?</span> <span class="cm-string">&quot;blue&quot;</span> :<span class="cm-string">&quot;black&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-string">&quot;3px&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-dasharray&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">===</span> <span class="cm-number">2</span> <span class="cm-operator">?</span> [<span class="cm-number">3</span>] : [])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;marker-end&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">===</span> <span class="cm-number">2</span> <span class="cm-operator">?</span> <span class="cm-string">&quot;url(#markerArrowBlue)&quot;</span>: <span class="cm-string">&quot;url(#markerArrow)&quot;</span>);
+    
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;line&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x1&quot;</span>, <span class="cm-variable-2">points</span>[<span class="cm-number">5</span>][<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x2&quot;</span>, <span class="cm-variable-2">points</span>[<span class="cm-number">3</span>][<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y1&quot;</span>, <span class="cm-variable-2">points</span>[<span class="cm-number">5</span>][<span class="cm-number">1</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y2&quot;</span>, <span class="cm-variable-2">points</span>[<span class="cm-number">3</span>][<span class="cm-number">1</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;green&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-string">&quot;3px&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;marker-end&quot;</span>, <span class="cm-string">&quot;url(#markerArrowGreen)&quot;</span>);
+
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">selectAll</span>()
+    .<span class="cm-property">data</span>([<span class="cm-string">&quot;moveTo&quot;</span>,<span class="cm-string">&quot;lineTo&quot;</span>,<span class="cm-string">&quot;closePath&quot;</span>])
+    .<span class="cm-property">join</span>(<span class="cm-string">&quot;text&quot;</span>)
+    .<span class="cm-property">text</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-number">20</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-number">150</span> <span class="cm-operator">+</span> <span class="cm-variable-2">i</span><span class="cm-operator">*</span><span class="cm-number">20</span>);
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">selectAll</span>()
+    .<span class="cm-property">data</span>([<span class="cm-string">&quot;blue&quot;</span>,<span class="cm-string">&quot;black&quot;</span>,<span class="cm-string">&quot;green&quot;</span>])
+    .<span class="cm-property">join</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-number">10</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-number">145</span> <span class="cm-operator">+</span> <span class="cm-variable-2">i</span><span class="cm-operator">*</span><span class="cm-number">20</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">7.5</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>);
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">code</span><span class="cm-tag cm-bracket">&gt;</span>addPathOutline(points, selection)<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">code</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-comment">&lt;!--&lt;svg width=&quot;0&quot; height=&quot;0&quot;&gt;</span>
+    <span class="cm-comment">&lt;defs&gt;</span>
+        <span class="cm-comment">&lt;marker id=&quot;markerArrow&quot; markerWidth=&quot;13&quot; markerHeight=&quot;13&quot; refX=&quot;6&quot; refY=&quot;3&quot;</span>
+            <span class="cm-comment">orient=&quot;auto&quot;&gt;</span>
+            <span class="cm-comment">&lt;path d=&quot;M1,1 L1,5.5 L5,3 L1,1&quot; style=&quot;fill: #000000;&quot; /&gt;</span>
+        <span class="cm-comment">&lt;/marker&gt;</span>
+        <span class="cm-comment">&lt;marker id=&quot;markerArrowGreen&quot; markerWidth=&quot;13&quot; markerHeight=&quot;13&quot; refX=&quot;6&quot; refY=&quot;3&quot;</span>
+            <span class="cm-comment">orient=&quot;auto&quot;&gt;</span>
+            <span class="cm-comment">&lt;path d=&quot;M1,1 L1,5.5 L5,3 L1,1&quot; style=&quot;fill: green;&quot; /&gt;</span>
+        <span class="cm-comment">&lt;/marker&gt;</span>
+        <span class="cm-comment">&lt;marker id=&quot;markerArrowBlue&quot; markerWidth=&quot;13&quot; markerHeight=&quot;13&quot; refX=&quot;6&quot; refY=&quot;3&quot;</span>
+            <span class="cm-comment">orient=&quot;auto&quot;&gt;</span>
+            <span class="cm-comment">&lt;path d=&quot;M1,1 L1,5.5 L5,3 L1,1&quot; style=&quot;fill: blue;&quot; /&gt;</span>
+        <span class="cm-comment">&lt;/marker&gt;</span>
+    <span class="cm-comment">&lt;/defs&gt;</span>
+<span class="cm-comment">&lt;/svg&gt;--&gt;</span></pre>
+
+<p><a class="p_ident" id="p_WUU/UpMs+W" href="#p_WUU/UpMs+W" tabindex="-1" role="presentation"></a>In Figure 4 we used the function <code>addCurveOutline()</code> to add guidelines for the control points.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_yWaJipE4w+" href="#c_yWaJipE4w+" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">function</span> <span class="cm-def">addCurveOutline</span>(<span class="cm-def">qControl</span>, <span class="cm-def">bControl1</span>, <span class="cm-def">bControl2</span>, <span class="cm-def">selection</span>){
+  <span class="cm-keyword">var</span> <span class="cm-def">qData</span> <span class="cm-operator">=</span> [[<span class="cm-number">10</span>,<span class="cm-number">10</span>], <span class="cm-variable-2">qControl</span>, [<span class="cm-number">190</span>,<span class="cm-number">10</span>]];
+  <span class="cm-keyword">var</span> <span class="cm-def">bData</span> <span class="cm-operator">=</span> [[<span class="cm-number">10</span>,<span class="cm-number">190</span>], <span class="cm-variable-2">bControl1</span>, <span class="cm-variable-2">bControl2</span>, [<span class="cm-number">190</span>,<span class="cm-number">120</span>]];
+
+  <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [ [<span class="cm-variable-2">qData</span>[<span class="cm-number">0</span>],<span class="cm-variable-2">qData</span>[<span class="cm-number">1</span>]], [<span class="cm-variable-2">qData</span>[<span class="cm-number">1</span>],<span class="cm-variable-2">qData</span>[<span class="cm-number">2</span>]], [<span class="cm-variable-2">bData</span>[<span class="cm-number">0</span>],<span class="cm-variable-2">bData</span>[<span class="cm-number">1</span>]], [<span class="cm-variable-2">bData</span>[<span class="cm-number">2</span>],<span class="cm-variable-2">bData</span>[<span class="cm-number">3</span>]] ];
+
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">selectAll</span>()
+    .<span class="cm-property">data</span>(<span class="cm-variable-2">data</span>)
+    .<span class="cm-property">join</span>(<span class="cm-string">&quot;line&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x1&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>[<span class="cm-number">0</span>][<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x2&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>[<span class="cm-number">1</span>][<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y1&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>[<span class="cm-number">0</span>][<span class="cm-number">1</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y2&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>[<span class="cm-number">1</span>][<span class="cm-number">1</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-dasharray&quot;</span>, <span class="cm-number">4</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+    
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">selectAll</span>()
+    .<span class="cm-property">data</span>(<span class="cm-variable-2">qData</span>.<span class="cm-property">concat</span>(<span class="cm-variable-2">bData</span>))
+    .<span class="cm-property">join</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>[<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>[<span class="cm-number">1</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">5</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">code</span><span class="cm-tag cm-bracket">&gt;</span>addCurveOutline(qControl, bControl1, bControl2, selection)<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">code</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_+VRGRbnpG+" href="#p_+VRGRbnpG+" tabindex="-1" role="presentation"></a>In Figure 5 we used the function <code>addArcOutline()</code> to add a circle outline and angle text elements to show the angles.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_wKfiappuz0" href="#c_wKfiappuz0" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">function</span> <span class="cm-def">addArcOutline</span>(<span class="cm-def">center</span>, <span class="cm-def">radius</span>, <span class="cm-def">selection</span>){
+  <span class="cm-comment">//Adds in the main circle</span>
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-variable-2">center</span>[<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-variable-2">center</span>[<span class="cm-number">1</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-variable-2">radius</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-string">&quot;2px&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>);  
+
+  <span class="cm-keyword">var</span> <span class="cm-def">pointLabels</span> <span class="cm-operator">=</span> [<span class="cm-string">&quot;3π/2&quot;</span>, <span class="cm-string">&quot;0&quot;</span>, <span class="cm-string">&quot;π/2&quot;</span>, <span class="cm-string">&quot;π&quot;</span>];
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">selectAll</span>()
+    .<span class="cm-property">data</span>(<span class="cm-variable-2">pointLabels</span>)
+    .<span class="cm-property">join</span>(<span class="cm-string">&quot;text&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;font-size&quot;</span>, <span class="cm-string">&quot;15px&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>( <span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">/</span> <span class="cm-number">2</span>, <span class="cm-variable-2">radius</span> <span class="cm-operator">+</span> <span class="cm-number">15</span>)[<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>( <span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">/</span> <span class="cm-number">2</span>, <span class="cm-variable-2">radius</span> <span class="cm-operator">+</span> <span class="cm-number">15</span>)[<span class="cm-number">1</span>])
+    .<span class="cm-property">text</span>( (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">center</span>[<span class="cm-number">0</span>] <span class="cm-operator">+</span> <span class="cm-string">&quot;,&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">center</span>[<span class="cm-number">1</span>] <span class="cm-operator">+</span> <span class="cm-string">&quot;)&quot;</span> );
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">code</span><span class="cm-tag cm-bracket">&gt;</span>addArcOutline(center, radius, selection)<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">code</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_/lJzF7TkfS" href="#p_/lJzF7TkfS" tabindex="-1" role="presentation"></a>In Figure 6 we used the function <code>addArcToOutline()</code> to add in the circle and lines to help illustrate where and how arcTo behaves.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_72JqrXqLUz" href="#c_72JqrXqLUz" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">function</span> <span class="cm-def">addArcToOutline</span>(<span class="cm-def">point1</span>, <span class="cm-def">point2</span>, <span class="cm-def">point3</span>, <span class="cm-def">radius</span>, <span class="cm-def">selection</span>){
+  <span class="cm-comment">//p3 =&gt; p2 = a</span>
+  <span class="cm-comment">//p2 =&gt; p1 = b</span>
+  <span class="cm-comment">//p1 =&gt; p3 = c</span>
+  
+  <span class="cm-comment">//Finding lengths of sides</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">a</span> <span class="cm-operator">=</span> <span class="cm-variable">Math</span>.<span class="cm-property">sqrt</span>(<span class="cm-variable">Math</span>.<span class="cm-property">pow</span>(<span class="cm-variable-2">point3</span>[<span class="cm-number">0</span>] <span class="cm-operator">-</span> <span class="cm-variable-2">point2</span>[<span class="cm-number">0</span>],<span class="cm-number">2</span>) <span class="cm-operator">+</span> <span class="cm-variable">Math</span>.<span class="cm-property">pow</span>(<span class="cm-variable-2">point3</span>[<span class="cm-number">1</span>] <span class="cm-operator">-</span> <span class="cm-variable-2">point2</span>[<span class="cm-number">1</span>],<span class="cm-number">2</span>) );
+  <span class="cm-keyword">var</span> <span class="cm-def">b</span> <span class="cm-operator">=</span> <span class="cm-variable">Math</span>.<span class="cm-property">sqrt</span>(<span class="cm-variable">Math</span>.<span class="cm-property">pow</span>(<span class="cm-variable-2">point2</span>[<span class="cm-number">0</span>] <span class="cm-operator">-</span> <span class="cm-variable-2">point1</span>[<span class="cm-number">0</span>],<span class="cm-number">2</span>) <span class="cm-operator">+</span> <span class="cm-variable">Math</span>.<span class="cm-property">pow</span>(<span class="cm-variable-2">point2</span>[<span class="cm-number">1</span>] <span class="cm-operator">-</span> <span class="cm-variable-2">point1</span>[<span class="cm-number">1</span>],<span class="cm-number">2</span>) );
+  <span class="cm-keyword">var</span> <span class="cm-def">c</span> <span class="cm-operator">=</span> <span class="cm-variable">Math</span>.<span class="cm-property">sqrt</span>(<span class="cm-variable">Math</span>.<span class="cm-property">pow</span>(<span class="cm-variable-2">point3</span>[<span class="cm-number">0</span>] <span class="cm-operator">-</span> <span class="cm-variable-2">point1</span>[<span class="cm-number">0</span>],<span class="cm-number">2</span>) <span class="cm-operator">+</span> <span class="cm-variable">Math</span>.<span class="cm-property">pow</span>(<span class="cm-variable-2">point3</span>[<span class="cm-number">1</span>] <span class="cm-operator">-</span> <span class="cm-variable-2">point1</span>[<span class="cm-number">1</span>],<span class="cm-number">2</span>) );
+  
+  <span class="cm-comment">//The angle C, or at p2</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">theta</span> <span class="cm-operator">=</span> <span class="cm-variable">Math</span>.<span class="cm-property">acos</span>((<span class="cm-variable-2">a</span><span class="cm-operator">*</span><span class="cm-variable-2">a</span> <span class="cm-operator">+</span> <span class="cm-variable-2">b</span><span class="cm-operator">*</span><span class="cm-variable-2">b</span> <span class="cm-operator">-</span> <span class="cm-variable-2">c</span><span class="cm-operator">*</span><span class="cm-variable-2">c</span>) <span class="cm-operator">/</span> (<span class="cm-number">2</span><span class="cm-operator">*</span><span class="cm-variable-2">a</span><span class="cm-operator">*</span><span class="cm-variable-2">b</span>));
+  
+  <span class="cm-comment">//Finding point for intercect line from C</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">thetaB</span> <span class="cm-operator">=</span> <span class="cm-variable">Math</span>.<span class="cm-property">acos</span>((<span class="cm-variable-2">a</span><span class="cm-operator">*</span><span class="cm-variable-2">a</span> <span class="cm-operator">+</span> <span class="cm-variable-2">c</span><span class="cm-operator">*</span><span class="cm-variable-2">c</span> <span class="cm-operator">-</span> <span class="cm-variable-2">b</span><span class="cm-operator">*</span><span class="cm-variable-2">b</span>) <span class="cm-operator">/</span> (<span class="cm-number">2</span><span class="cm-operator">*</span><span class="cm-variable-2">a</span><span class="cm-operator">*</span><span class="cm-variable-2">c</span>));
+  <span class="cm-keyword">var</span> <span class="cm-def">theta2</span> <span class="cm-operator">=</span> <span class="cm-number">3.14</span> <span class="cm-operator">-</span> (<span class="cm-variable-2">theta</span><span class="cm-operator">/</span><span class="cm-number">2</span>) <span class="cm-operator">-</span> <span class="cm-variable-2">thetaB</span>;
+  <span class="cm-keyword">var</span> <span class="cm-def">theta3</span> <span class="cm-operator">=</span> <span class="cm-number">3.14</span> <span class="cm-operator">-</span> <span class="cm-variable-2">theta2</span>;
+  <span class="cm-keyword">var</span> <span class="cm-def">yM</span> <span class="cm-operator">=</span> (<span class="cm-variable">Math</span>.<span class="cm-property">sin</span>(<span class="cm-variable-2">theta</span><span class="cm-operator">/</span><span class="cm-number">2</span>) <span class="cm-operator">*</span> <span class="cm-variable-2">a</span>);
+  <span class="cm-keyword">var</span> <span class="cm-def">xM</span> <span class="cm-operator">=</span> (<span class="cm-variable">Math</span>.<span class="cm-property">tan</span>(<span class="cm-variable-2">theta3</span>)<span class="cm-operator">*</span> (<span class="cm-number">1</span><span class="cm-operator">/</span><span class="cm-variable-2">yM</span>));
+  <span class="cm-keyword">var</span> <span class="cm-def">m</span> <span class="cm-operator">=</span> [<span class="cm-variable-2">point3</span>[<span class="cm-number">0</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">xM</span>, <span class="cm-variable-2">point3</span>[<span class="cm-number">1</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">yM</span>];
+  
+  <span class="cm-comment">//distance from p2 where center of circle lies</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">disC</span> <span class="cm-operator">=</span> <span class="cm-variable-2">radius</span> <span class="cm-operator">/</span> <span class="cm-variable">Math</span>.<span class="cm-property">sin</span>(<span class="cm-variable-2">theta</span><span class="cm-operator">/</span><span class="cm-number">2</span>);
+  
+  <span class="cm-comment">//distance from p2 to m</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">disA</span> <span class="cm-operator">=</span> <span class="cm-variable">Math</span>.<span class="cm-property">sqrt</span>(<span class="cm-variable">Math</span>.<span class="cm-property">pow</span>(<span class="cm-variable-2">m</span>[<span class="cm-number">0</span>] <span class="cm-operator">-</span> <span class="cm-variable-2">point2</span>[<span class="cm-number">0</span>],<span class="cm-number">2</span>) <span class="cm-operator">+</span> <span class="cm-variable">Math</span>.<span class="cm-property">pow</span>(<span class="cm-variable-2">m</span>[<span class="cm-number">1</span>] <span class="cm-operator">-</span> <span class="cm-variable-2">point2</span>[<span class="cm-number">1</span>],<span class="cm-number">2</span>) );
+  
+  <span class="cm-comment">//Position of circle</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">pos</span> <span class="cm-operator">=</span> [(<span class="cm-variable-2">point2</span>[<span class="cm-number">0</span>] <span class="cm-operator">-</span> (<span class="cm-variable-2">disC</span><span class="cm-operator">*</span>(<span class="cm-variable-2">point2</span>[<span class="cm-number">0</span>]<span class="cm-operator">-</span><span class="cm-variable-2">m</span>[<span class="cm-number">0</span>]))<span class="cm-operator">/</span><span class="cm-variable-2">disA</span>),(<span class="cm-variable-2">point2</span>[<span class="cm-number">1</span>] <span class="cm-operator">-</span> (<span class="cm-variable-2">disC</span><span class="cm-operator">*</span>(<span class="cm-variable-2">point2</span>[<span class="cm-number">1</span>]<span class="cm-operator">-</span><span class="cm-variable-2">m</span>[<span class="cm-number">1</span>]))<span class="cm-operator">/</span><span class="cm-variable-2">disA</span>)];
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-variable-2">pos</span>[<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-variable-2">pos</span>[<span class="cm-number">1</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-string">&quot;2px&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-variable-2">radius</span>);
+ 
+  <span class="cm-comment">//Adds in reference lines</span>
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;line&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x1&quot;</span>, <span class="cm-variable-2">point2</span>[<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x2&quot;</span>, <span class="cm-variable-2">point3</span>[<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y1&quot;</span>, <span class="cm-variable-2">point2</span>[<span class="cm-number">1</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y2&quot;</span>, <span class="cm-variable-2">point3</span>[<span class="cm-number">1</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-string">&quot;2px&quot;</span>);
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;line&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x1&quot;</span>, <span class="cm-variable-2">point2</span>[<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x2&quot;</span>, <span class="cm-variable-2">point1</span>[<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y1&quot;</span>, <span class="cm-variable-2">point2</span>[<span class="cm-number">1</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y2&quot;</span>, <span class="cm-variable-2">point1</span>[<span class="cm-number">1</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-string">&quot;2px&quot;</span>);
+ 
+  <span class="cm-keyword">let</span> <span class="cm-def">points</span> <span class="cm-operator">=</span> [<span class="cm-variable-2">point1</span>, <span class="cm-variable-2">point2</span>, <span class="cm-variable-2">point3</span>];
+  <span class="cm-comment">//Adds in reference points</span>
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">selectAll</span>()
+    .<span class="cm-property">data</span>(<span class="cm-variable-2">points</span>)
+    .<span class="cm-property">join</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>[<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>[<span class="cm-number">1</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">5</span>);
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">code</span><span class="cm-tag cm-bracket">&gt;</span>addCircle(point1, point2, point3, radius, selection)<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">code</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_xIu+T2h+xD" href="#p_xIu+T2h+xD" tabindex="-1" role="presentation"></a>In Figure 7 we used the function <code>addRectOutline</code> to add the origin and width/height guides to help illustrate how the <code>rect</code> element is drawn.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_HPPt7SfxNY" href="#c_HPPt7SfxNY" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">function</span> <span class="cm-def">addRectOutline</span>(<span class="cm-def">origin</span>, <span class="cm-def">width</span>, <span class="cm-def">height</span>, <span class="cm-def">selection</span>){
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-variable-2">origin</span>[<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-variable-2">origin</span>[<span class="cm-number">1</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">5</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;black&quot;</span>);
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;text&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-variable-2">origin</span>[<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-variable-2">origin</span>[<span class="cm-number">1</span>]<span class="cm-operator">-</span><span class="cm-number">10</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>)
+    .<span class="cm-property">text</span>(<span class="cm-string">&quot;Origin&quot;</span>);
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;line&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x1&quot;</span>, <span class="cm-variable-2">origin</span>[<span class="cm-number">0</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">width</span><span class="cm-operator">*</span><span class="cm-number">3</span><span class="cm-operator">/</span><span class="cm-number">4</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x2&quot;</span>, <span class="cm-variable-2">origin</span>[<span class="cm-number">0</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">width</span><span class="cm-operator">*</span><span class="cm-number">3</span><span class="cm-operator">/</span><span class="cm-number">4</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y1&quot;</span>, <span class="cm-variable-2">origin</span>[<span class="cm-number">1</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y2&quot;</span>, <span class="cm-variable-2">origin</span>[<span class="cm-number">1</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">height</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-string">&quot;3px&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;marker-start&quot;</span>, <span class="cm-string">&quot;url(#markerArrowStart)&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;marker-end&quot;</span>, <span class="cm-string">&quot;url(#markerArrowEnd)&quot;</span>);
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;line&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x1&quot;</span>, <span class="cm-variable-2">origin</span>[<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x2&quot;</span>, <span class="cm-variable-2">origin</span>[<span class="cm-number">0</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">width</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y1&quot;</span>, <span class="cm-variable-2">origin</span>[<span class="cm-number">1</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">height</span><span class="cm-operator">*</span><span class="cm-number">3</span><span class="cm-operator">/</span><span class="cm-number">4</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y2&quot;</span>, <span class="cm-variable-2">origin</span>[<span class="cm-number">1</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">height</span><span class="cm-operator">*</span><span class="cm-number">3</span><span class="cm-operator">/</span><span class="cm-number">4</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-string">&quot;3px&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;marker-start&quot;</span>, <span class="cm-string">&quot;url(#markerArrowStart)&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;marker-end&quot;</span>, <span class="cm-string">&quot;url(#markerArrowEnd)&quot;</span>);
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;text&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-variable-2">origin</span>[<span class="cm-number">0</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">width</span><span class="cm-operator">*</span><span class="cm-number">3</span><span class="cm-operator">/</span><span class="cm-number">4</span> <span class="cm-operator">-</span> <span class="cm-number">10</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-variable-2">origin</span>[<span class="cm-number">1</span>] <span class="cm-operator">+</span> <span class="cm-number">25</span>)
+    .<span class="cm-property">text</span>(<span class="cm-string">&quot;h&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>);
+  <span class="cm-variable-2">selection</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;text&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-variable-2">origin</span>[<span class="cm-number">0</span>] <span class="cm-operator">+</span> <span class="cm-number">25</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-variable-2">origin</span>[<span class="cm-number">1</span>] <span class="cm-operator">+</span> <span class="cm-variable-2">height</span><span class="cm-operator">*</span><span class="cm-number">3</span><span class="cm-operator">/</span><span class="cm-number">4</span> <span class="cm-operator">-</span> <span class="cm-number">5</span>)
+    .<span class="cm-property">text</span>(<span class="cm-string">&quot;w&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>);
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">code</span><span class="cm-tag cm-bracket">&gt;</span>addRectOutline(origin, width, height, selection)<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">code</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-comment">&lt;!--&lt;svg width=0 height=0&gt;</span>
+    <span class="cm-comment">&lt;defs&gt;</span>
+        <span class="cm-comment">&lt;marker id=&quot;markerArrowStart&quot; markerWidth=&quot;13&quot; markerHeight=&quot;13&quot; refX=&quot;5&quot; refY=&quot;3&quot;</span>
+            <span class="cm-comment">orient=&quot;auto-start-reverse&quot;&gt;</span>
+            <span class="cm-comment">&lt;path d=&quot;M1,1 L1,5.5 L5,3 L1,1&quot; style=&quot;fill: #000000;&quot; /&gt;</span>
+        <span class="cm-comment">&lt;/marker&gt;</span>
+        <span class="cm-comment">&lt;marker id=&quot;markerArrowEnd&quot; markerWidth=&quot;13&quot; markerHeight=&quot;13&quot; refX=&quot;5&quot; refY=&quot;3&quot;</span>
+            <span class="cm-comment">orient=&quot;auto&quot;&gt;</span>
+            <span class="cm-comment">&lt;path d=&quot;M1,1 L1,5.5 L5,3 L1,1&quot; style=&quot;fill: #000000;&quot; /&gt;</span>
+        <span class="cm-comment">&lt;/marker&gt;</span>
+    <span class="cm-comment">&lt;/defs&gt;</span>
+<span class="cm-comment">&lt;/svg&gt;--&gt;</span></pre></aside>
+<svg width="0" height="0">
+  <defs>
+    <marker id="markerArrow" markerWidth="13" markerHeight="13" refX="6" refY="3" orient="auto">
+        <path d="M1,1 L1,5.5 L5,3 L1,1" style="fill: #000000;" />
+    </marker>
+    <marker id="markerArrowGreen" markerWidth="13" markerHeight="13" refX="6" refY="3" orient="auto">
+        <path d="M1,1 L1,5.5 L5,3 L1,1" style="fill: green;" />
+    </marker>
+    <marker id="markerArrowBlue" markerWidth="13" markerHeight="13" refX="6" refY="3" orient="auto">
+        <path d="M1,1 L1,5.5 L5,3 L1,1" style="fill: blue;" />
+    </marker>
+    <marker id="markerArrowStart" markerWidth="13" markerHeight="13" refX="5" refY="3" orient="auto-start-reverse">
+        <path d="M1,1 L1,5.5 L5,3 L1,1" style="fill: #000000;" />
+    </marker>
+    <marker id="markerArrowEnd" markerWidth="13" markerHeight="13" refX="5" refY="3" orient="auto">
+        <path d="M1,1 L1,5.5 L5,3 L1,1" style="fill: #000000;" />
+    </marker>
+  </defs>
+</svg>
+<nav><a href="04_08_legends.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_02_lines.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

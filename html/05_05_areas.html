@@ -1,0 +1,667 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Areas and Area Radials</title>
+  <link rel="canonical" href="http://using-d3js.com/05_05_areas.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 05;</script></head>
+
+<article>
+<nav><a href="05_04_curves.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_06_stacks.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 05</span>Areas and Area Radials</h1><script src="https://unpkg.com/d3-area-label@1.5.0/build/d3-area-label.js"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<style>
+    svg { background-color: white; display: inline-block;}
+    .sandbox-output { text-align: center;}
+</style>
+
+
+<p><a class="p_ident" id="p_u8KwgWrk9f" href="#p_u8KwgWrk9f" tabindex="-1" role="presentation"></a>In this tutorial we will discuss how to draw areas and area radials. Areas can be used on their own or with <a href="./05_08_stacks.html">stacks</a>.</p>
+
+<h2><a class="h_ident" id="h_FM4JqN1OD7" href="#h_FM4JqN1OD7" tabindex="-1" role="presentation"></a>Areas</h2>
+
+<p><a class="p_ident" id="p_N1t1SFawD9" href="#p_N1t1SFawD9" tabindex="-1" role="presentation"></a>D3 provides <a href="https://github.com/d3/d3-shape#area">d3.area()</a>, a method that returns an area generator that is used to create areas.</p>
+
+<p><a class="p_ident" id="p_Gpj0DHlZRv" href="#p_Gpj0DHlZRv" tabindex="-1" role="presentation"></a>An area is a path that can be thought of as the enclosure between two lines. These two “lines” are created by setting an <code>x</code> value, which is the same for each point on the lines, and two <code>y</code> values, <code>y0</code> and <code>y1</code>, which are the bottom lines <code>y</code> position and the top lines <code>y</code> position respectively.</p>
+
+<p><a class="p_ident" id="p_UFbv+hQ2HL" href="#p_UFbv+hQ2HL" tabindex="-1" role="presentation"></a>Like <a href="./05_02_lines.html">lines</a>, we have an area generator, <a href="https://github.com/d3/d3-shape#area">d3.area()</a> which has accessors we can call to set how the area is generated. We pass data into an area generator and it returns back a <code>string</code> that can be used inside a <code>path</code> <code>d</code> attribute.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_3a2Hkg125x" href="#p_3a2Hkg125x" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#_area">area(data)</a> - Invokes the area generator using the array of data passed into it, returns back a <code>string</code> that can be used by the <code>d</code> attribute of a <code>path</code>.</p></li></ul>
+
+<p><a class="p_ident" id="p_W8njzkJbbf" href="#p_W8njzkJbbf" tabindex="-1" role="presentation"></a>However unlike lines, areas make <b>two</b> points for every set of data passed into it. These points create the upper and lower “lines” or bounds that our area encloses. The first point uses <code>y0</code> and is used as the lower bounds of the graph. The second point uses <code>y1</code> and is used as the upper bounds. Both points use the same <code>x</code> position.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_7wU7Q2wwWr" href="#p_7wU7Q2wwWr" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#area_x">area.x([x])</a> - Sets the <code>x</code> accessor to the argument passed to it which may be either a number or a function that returns a number</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_XJsUJ0sQ7L" href="#p_XJsUJ0sQ7L" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#area_y0">area.y0([y])</a> - Sets the <code>y0</code> accessor to the argument passed to it which may be either a number or a function that returns a number, this is the first point or our lower bounds</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_SFq2uSqHW1" href="#p_SFq2uSqHW1" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#area_y1">area.y1([y])</a> - Sets the <code>y1</code> accessor to the argument passed to it which may be either a number or a function that returns a number, this is the second point or our upper bounds</p></li></ul>
+
+<p><a class="p_ident" id="p_Tn1lucybfy" href="#p_Tn1lucybfy" tabindex="-1" role="presentation"></a>For our examples we will be using the same array of data and scales that we used with lines:</p><pre>
+var data = [
+    {x: 0, y: 0},
+    {x: 1, y: 3},
+    {x: 2, y: 12},
+    {x: 3, y: 8},
+    {x: 4, y: 17},
+    {x: 5, y: 15},
+    {x: 6, y: 20}];
+
+var xScale = d3.scaleLinear().domain([0, 6]).range([25, 175]);
+var yScale = d3.scaleLinear().domain([0,20]).range([175, 25]);
+</pre>
+
+
+<p><a class="p_ident" id="p_aBEAGeW3n8" href="#p_aBEAGeW3n8" tabindex="-1" role="presentation"></a>Next, we will create an area generator and set the <code>x</code>, <code>y0</code> (lower bounds), and <code>y1</code> (upper bounds) accessors:</p><pre>
+var area = d3.area()
+      .x(d => xScale(d.x))
+      .y0(yScale(0))
+      .y1(d => yScale(d.y));
+</pre>
+
+
+<p><a class="p_ident" id="p_diV7THJEZw" href="#p_diV7THJEZw" tabindex="-1" role="presentation"></a>And finally, just like we did with lines, we will append a <code>path</code> element and call <code>area(data)</code> in our <code>d</code> attribute. However this time we need to make sure to set a color in our <code>fill</code> attribute to show the area filled in.</p><pre>
+d3.select("#demo")
+    .append("path")
+    .attr("d", area(data))
+    .attr("fill", "red")
+    .attr("stroke", "black");
+</pre>
+
+
+<p><a class="p_ident" id="p_IzYvd+5ex9" href="#p_IzYvd+5ex9" tabindex="-1" role="presentation"></a>In Figure 1 we use these code snippets to create an area. We also set the fill of the area to red.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_uICli5c/SS" href="#c_uICli5c/SS" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+ <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+    {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">20</span>}];
+
+   <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">6</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+   <span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+
+   <span class="cm-keyword">var</span> <span class="cm-def">area</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">area</span>()
+      .<span class="cm-property">x</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+      .<span class="cm-property">y0</span>(<span class="cm-variable">yScale</span>(<span class="cm-number">0</span>))
+      .<span class="cm-property">y1</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>));
+
+   <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">area</span>(<span class="cm-variable">data</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 1 - An area created by setting the x, y0, and y1 accessors of d3.area.  </figcaption></figure>
+
+
+<h3><a class="i_ident" id="i_Y62ZzLYTJo" href="#i_Y62ZzLYTJo" tabindex="-1" role="presentation"></a>Setting the lower bounds</h3>
+
+<p><a class="p_ident" id="p_2GSBFCwiqa" href="#p_2GSBFCwiqa" tabindex="-1" role="presentation"></a>Many times we will not want our lower bounds to be 0. Instead of setting <code>y0</code> to <code>0</code> we can instead set it to whatever custom value, property, or method we choose.</p>
+
+<p><a class="p_ident" id="p_q04nb81xIB" href="#p_q04nb81xIB" tabindex="-1" role="presentation"></a>In Figure 2 we set <code>y0</code> to be one-third of <code>y1</code>.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_fPdfIdUiO8" href="#c_fPdfIdUiO8" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+ <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+    {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">20</span>}];
+
+   <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">6</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+   <span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+
+   <span class="cm-keyword">var</span> <span class="cm-def">area</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">area</span>()
+      .<span class="cm-property">x</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+      .<span class="cm-property">y0</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span> <span class="cm-operator">/</span> <span class="cm-number">3</span>))
+      .<span class="cm-property">y1</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>));
+
+   <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo2&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">area</span>(<span class="cm-variable">data</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 2 - An area with y0 set to be one-third of y1.  </figcaption></figure>
+
+
+<h3><a class="i_ident" id="i_gBsdOb2ZJP" href="#i_gBsdOb2ZJP" tabindex="-1" role="presentation"></a>Setting <code>x0</code> and <code>x1</code></h3>
+
+<p><a class="p_ident" id="p_W/nQiO9JIJ" href="#p_W/nQiO9JIJ" tabindex="-1" role="presentation"></a>Setting <code>x</code>, <code>y0</code>, and <code>y1</code> is useful for creating left-to-right oriented areas, but to create a bottom-to-top oriented area we use different accessors.</p>
+
+<p><a class="p_ident" id="p_sbcRdzHVjK" href="#p_sbcRdzHVjK" tabindex="-1" role="presentation"></a>The new accessors <code>y</code>, <code>x0</code>, and <code>x1</code> work very similarly to the previous accessors. Instead of <code>y0</code> and <code>y1</code> being the lower/upper bounds, we now have <code>x0</code> and <code>x1</code> to be our right/left bounds. When using the new accessors (along with an updated scale) we are effectively rotating our area 90 degrees from the original area.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_sK5Uqd2IKV" href="#p_sK5Uqd2IKV" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#area_y">area.y([y])</a> - Sets the <code>y</code> accessor to the argument passed to it which may be either a number or a function that returns a number</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_eaxGLkECKd" href="#p_eaxGLkECKd" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#area_x0">area.x0([x])</a> - Sets the <code>x0</code> accessor to the argument passed to it which may be either a number or a function that returns a number, this is our right-most bounds</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_shPtkN7Rmu" href="#p_shPtkN7Rmu" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#area_x1">area.x1([x])</a> - Sets the <code>x1</code> accessor to the argument passed to it which may be either a number or a function that returns a number, this is our left-most bounds</p></li></ul>
+
+<p><a class="p_ident" id="p_mKkmFqiZUE" href="#p_mKkmFqiZUE" tabindex="-1" role="presentation"></a>All we need to change is the accessors in our area generator and the xScale:</p><pre>
+var xScale = d3.scale.Linear().domain([0,6]).range([<b>175, 25</b>]);
+
+var area = d3.area()
+      .y(d => xScale(d.x))
+      .x0(d => yScale(d.y / 3))
+      .x1(d => yScale(d.y));
+</pre>
+
+
+<p><a class="p_ident" id="p_XXbZfWNfYB" href="#p_XXbZfWNfYB" tabindex="-1" role="presentation"></a><b>Note:</b> It may seem weird to use the <code>xScale</code> and <code>d.x</code> in our <code>y</code> accessor, we are doing this so it acts like a rotation of our original data without renaming our data.</p>
+
+<p><a class="p_ident" id="p_ciHvdHniag" href="#p_ciHvdHniag" tabindex="-1" role="presentation"></a>In Figure 3 we use <code>y</code>, <code>x0</code>, and <code>x1</code> to make a new area where it is orientated bottom-to-top with the baseline on the right side.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_cBWizCc/Li" href="#c_cBWizCc/Li" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+ <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+    {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">20</span>}];
+
+   <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">6</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+   <span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+
+   <span class="cm-keyword">var</span> <span class="cm-def">area</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">area</span>()
+      .<span class="cm-property">y</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+      .<span class="cm-property">x0</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span> <span class="cm-operator">/</span> <span class="cm-number">3</span>))
+      .<span class="cm-property">x1</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>));
+
+   <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo3&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">area</span>(<span class="cm-variable">data</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo3&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 3 - An area created by setting the y, x0, and x1 accessors of d3.area.  </figcaption></figure>
+
+
+<h3><a class="i_ident" id="i_26ittIRcAX" href="#i_26ittIRcAX" tabindex="-1" role="presentation"></a>Curve and Defined</h3>
+
+<p><a class="p_ident" id="p_ebQvTEiLZq" href="#p_ebQvTEiLZq" tabindex="-1" role="presentation"></a>Just like with lines we have areas have <code>curve</code> and <code>defined</code> accessors:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_aX8ZHHdZXL" href="#p_aX8ZHHdZXL" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#area_defined">area.defined([defined])</a>  - Takes as an argument a boolean or a function that returns a boolean.  For each point, if the value returned is true, the point is kept, otherwise it is removed or omitted.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_6ayLnLI2Oe" href="#p_6ayLnLI2Oe" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#area_curve">area.curve([curve])</a> - Sets the curve the area uses.</p></li></ul>
+
+<p><a class="p_ident" id="p_2aHOCJ6+TH" href="#p_2aHOCJ6+TH" tabindex="-1" role="presentation"></a>In Figure 4 we use the following code to omit the fifth point and apply a curve to the area.</p><pre>
+var area = d3.area()
+      .x(d => xScale(d.x))
+      .y0(yScale(0))
+      .y1(d => yScale(d.y))
+      .curve(d3.curveBasis)
+      .defined((d,i) => (i != 4);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_NaBX4OQiQz" href="#c_NaBX4OQiQz" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+ <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+    {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">20</span>}];
+
+   <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">6</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+   <span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+
+   <span class="cm-keyword">var</span> <span class="cm-def">area</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">area</span>()
+     .<span class="cm-property">x</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+     .<span class="cm-property">y0</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span> <span class="cm-operator">/</span> <span class="cm-number">3</span>))
+     .<span class="cm-property">y1</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>))
+     .<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveBasis</span>)
+     .<span class="cm-property">defined</span>((<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> (<span class="cm-variable-2">i</span> <span class="cm-operator">!=</span> <span class="cm-number">4</span>));
+
+   <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo4&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">area</span>(<span class="cm-variable">data</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo4&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 4 - An area with the fifth element removed and a curve applied.  </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_fTHuwL7ePD" href="#h_fTHuwL7ePD" tabindex="-1" role="presentation"></a>Area Radials</h2>
+
+<p><a class="p_ident" id="p_INXc7uG0um" href="#p_INXc7uG0um" tabindex="-1" role="presentation"></a>D3.js also has an area radial generator that works like line radial.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_2fOe7NuLdN" href="#p_2fOe7NuLdN" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#areaRadial">d3.areaRadial()</a> - returns an area radial generator for creating radial lines.</p></li></ul>
+
+<p><a class="p_ident" id="p_sQe2P4DSe6" href="#p_sQe2P4DSe6" tabindex="-1" role="presentation"></a>Since <code>d3.areaRadial</code> is an area, it can still be thought of as being the enclosure between two line radials. These line radials will have identical angles (formerly <code>x</code>) for each of their respective points, and now instead of <code>y0</code> and <code>y1</code> separating our lines, <code>innerRadius</code> and <code>outerRadius</code> will.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_zSNq3lFtYd" href="#p_zSNq3lFtYd" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#areaRadial_angle">areaRadial.angle([angle])</a> - Considered to be a radian (0 to 2π). Equivalent to the x() accessor from d3.area().</p></li></ul><!--
++ [areaRadial.startAngle([angle])](https://github.com/d3/d3-shape#areaRadial_startAngle) - Considered to be a radian (0 to 2π). Equivalent to the x0() accessor from d3.area().
++ [areaRadial.endAngle([angle])](https://github.com/d3/d3-shape#areaRadial_endAngle) - Considered to be a radian (0 to 2π). Equivalent to the x1() accessor from d3.area().
++ [areaRadial.radius([radius])](https://github.com/d3/d3-shape#areaRadial_radius) - Equivalent to the y() accessor from d3.area().
+-->
+
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_jTwyFdQBwj" href="#p_jTwyFdQBwj" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#areaRadial_innerRadius">areaRadial.innerRadius([radius])</a> - Equivalent to the y0() accessor from d3.area().</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_J8nhAgc3ca" href="#p_J8nhAgc3ca" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#areaRadial_outerRadius">areaRadial.outerRadius([radius])</a> - Equivalent to the y1() accessor from d3.area().</p></li></ul>
+
+<p><a class="p_ident" id="p_q26feFaG5N" href="#p_q26feFaG5N" tabindex="-1" role="presentation"></a>In Figure 5 we create an area radial by converting the scales and <code>d3.area</code> accessors into <code>d3.areaRadial</code> compatible ones.</p>
+
+<p><a class="p_ident" id="p_+SVEmUw+03" href="#p_+SVEmUw+03" tabindex="-1" role="presentation"></a>To start we will change our ranges to work with the angles and radii:</p><pre>
+var angleScale = d3.scaleLinear().domain([0, 6]).range([0, 2 * Math.PI]);
+var radiiScale = d3.scaleLinear().domain([0,20]).range([90,30]);
+</pre>
+
+
+<p><a class="p_ident" id="p_hUjq5i5kYA" href="#p_hUjq5i5kYA" tabindex="-1" role="presentation"></a>Next we will convert the area accessors into the new area radial accessors:</p><pre>
+.x()  => .angle()
+.y0() => .innerRadius()
+.y1() => .outerRadius()
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_87ZIWar5FC" href="#c_87ZIWar5FC" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+ <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+    {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">20</span>}];
+
+   <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">6</span>]).<span class="cm-property">range</span>([<span class="cm-number">0</span>, <span class="cm-number">2</span> <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>]);
+   <span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">90</span>,<span class="cm-number">30</span>]);
+
+   <span class="cm-keyword">var</span> <span class="cm-def">areaRadial</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">areaRadial</span>()
+     .<span class="cm-property">angle</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+     .<span class="cm-property">innerRadius</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span> <span class="cm-operator">/</span> <span class="cm-number">3</span>))
+     .<span class="cm-property">outerRadius</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>));
+
+   <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo5&quot;</span>)
+    .<span class="cm-property">select</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">areaRadial</span>(<span class="cm-variable">data</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo5&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(100,100)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 5 - An area radial.  </figcaption></figure>
+
+
+<p><a class="p_ident" id="p_GQ5ww19djK" href="#p_GQ5ww19djK" tabindex="-1" role="presentation"></a>We can also use <code>.curve()</code> and <code>.defined()</code> with area radials exactly like we did for areas.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_JAFYoWtRDc" href="#p_JAFYoWtRDc" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#areaRadial_defined">areaRadial.defined([defined])</a> - Takes as an argument a boolean or a function that returns a boolean.  For each point, if the value returned is true, the point is kept, otherwise it is removed or omitted.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_z8thSQrHH7" href="#p_z8thSQrHH7" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#areaRadial_curve">areaRadial.curve([curve])</a> - Sets the curve the area radial uses.</p></li></ul>
+
+<p><a class="p_ident" id="p_A37tIc8seQ" href="#p_A37tIc8seQ" tabindex="-1" role="presentation"></a>Figure 6 is identical to Figure 5 except that a curve is applied and the fifth point is omitted.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_XD9qg5lR9t" href="#c_XD9qg5lR9t" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+ <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+    {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+    {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">20</span>}];
+
+   <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">6</span>]).<span class="cm-property">range</span>([<span class="cm-number">0</span>, <span class="cm-number">2</span> <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>]);
+   <span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">90</span>,<span class="cm-number">30</span>]);
+
+   <span class="cm-keyword">var</span> <span class="cm-def">areaRadial</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">areaRadial</span>()
+     .<span class="cm-property">angle</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+     .<span class="cm-property">innerRadius</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span> <span class="cm-operator">/</span> <span class="cm-number">3</span>))
+     .<span class="cm-property">outerRadius</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>))
+     .<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveBasis</span>)
+     .<span class="cm-property">defined</span>((<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> (<span class="cm-variable-2">i</span> <span class="cm-operator">!=</span> <span class="cm-number">4</span>));
+
+   <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo6&quot;</span>)
+    .<span class="cm-property">select</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">areaRadial</span>(<span class="cm-variable">data</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo6&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(100,100)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 6 - An area radial with the fifth element removed and a curve applied.  </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_tMJUmaYhD5" href="#h_tMJUmaYhD5" tabindex="-1" role="presentation"></a>Canvasses</h2>
+
+<p><a class="p_ident" id="p_XMB5Ddsum5" href="#p_XMB5Ddsum5" tabindex="-1" role="presentation"></a>Our examples in the section all use an <code>SVG</code> as the graphic medium. If we want to work with a Canvas instead, we just pass in the <code>context</code> of a canvas into the <code>.context()</code> accessor of area or areaRadial.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_9QuodRPXbd" href="#p_9QuodRPXbd" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#area_context">area.context([context])</a> - Applies the area to the context.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_KwXkU13kkc" href="#p_KwXkU13kkc" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#areaRadial_context">areaRadial.context([context])</a> - Applies the area to the context.</p></li></ul>
+
+<p><a class="p_ident" id="p_S0/lfHuX6B" href="#p_S0/lfHuX6B" tabindex="-1" role="presentation"></a>In Figure 7 we use the same areas in Figure 2 and 5, but apply them to a canvas instead. Note that we have to use additional CanvasPathMethods for our graphics to display.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_4rAuQXZoR/" href="#c_4rAuQXZoR/" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+        {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">20</span>}];
+        
+    <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">6</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+    <span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+    <span class="cm-keyword">var</span> <span class="cm-def">angleScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">6</span>]).<span class="cm-property">range</span>([<span class="cm-number">0</span>, <span class="cm-number">2</span> <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>]);
+    <span class="cm-keyword">var</span> <span class="cm-def">radiiScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">90</span>,<span class="cm-number">30</span>]);
+    
+    <span class="cm-comment">//Begin adding area</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">areaContext</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo7a&quot;</span>).<span class="cm-property">node</span>().<span class="cm-property">getContext</span>(<span class="cm-string">&quot;2d&quot;</span>);
+    
+    <span class="cm-keyword">var</span> <span class="cm-def">area</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">area</span>()
+      .<span class="cm-property">x</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+      .<span class="cm-property">y0</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span> <span class="cm-operator">/</span> <span class="cm-number">3</span>))
+      .<span class="cm-property">y1</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>))
+      .<span class="cm-property">context</span>(<span class="cm-variable">areaContext</span>);
+    
+    <span class="cm-variable">areaContext</span>.<span class="cm-property">beginPath</span>();
+    <span class="cm-variable">areaContext</span>.<span class="cm-property">strokeStyle</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;black&quot;</span>;
+    <span class="cm-variable">areaContext</span>.<span class="cm-property">fillStyle</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;red&quot;</span>;
+    <span class="cm-variable">area</span>(<span class="cm-variable">data</span>);
+    <span class="cm-variable">areaContext</span>.<span class="cm-property">fill</span>();
+    <span class="cm-variable">areaContext</span>.<span class="cm-property">stroke</span>();
+    
+    <span class="cm-comment">//Begin adding area radial</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">radialContext</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo7b&quot;</span>).<span class="cm-property">node</span>().<span class="cm-property">getContext</span>(<span class="cm-string">&quot;2d&quot;</span>);
+    
+    <span class="cm-keyword">var</span> <span class="cm-def">areaRadial</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">areaRadial</span>()
+         .<span class="cm-property">angle</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">angleScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+         .<span class="cm-property">innerRadius</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">radiiScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span> <span class="cm-operator">/</span> <span class="cm-number">3</span>))
+         .<span class="cm-property">outerRadius</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">radiiScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>))
+         .<span class="cm-property">context</span>(<span class="cm-variable">radialContext</span>);
+         
+    <span class="cm-variable">radialContext</span>.<span class="cm-property">translate</span>(<span class="cm-number">100</span>,<span class="cm-number">100</span>);
+    <span class="cm-variable">radialContext</span>.<span class="cm-property">beginPath</span>();
+    <span class="cm-variable">radialContext</span>.<span class="cm-property">strokeStyle</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;black&quot;</span>;
+    <span class="cm-variable">radialContext</span>.<span class="cm-property">fillStyle</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;red&quot;</span>;
+    <span class="cm-variable">areaRadial</span>(<span class="cm-variable">data</span>);
+    <span class="cm-variable">radialContext</span>.<span class="cm-property">fill</span>();
+    <span class="cm-variable">radialContext</span>.<span class="cm-property">stroke</span>();
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">canvas</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo7a&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">200</span> <span class="cm-attribute">height</span>=<span class="cm-string">200</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">canvas</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">canvas</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo7b&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">200</span> <span class="cm-attribute">height</span>=<span class="cm-string">200</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">canvas</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 7 - Canvas versions of Figure 2 (left) and Figure 5 (right).  </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_hpH1SWb13W" href="#h_hpH1SWb13W" tabindex="-1" role="presentation"></a>d3.arealabel</h2>
+
+<p><a class="p_ident" id="p_MPyAvfVaZ6" href="#p_MPyAvfVaZ6" tabindex="-1" role="presentation"></a>Many times it is useful to the viewers of our visualizations to have labels indicating what every line or area represents. Luckily, <a href="https://github.com/curran">Curran Kelleher</a> created <a href="https://github.com/curran/d3-area-label">d3-area-label</a> to dynamically add text labels inside of an area.</p>
+
+<p><a class="p_ident" id="p_04fAtVj5vl" href="#p_04fAtVj5vl" tabindex="-1" role="presentation"></a>This module is not apart of the main D3.js files so we will have to separately add it to our page:</p><pre>
+&lt;script src="https://unpkg.com/d3-area-label@1.5.0/build/d3-area-label.js">&lt;/script>
+</pre>
+
+
+<p><a class="p_ident" id="p_HSRQCWIF0C" href="#p_HSRQCWIF0C" tabindex="-1" role="presentation"></a><code>d3.arealabel</code> is a generator with many accessors on it to determine size, conditions, and format of the labels to add. To create a label we need to either pass the generator an area, or redefine an area to use. Note that <code>d3.areaLabel</code> only works on left-to-right areas (areas that use <code>x</code>, <code>y0</code>, and <code>y1</code>).</p><pre>
+var areaLabel = d3.areaLabel().area(areaGen);
+</pre>
+
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_ArLJswGvks" href="#p_ArLJswGvks" tabindex="-1" role="presentation"></a><a href="https://github.com/curran/d3-area-label#area-label">d3.areaLabel([area])</a> - Constructs an area label generator and calls <code>areaLabel.<wbr>area(area)</code>.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_RPt+8XaPkq" href="#p_RPt+8XaPkq" tabindex="-1" role="presentation"></a><a href="https://github.com/curran/d3-area-label#area">areaLabel.area(area)</a> - Sets the <code>x</code>, <code>y0</code>, and <code>y1</code> accessors of the areaLabel to be the same as an instance of <code>d3.area</code>.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_4zZ3bSplQH" href="#p_4zZ3bSplQH" tabindex="-1" role="presentation"></a><a href="https://github.com/curran/d3-area-label#_areaLabel">areaLabel(data)</a> - Calls the area label generator with the passed in data. Note that this data should be in the form [<code>area1</code>, <code>area2</code>, ...] where each <code>area#</code> is all the data points for an area. For example when working with a single area: <code>areaLabel([areaData])</code>.</p></li></ul>
+
+<p><a class="p_ident" id="p_iy8RDYXhT4" href="#p_iy8RDYXhT4" tabindex="-1" role="presentation"></a><code>d3.areaLabel</code> works by first finding the bounding box or aspect ratio around a particular <code>text</code> element. Next, <code>d3.areaLabel</code> will use a <a href="https://en.wikipedia.org/wiki/Bisection_method#Algorithm">bisection method</a> to find the maximum size rectangle with the same aspect ratio as the text that fits within an area. Finally, <code>d3.areaLabel</code> modifies the <code>transform</code> attribute of a <code>text</code> element, so it returns a string that can be used when modifying the <code>transform</code> that properly places the label where it should be.</p><pre>
+selection
+    .append("text")
+    .text("Area")
+    .attr("transform", areaLabel([dataSet]);
+</pre>
+
+
+<p><a class="p_ident" id="p_7GV51ZGtTA" href="#p_7GV51ZGtTA" tabindex="-1" role="presentation"></a>In Figure 8 we apply a label with the text “Area” to the same area we have been using above. Try changing the text to see how <code>d3.areaLabel</code> dynamically changes the positioning and size.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_1rzeqoeFDJ" href="#c_1rzeqoeFDJ" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+        {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">20</span>}];
+    
+    <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">6</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+    <span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+    
+    <span class="cm-keyword">var</span> <span class="cm-def">area</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">area</span>()
+        .<span class="cm-property">x</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+        .<span class="cm-property">y0</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span> <span class="cm-operator">/</span> <span class="cm-number">3</span>))
+        .<span class="cm-property">y1</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>));
+    
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo8&quot;</span>)
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">area</span>(<span class="cm-variable">data</span>))
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>);
+    
+    <span class="cm-keyword">var</span> <span class="cm-def">areaLabel</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">areaLabel</span>(<span class="cm-variable">area</span>);
+    
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo8&quot;</span>)
+        .<span class="cm-property">data</span>([<span class="cm-variable">data</span>])
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;text&quot;</span>)
+        .<span class="cm-property">text</span>(<span class="cm-string">&quot;Area&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-variable">areaLabel</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo8&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">200</span> <span class="cm-attribute">height</span>=<span class="cm-string">200</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 8 - An area with the label "Area" added with d3.areaLabel.  </figcaption></figure>
+
+
+<p><a class="p_ident" id="p_zIWTYSniXW" href="#p_zIWTYSniXW" tabindex="-1" role="presentation"></a>For most cases we will already have an instance of a <code>d3.area</code> generator so we can use <code>d3.<wbr>areaLabel([area])</code>, however if for some reason we do not have an area generator, need to redefine an accessor, or get an accessor <code>d3.areaLabel</code> provides us with the following additional methods:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_atBPWDzvAD" href="#p_atBPWDzvAD" tabindex="-1" role="presentation"></a><a href="https://github.com/curran/d3-area-label#x">areaLabel.x(x)</a> - If <code>x</code> is specified, sets the areaLabel’s <code>x</code> accessor to the value/function of <code>x</code>. Otherwise returns the current <code>x</code> accessor.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_BtZ8pcEkY/" href="#p_BtZ8pcEkY/" tabindex="-1" role="presentation"></a><a href="https://github.com/curran/d3-area-label#y0">areaLabel.y0(y0)</a> - If <code>y0</code> is specified, sets the areaLabel’s <code>y0</code> accessor to the value/function of <code>y0</code>. Otherwise returns the current <code>y0</code> accessor.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_zaaFpEHqSQ" href="#p_zaaFpEHqSQ" tabindex="-1" role="presentation"></a><a href="https://github.com/curran/d3-area-label#y1">areaLabel.y1(y1)</a> - If <code>y1</code> is specified, sets the areaLabel’s <code>y1</code> accessor to the value/function of <code>y1</code>. Otherwise returns the current <code>y1</code> accessor.</p></li></ul>
+
+<h3><a class="i_ident" id="i_BBpd7Egda/" href="#i_BBpd7Egda/" tabindex="-1" role="presentation"></a>Format</h3>
+
+<p><a class="p_ident" id="p_NFm5vxNJoF" href="#p_NFm5vxNJoF" tabindex="-1" role="presentation"></a>When working with many areas (such as in the next section on <a href="./05_06_stacks.html">stacks</a>) we may have areas that are very thin. Applying a label to these thin areas is not always the best idea since we will not be able to actually read them. We can use <code>areaLabel.<wbr>minHeight</code> to exclude labels that are smaller than a specified height.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_dWoOHdlmNP" href="#p_dWoOHdlmNP" tabindex="-1" role="presentation"></a><a href="https://github.com/curran/d3-area-label#minHeight">areaLabel.minHeight(minHeight)</a> - Excludes labels that are smaller than <code>minHeight</code>. Defaults at 2.</p></li></ul>
+
+<p><a class="p_ident" id="p_JzWJkO4RK3" href="#p_JzWJkO4RK3" tabindex="-1" role="presentation"></a>An example of <code>areaLabel.<wbr>minHeight</code> can be seen in the next section, <a href="./05_06_stacks.html">stacks</a>.</p>
+
+<h3><a class="i_ident" id="i_EqOk9JiyjL" href="#i_EqOk9JiyjL" tabindex="-1" role="presentation"></a>Accuracy</h3>
+
+<p><a class="p_ident" id="p_YwoPupO/80" href="#p_YwoPupO/80" tabindex="-1" role="presentation"></a>Sometimes <code>d3.areaLabel</code> may output unoptimized or inaccurate positions/scales. In these cases <code>d3.areaLabel</code> provides us with additional accessors to adjust how the placement and positioning is found.</p>
+
+<p><a class="p_ident" id="p_TEGr5YOVDY" href="#p_TEGr5YOVDY" tabindex="-1" role="presentation"></a>When finding the maximum size rectangle, <code>d3.areaLabel</code> looks at a set number of <code>x</code> values as the leftmost side of the rectangle and goes right from this <code>x</code> position to find the largest rectangle. We can set what <code>x</code> values <code>d3.areaLabel</code> looks at if the default values produce inaccurate positions or if our visualizations take too long to load.</p>
+
+<p><a class="p_ident" id="p_OMV6UrDcju" href="#p_OMV6UrDcju" tabindex="-1" role="presentation"></a><a href="https://github.com/curran/d3-area-label#interpolate">areaLabel.interpolate(interpolate)</a> takes a boolean value and determines whether or not the area label generator will use linear interpolation to compute label positions.</p>
+
+<p><a class="p_ident" id="p_0IFvwMCK86" href="#p_0IFvwMCK86" tabindex="-1" role="presentation"></a>If set to <code>false</code>, the only <code>x</code> positions that will be used as a left-most side of a rectangle will be the <code>x</code> values in the data set. If we have a large amount of evenly spaced <code>x</code> values in our data set, setting this to <code>false</code> works well.</p>
+
+<p><a class="p_ident" id="p_ieGEAox2A5" href="#p_ieGEAox2A5" tabindex="-1" role="presentation"></a>If set to <code>true</code>, the area label generator will use a linear interpolation over the data sets <code>x</code> positions to find a set number (<code>interpolateResolution</code>) of coordinates.</p>
+
+<p><a class="p_ident" id="p_Id5z5bTPlj" href="#p_Id5z5bTPlj" tabindex="-1" role="presentation"></a>For instance if we have the <code>x</code> values <code>[1, 2, 3, 4, 5]</code> in our data set and we set <code>interpolateResolution</code> to <code>10</code> then our area generator will try to find the maximum size rectangle with the left side of the rectangle at positions: <code>[1, 1.<wbr>5, 2, 2.<wbr>5, 3, 3.<wbr>5, 4, 4.<wbr>5, 5, 5.<wbr>5]</code></p>
+
+<p><a class="p_ident" id="p_AG1DN1fX0d" href="#p_AG1DN1fX0d" tabindex="-1" role="presentation"></a>For large evenly spaced data, setting <code>areaLabel.<wbr>interpolate</code> to <code>false</code> will work well. However, setting this to <code>false</code> for smaller sets of data will not produce the best positioned labels.</p>
+
+<p><a class="p_ident" id="p_4R5rGtzxaD" href="#p_4R5rGtzxaD" tabindex="-1" role="presentation"></a>Setting <code>areaLabel.<wbr>interpolate</code> to <code>true</code> helps smaller data sets have better positioned labels. However when used on larger data sets it can be taxing on our computers, so if our visualizations are taking some time to load, setting to <code>false</code> may be a better option.</p>
+
+<p><a class="p_ident" id="p_5y6qhy/0W3" href="#p_5y6qhy/0W3" tabindex="-1" role="presentation"></a><code>areaLabel.<wbr>interpolate</code> is <code>true</code> by default.</p>
+
+<p><a class="p_ident" id="p_I7aEdvrsQS" href="#p_I7aEdvrsQS" tabindex="-1" role="presentation"></a><a href="https://github.com/curran/d3-area-label#interpolateResolution">areaLabel.interpolateResolution(interpolateResolution)</a> sets how many positions will be used as the left-most side of any rectangles checked for maximum size. It only works when <code>areaLabel.<wbr>interpolate</code> is set to <code>true</code>.</p>
+
+<p><code>areaLabel.<wbr>interpolateResolution</code> is <code>200</code> by default.</p>
+
+<p><a class="p_ident" id="p_Q1nCqx/bEI" href="#p_Q1nCqx/bEI" tabindex="-1" role="presentation"></a><code>areaLabel.<wbr>interpolate</code> and <code>areaLabel.<wbr>interpolateResolution</code> should really only be changed if we notice any oddities in the placements of our labels.</p>
+
+<h3><a class="i_ident" id="i_nEfKVZ5nWg" href="#i_nEfKVZ5nWg" tabindex="-1" role="presentation"></a>Padding</h3>
+
+<p><a class="p_ident" id="p_AzskS7CZ5m" href="#p_AzskS7CZ5m" tabindex="-1" role="presentation"></a>We can apply a padding to each of the sides of the text within its bounding box. When applying a padding, we should make sure to not use large paddings that make the label hard to read. It is also important to remember that each padding should be set to a value from 0 to 1; larger values will technically still work, but will result in text labels usually too small to read. The default value for each padding is 0.</p><pre>
+var areaLabel = d3.areaLabel([area1]).paddingLeft(5);
+</pre>
+
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_nVnWLrnYLY" href="#p_nVnWLrnYLY" tabindex="-1" role="presentation"></a><a href="https://github.com/curran/d3-area-label#paddingLeft">areaLabel.paddingLeft(paddingLeft)</a> - The padding on the left side of the text.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_M1r8KefXiF" href="#p_M1r8KefXiF" tabindex="-1" role="presentation"></a><a href="https://github.com/curran/d3-area-label#paddingRight">areaLabel.paddingRight(paddingRight)</a> - The padding on the right side of the text.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_LLvn2XwQW1" href="#p_LLvn2XwQW1" tabindex="-1" role="presentation"></a><a href="https://github.com/curran/d3-area-label#paddingTop">areaLabel.paddingTop(paddingTop)</a> - The padding on the top side of the text.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_REUeG8RmFC" href="#p_REUeG8RmFC" tabindex="-1" role="presentation"></a><a href="https://github.com/curran/d3-area-label#paddingBottom">areaLabel.paddingBottom(paddingBottom)</a> - The padding on the bottom side of the text.</p></li></ul>
+
+<p><a class="p_ident" id="p_m4cH2ps+Bf" href="#p_m4cH2ps+Bf" tabindex="-1" role="presentation"></a><code>d3.areaLabel</code> also provides us with the following shortcut accessors:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_lgbX9S6pK2" href="#p_lgbX9S6pK2" tabindex="-1" role="presentation"></a><a href="https://github.com/curran/d3-area-label#paddingX">areaLabel.paddingX(paddingX)</a> - Sets <code>paddingRight</code> and <code>paddingLeft</code> simultaneously.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_3fmw5D4VzP" href="#p_3fmw5D4VzP" tabindex="-1" role="presentation"></a><a href="https://github.com/curran/d3-area-label#paddingY">areaLabel.paddingY(paddingY)</a> - Sets <code>paddingTop</code> and <code>paddingBottom</code> simultaneously.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_oe9GxecMuC" href="#p_oe9GxecMuC" tabindex="-1" role="presentation"></a><a href="https://github.com/curran/d3-area-label#padding">areaLabel.padding(padding)</a> - Sets <code>paddingX</code> and <code>paddingY</code> simultaneously (i.e. <em>All</em> of the paddings at once).</p></li></ul>
+
+<p><a class="p_ident" id="p_BfijqIvUSi" href="#p_BfijqIvUSi" tabindex="-1" role="presentation"></a>In Figure 9 we apply a padding to every side by using <code>areaLabel.<wbr>padding</code>.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_SZpEowyEty" href="#c_SZpEowyEty" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+        {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+        {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">20</span>}];
+    
+    <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">6</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+    <span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+    
+    <span class="cm-keyword">var</span> <span class="cm-def">area</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">area</span>()
+        .<span class="cm-property">x</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+        .<span class="cm-property">y0</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span> <span class="cm-operator">/</span> <span class="cm-number">3</span>))
+        .<span class="cm-property">y1</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>));
+    
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo9&quot;</span>)
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">area</span>(<span class="cm-variable">data</span>))
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>);
+    
+    <span class="cm-keyword">var</span> <span class="cm-def">areaLabel</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">areaLabel</span>().<span class="cm-property">area</span>(<span class="cm-variable">area</span>).<span class="cm-property">padding</span>(<span class="cm-number">.5</span>);
+    
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo9&quot;</span>)
+        .<span class="cm-property">data</span>([<span class="cm-variable">data</span>])
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;text&quot;</span>)
+        .<span class="cm-property">text</span>(<span class="cm-string">&quot;Area&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-variable">areaLabel</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo9&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">200</span> <span class="cm-attribute">height</span>=<span class="cm-string">200</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 9 - An area with the label "Area" and a padding of 15px on every side.  </figcaption></figure><nav><a href="05_04_curves.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_06_stacks.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

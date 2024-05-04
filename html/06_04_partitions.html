@@ -1,0 +1,186 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Partition Layouts</title>
+  <link rel="canonical" href="http://using-d3js.com/06_04_partitions.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 06;</script></head>
+
+<article>
+<nav><a href="06_03_treemaps.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="06_05_packs.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 06</span>Partition Layouts</h1><script src="https://d3js.org/d3.v4.min.js"></script>
+<style>
+rect {
+  fill: aquamarine;
+  opacity: 1.0;
+  stroke: white;
+}
+</style>
+
+
+<p><a class="p_ident" id="p_C8PUGBorJn" href="#p_C8PUGBorJn" tabindex="-1" role="presentation"></a>The partition layout represents nodes in a hierarchy model as rectangles with rectangles for child nodes positioned adjacent to the rectangles for their parents’ and the length of a rectangle being proportional to the value of the node’s <code>value</code> property.</p>
+
+<p><a class="p_ident" id="p_0gfFf+cbTK" href="#p_0gfFf+cbTK" tabindex="-1" role="presentation"></a>Below we show a tree and a partition, both created using the same hierarchal model.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_hSsffjxXxv" href="#c_hSsffjxXxv" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;A&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;B&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;C&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;E&quot;</span>},
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;F&quot;</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;D&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;G&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;H&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;I&quot;</span>},
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;J&quot;</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;K&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;L&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;M&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                  {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;M&quot;</span>},
+                  {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;N&quot;</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;O&quot;</span>}
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">drawTree</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>() {
+  <span class="cm-keyword">let</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>)
+    .<span class="cm-property">count</span>();
+
+  <span class="cm-keyword">let</span> <span class="cm-def">treeLayout4</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">tree</span>()
+    .<span class="cm-property">size</span>([<span class="cm-number">200</span>, <span class="cm-number">200</span>]);
+
+  <span class="cm-variable-2">treeLayout4</span>(<span class="cm-variable-2">root</span>);
+
+  <span class="cm-keyword">let</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1&quot;</span>);
+
+  <span class="cm-comment">// draw links</span>
+  <span class="cm-variable-2">svg</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.links'</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">'line.link'</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable-2">root</span>.<span class="cm-property">links</span>())
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">'line'</span>)
+    .<span class="cm-property">classed</span>(<span class="cm-string">'link'</span>, <span class="cm-atom">true</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'x1'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">source</span>.<span class="cm-property">x</span>;})
+    .<span class="cm-property">attr</span>(<span class="cm-string">'y1'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">source</span>.<span class="cm-property">y</span>;})
+    .<span class="cm-property">attr</span>(<span class="cm-string">'x2'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">target</span>.<span class="cm-property">x</span>;})
+    .<span class="cm-property">attr</span>(<span class="cm-string">'y2'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">target</span>.<span class="cm-property">y</span>;})
+    .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">2</span>);
+
+  <span class="cm-comment">// draw nodes</span>
+  <span class="cm-variable-2">svg</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.nodes'</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">'circle.node'</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable-2">root</span>.<span class="cm-property">descendants</span>())
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">'circle'</span>)
+    .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'cx'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>;})
+    .<span class="cm-property">attr</span>(<span class="cm-string">'cy'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>;})
+    .<span class="cm-property">attr</span>(<span class="cm-string">'r'</span>, <span class="cm-number">6</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;lightblue&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">1</span>);
+};
+
+<span class="cm-keyword">var</span> <span class="cm-def">drawPartition</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>() {
+  <span class="cm-keyword">let</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>)
+  .<span class="cm-property">count</span>();
+
+  <span class="cm-keyword">let</span> <span class="cm-def">partition</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">partition</span>()
+    .<span class="cm-property">size</span>([<span class="cm-number">210</span>,<span class="cm-number">210</span>]);
+
+  <span class="cm-variable-2">partition</span>(<span class="cm-variable-2">root</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo2&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">'rect.node'</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable-2">root</span>.<span class="cm-property">descendants</span>())
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">'rect'</span>)
+    .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x0</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y0</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'width'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x1</span> <span class="cm-operator">-</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x0</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'height'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y1</span> <span class="cm-operator">-</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y0</span>);
+};
+
+<span class="cm-variable">drawTree</span>();
+<span class="cm-variable">drawPartition</span>();
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">250</span> <span class="cm-attribute">height</span>=<span class="cm-string">250</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;rotate(-90), translate(-220,10)&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;rects&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;links&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;nodes&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">250</span> <span class="cm-attribute">height</span>=<span class="cm-string">250</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;rotate(-90), translate(20,0)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_Z9Is8CShgl" href="#h_Z9Is8CShgl" tabindex="-1" role="presentation"></a>Creating the Layout</h2>
+
+<p><a class="p_ident" id="p_HWGz2l4Pbb" href="#p_HWGz2l4Pbb" tabindex="-1" role="presentation"></a>We generate a partion layout using <a href="https://github.com/d3/d3-hierarchy#partition">d3.partition()</a> and can specify the height and width of the layout region by chaining a call to <a href="https://github.com/d3/d3-hierarchy#partition_size">partion.size([width,height])</a>.</p>
+
+<p><a class="p_ident" id="p_k/33IbHjSL" href="#p_k/33IbHjSL" tabindex="-1" role="presentation"></a>The <a href="https://github.com/d3/d3-hierarchy#partition_round">partition.round([boolean])</a> method takes a boolean as an argument and sets whether or not the layout will round to exact pixel boundaries.</p>
+
+<p><a class="p_ident" id="p_qHNjFi4Qyo" href="#p_qHNjFi4Qyo" tabindex="-1" role="presentation"></a>Below we illustrate the <a href="https://github.com/d3/d3-hierarchy#partition_padding">partition.padding([padding])</a> method which puts space between adjacent children and between children and their parent.  Note that we also sort the nodes in the hierarchal model before we  call the partition layout function.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_7xRGz8pEy2" href="#c_7xRGz8pEy2" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;A&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;B&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;C&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;E&quot;</span>},
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;F&quot;</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;D&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;G&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;H&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;I&quot;</span>},
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;J&quot;</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;K&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;L&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;M&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                  {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;M&quot;</span>},
+                  {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;N&quot;</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;O&quot;</span>}
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>)
+  .<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span>.<span class="cm-property">height</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>.<span class="cm-property">height</span> <span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-variable-2">a</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>.<span class="cm-property">localeCompare</span>(<span class="cm-variable-2">b</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>))
+  .<span class="cm-property">count</span>();
+
+<span class="cm-keyword">var</span> <span class="cm-def">partition</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">partition</span>()
+  .<span class="cm-property">size</span>([<span class="cm-number">210</span>,<span class="cm-number">210</span>])
+  .<span class="cm-property">padding</span>(<span class="cm-number">10</span>);
+
+<span class="cm-variable">partition</span>(<span class="cm-variable">root</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo3&quot;</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'rect.node'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'rect'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x0</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y0</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'width'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x1</span> <span class="cm-operator">-</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x0</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'height'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y1</span> <span class="cm-operator">-</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y0</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo3&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">250</span> <span class="cm-attribute">height</span>=<span class="cm-string">250</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;rotate(-90), translate(20,0)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_toqdvZzLkW" href="#p_toqdvZzLkW" tabindex="-1" role="presentation"></a>The partition layout, when called, adds <code>x0</code>, <code>y0</code>, <code>x1</code>, and <code>y1</code> properties, representing rectangles, in each node of the hierarchal model that is passed as an argument to the layout function.  The values of these properties are dependent on the values in the nodes’ <code>value</code> properties.  As mentioned in the hierarchy section, the <code>node.sum</code> and <code>node.count</code> methods can be called on the root node to set the <code>value</code> properties of each node in the hierarchy.</p><nav><a href="06_03_treemaps.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="06_05_packs.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

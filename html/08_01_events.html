@@ -1,0 +1,307 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Events</title>
+  <link rel="canonical" href="http://using-d3js.com/08_01_events.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 08;</script></head>
+
+<article>
+<nav><a href="07_02_chords.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="08_02_dispatches.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 08</span>Events</h1><!--<style>
+  .tooltip {
+    position: absolute;
+    text-align: center;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+  }
+  .box {
+    width: 580px;
+    height: 100px;
+    background: lightblue;
+  }
+</style>-->
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script>
+    //Put global scripts here
+</script>
+
+
+<p><a class="p_ident" id="p_uyhV7YSBop" href="#p_uyhV7YSBop" tabindex="-1" role="presentation"></a>In this section we discuss adding and handling events using D3.js.</p>
+
+<p><a class="p_ident" id="p_O8FcxSs+FI" href="#p_O8FcxSs+FI" tabindex="-1" role="presentation"></a>When displaying our visualizations in a webpage, it may help our readers if our visualizations are interactive. Buttons that alter the graphic and tooltips that display additional information are good ways to help convey the information in our visualizations.</p>
+
+<p><a class="p_ident" id="p_6AJjvwN2fT" href="#p_6AJjvwN2fT" tabindex="-1" role="presentation"></a>To add in these interactive features to our visualizations we will need to use <a href="https://developer.mozilla.org/en-US/docs/Web/API/Event"><code>events</code></a>. When adding an event to any element or node we need to set two things: the event type and the listener function.</p>
+
+<p><a class="p_ident" id="p_aD11OZOYpL" href="#p_aD11OZOYpL" tabindex="-1" role="presentation"></a>The event type is what scenario the element is checking for, such as when the mouse comes onto or goes off of the element (<code>onmouseenter</code> and <code>onmouseout</code> respectively). The listener is the function that is called whenever the event is triggered. For example, our listener function could change the color of an element whenever the mouse goes over the element.</p>
+
+<p><a class="p_ident" id="p_G1gVln0mjP" href="#p_G1gVln0mjP" tabindex="-1" role="presentation"></a>A complete list of <a href="https://developer.mozilla.org/en-US/docs/Web/Events">event types</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/API/Event">properties, and methods</a>.</p>
+
+<h2><a class="h_ident" id="h_kPvRF/xrHQ" href="#h_kPvRF/xrHQ" tabindex="-1" role="presentation"></a>Adding an event using HTML</h2>
+
+<p><a class="p_ident" id="p_CqVftb+jjx" href="#p_CqVftb+jjx" tabindex="-1" role="presentation"></a>One way to add events to our elements is to set the event in our <code>html</code> file. To do this we name the event type and set its listener function in the <code>.html</code> file that our page loads.</p>
+
+<p><a class="p_ident" id="p_EWaZEc+eJx" href="#p_EWaZEc+eJx" tabindex="-1" role="presentation"></a>For example to set a <code>&lt;circle&gt;</code> event listener:</p><pre>
+&lt;circle id="id" onmouseenter="foo(this, event)">&lt;/circle>
+</pre>   
+
+
+<p><a class="p_ident" id="p_o/GkoW2haF" href="#p_o/GkoW2haF" tabindex="-1" role="presentation"></a>In the above example we set the <code>onmouseenter</code> event to call <code>foo</code> when it is triggered. We also pass <code>this</code> and <code>event</code> into <code>foo</code>. <code>this</code> is a reference to the node that called the event, in this case the <code>&lt;circle&gt;</code> node. <code>event</code> is a reference to the event itself that was called; it contains various properties and methods of the event.</p>
+
+<p><a class="p_ident" id="p_6eH+jZlHBb" href="#p_6eH+jZlHBb" tabindex="-1" role="presentation"></a>In Figure 1, we set <code>onmouseenter</code> and <code>onmouseout</code> and set their respective listener functions. The circle will change colors when the mouse comes over it, and again when the mouse leaves it.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_Jih/fJALSr" href="#c_Jih/fJALSr" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">function</span> <span class="cm-def">mouseEnter</span>(<span class="cm-def">node</span>){
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-variable-2">node</span>)
+    	.<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;green&quot;</span>);
+}
+<span class="cm-keyword">function</span> <span class="cm-def">mouseOut</span>(<span class="cm-def">node</span>){
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-variable-2">node</span>)
+    	.<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoEvent&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">200</span> <span class="cm-attribute">height</span>=<span class="cm-string">200</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;circleColorChangeH&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">100</span> <span class="cm-attribute">cy</span>=<span class="cm-string">100</span> <span class="cm-attribute">r</span>=<span class="cm-string">50</span> <span class="cm-attribute">onmouseenter</span>=<span class="cm-string">&quot;mouseEnter(this)&quot;</span> <span class="cm-attribute">onmouseout</span>=<span class="cm-string">&quot;mouseOut(this)&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">circle</span><span class="cm-tag cm-bracket">&gt;</span> 
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 1 - A circle with an onmouseenter and onmouseout function. All the events were added in the HTML. </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_E6LHea72ec" href="#h_E6LHea72ec" tabindex="-1" role="presentation"></a>Adding an event using javascript</h2>
+
+<p><a class="p_ident" id="p_SnbrsD4uA+" href="#p_SnbrsD4uA+" tabindex="-1" role="presentation"></a>Adding our events into the HTML code works when we already have the elements in the <code>.html</code> file, but if we are dynamically adding elements and events to our page this method will not work. Instead, the typical way to add event listeners with JavaScript is to use <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener"><code>node.<wbr>addEventListener</code></a>. To use <code>node.<wbr>addEventListener(type, listener)</code> we pass in the <code>type</code> (such as <code>mouseenter</code> or <code>mousemove</code>) and the <code>listener</code> (the function called when the event is triggered).</p><pre>
+document.getElementById(id)
+    .addEventListener("mouseenter", function(event){
+        //do stuff
+    });
+</pre>
+
+
+<p><a class="p_ident" id="p_Sy2IbV//YG" href="#p_Sy2IbV//YG" tabindex="-1" role="presentation"></a>It is important to note that in the last example we added <code>onmouseenter</code> in our <code>.html</code> but when we are adding event in JavaScript we drop the <code>on-</code> and use <code>mouseenter</code>. This pattern holds true in all event types that start with <code>on-</code>.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_geLXdzRb9i" href="#c_geLXdzRb9i" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">selection</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoJSEvent&quot;</span>);
+    <span class="cm-variable">document</span>.<span class="cm-property">getElementById</span>(<span class="cm-string">&quot;circleColorChangeJ&quot;</span>)
+        .<span class="cm-property">addEventListener</span>(<span class="cm-string">&quot;mouseenter&quot;</span>, <span class="cm-keyword">function</span>(<span class="cm-def">event</span>){
+            <span class="cm-variable">selection</span>
+                .<span class="cm-property">select</span>(<span class="cm-string">&quot;#circleColorChangeJ&quot;</span>)
+                .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+        });
+    <span class="cm-variable">document</span>.<span class="cm-property">getElementById</span>(<span class="cm-string">&quot;circleColorChangeJ&quot;</span>)
+        .<span class="cm-property">addEventListener</span>(<span class="cm-string">&quot;mouseout&quot;</span>, <span class="cm-keyword">function</span>(<span class="cm-def">event</span>){
+            <span class="cm-variable">selection</span>
+                .<span class="cm-property">select</span>(<span class="cm-string">&quot;#circleColorChangeJ&quot;</span>)
+                .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;green&quot;</span>);
+        });
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoJSEvent&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">200</span> <span class="cm-attribute">height</span>=<span class="cm-string">200</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;circleColorChangeJ&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">100</span> <span class="cm-attribute">cy</span>=<span class="cm-string">100</span> <span class="cm-attribute">r</span>=<span class="cm-string">50</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">circle</span><span class="cm-tag cm-bracket">&gt;</span> 
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 2 - A circle with an onmouseenter and onmouseout function (right). All the events were added via javascript. </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_dxY0NzC7G7" href="#h_dxY0NzC7G7" tabindex="-1" role="presentation"></a>Adding an event using D3.js</h2>
+
+<p><a class="p_ident" id="p_QWrxfMPoS0" href="#p_QWrxfMPoS0" tabindex="-1" role="presentation"></a>Now we know how to add events to elements in JavaScript; however, the <code>addEventListener</code> method only works on a single element at a time. We could make a <code>for</code> loop to iterate over multiple elements, but this would be cumbersome, especially when working with selections from D3.js.</p>
+
+<p><a class="p_ident" id="p_IhvEETXj/a" href="#p_IhvEETXj/a" tabindex="-1" role="presentation"></a>Luckily D3.js allows us to add an event to every node in a selection at once with <code>selection.<wbr>on(typenames[,listener[,options]])</code>. We use <code>selection.on</code> in a similar way as <code>addEventListener</code>.</p>
+
+<p><a class="p_ident" id="p_8+CjM3nrQT" href="#p_8+CjM3nrQT" tabindex="-1" role="presentation"></a>First we pass in the the type of event we want to add; however, now we can add multiple events at the same time by separating the event types with a space such as <code>&quot;mouseenter mouseout&quot;</code>. Next we pass in the <code>listener</code> function for the event(s). This <code>listener</code> will replace any current <code>listener</code> applied to that event on that node. If we want to get rid of a <code>listener</code>, we can choose to not pass one in. Finally, we can choose to add optional parameters to our event listener as outlined in this <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener">event.addEventListener documentation</a>.</p>
+
+<p><a class="p_ident" id="p_mvdwUOrjA1" href="#p_mvdwUOrjA1" tabindex="-1" role="presentation"></a>When creating the <code>listener</code> we can use either <code>this</code> or <code>nodes[i]</code> to refer to the node that triggered the event.</p>
+
+<p><a class="p_ident" id="p_dtmdzBrorU" href="#p_dtmdzBrorU" tabindex="-1" role="presentation"></a>For example to have an element change to a random color everytime the mouse comes onto and leaves the element we could use:</p><pre>
+d3.select(id)
+    .on("mouseenter mouseout", function(){
+        d3.select(this)
+            .attr("fill", randomColor);
+    });
+</pre>
+
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_Y3adKu6IqT" href="#p_Y3adKu6IqT" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection#selection_on"><em>selection</em>.on(typenames[,listener[, options]])</a> - Sets (or removes) a <code>listener</code> on the <code>typenames</code> event(s).</p></li></ul>
+
+<p><a class="p_ident" id="p_WmVVLjlVO6" href="#p_WmVVLjlVO6" tabindex="-1" role="presentation"></a>In Figure 3 we use <code>selection.on</code> to add our event listeners to a circle. The circle turns green when the mouse goes over it, and red when the mouse leaves.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_SVzPDQjZ0V" href="#c_SVzPDQjZ0V" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoSelectOn&quot;</span>)
+    .<span class="cm-property">select</span>(<span class="cm-string">&quot;#circleColorChangeD&quot;</span>)
+	.<span class="cm-property">on</span>(<span class="cm-string">&quot;mouseenter&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>,<span class="cm-def">n</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">n</span>[<span class="cm-variable-2">i</span>].<span class="cm-property">setAttribute</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;green&quot;</span>))
+    .<span class="cm-property">on</span>(<span class="cm-string">&quot;mouseout&quot;</span>,   (<span class="cm-def">d</span>,<span class="cm-def">i</span>,<span class="cm-def">n</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">n</span>[<span class="cm-variable-2">i</span>].<span class="cm-property">setAttribute</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>));
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoSelectOn&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">200px</span> <span class="cm-attribute">height</span>=<span class="cm-string">200px</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;circleColorChangeD&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">100</span> <span class="cm-attribute">cy</span>=<span class="cm-string">100</span> <span class="cm-attribute">r</span>=<span class="cm-string">50</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">circle</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 3 - A circle with an onmouseenter and onmouseout function. All the events were added using selection.on from D3.js. </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_42s6Es9avm" href="#h_42s6Es9avm" tabindex="-1" role="presentation"></a>d3.event</h2>
+
+<p><a class="p_ident" id="p_1XbWaa8OiV" href="#p_1XbWaa8OiV" tabindex="-1" role="presentation"></a>Using <code>selection.on</code> has additional advantages when it comes to handling events. Any event that is registered by <code>selection.on</code> will be accessible inside the event handler with the static field <code>d3.event</code>. <code>d3.event</code> always points to the <em>current</em> event being invoked, so it is useful inside event functions to access various fields or methods on the event (such as <code>event.timeStamp</code> or <code>event.<wbr>preventDefault()</code>).</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_3gA9BcJ8pU" href="#p_3gA9BcJ8pU" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection#event">d3.event</a> - Returns the current event being invoked. This contains various fields such as event.pathX/Y and event.timeStamp and methods like event.preventDefault(). Only works when the event handler that is triggered was registered by <code>selection.on</code></p></li></ul>
+
+<p><a class="p_ident" id="p_4WNU07GG2V" href="#p_4WNU07GG2V" tabindex="-1" role="presentation"></a>In Figure 4 we show an example using <code>d3.<wbr>event.<wbr>timeStamp</code>.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_jFNXvqrmAD" href="#c_jFNXvqrmAD" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#circleTime&quot;</span>)
+    .<span class="cm-property">on</span>(<span class="cm-string">&quot;click&quot;</span>, <span class="cm-keyword">function</span>(){
+        <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#textTime&quot;</span>)
+            .<span class="cm-property">text</span>(<span class="cm-variable">Math</span>.<span class="cm-property">round</span>(<span class="cm-variable">d3</span>.<span class="cm-property">event</span>.<span class="cm-property">timeStamp</span>) <span class="cm-operator">+</span> <span class="cm-string">&quot;ms&quot;</span>);
+    });
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoTime&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">200</span> <span class="cm-attribute">height</span>=<span class="cm-string">200</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;circleTime&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;100&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;100&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;50&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">circle</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">text</span> <span class="cm-attribute">id</span>= <span class="cm-string">&quot;textTime&quot;</span> <span class="cm-attribute">x</span>=<span class="cm-string">&quot;100&quot;</span> <span class="cm-attribute">y</span>=<span class="cm-string">&quot;190&quot;</span> <span class="cm-attribute">text-anchor</span>=<span class="cm-string">&quot;middle&quot;</span> <span class="cm-attribute">font-size</span>=<span class="cm-string">&quot;16px&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">text</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 4 - A circle with an onclick function that shows when the circle was clicked (in milliseconds from the load of the page).  </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_A6SET3e2zZ" href="#h_A6SET3e2zZ" tabindex="-1" role="presentation"></a>d3.mouse</h2>
+
+<p><a class="p_ident" id="p_zenJEND7GP" href="#p_zenJEND7GP" tabindex="-1" role="presentation"></a>One situation we may run into is needing to know where an event is triggered. <code>d3.event</code> contains the fields <code>event.pathX</code> and <code>event.pathY</code> which tell us the position of the mouse when the event was triggered, but this position is in relation to the <em>entire HTML document</em>. So while it may help us in some situations, it won’t help us figure out where the mouse is within our visualizations. To aid in this scenario D3.js provides us with <code>d3.<wbr>mouse(container)</code>.</p>
+
+<p><a class="p_ident" id="p_niBr4SylwC" href="#p_niBr4SylwC" tabindex="-1" role="presentation"></a>When we call <code>d3.<wbr>mouse(container)</code> we pass in the node that we want to have our event position related to. <code>d3.mouse</code> will return back an array of the <code>x</code> and <code>y</code> positions of where the current event was triggered. In many cases, we will pass in the <code>svg</code> node that our visualizations lie in.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_uOc7UOvcTb" href="#p_uOc7UOvcTb" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection#mouse">d3.mouse(container)</a> - Returns the location of the current event relative to the specified <code>container</code>. A <em>container</em> is an HTML node. Uses the same event that is in <code>d3.event</code>, so the event must have been registered by <code>selection.on</code>.</p></li></ul>
+
+<p><a class="p_ident" id="p_Fel9oTTVNs" href="#p_Fel9oTTVNs" tabindex="-1" role="presentation"></a>In Figure 5 we use <code>d3.mouse</code> and pass in the svg node. We use the position it returns to update a text element to show the position.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_Yrayj6S79j" href="#c_Yrayj6S79j" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoMouseMove&quot;</span>)
+	.<span class="cm-property">on</span>(<span class="cm-string">&quot;mousemove&quot;</span>, <span class="cm-keyword">function</span>() {
+	    <span class="cm-keyword">let</span> <span class="cm-def">pos</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">mouse</span>(<span class="cm-keyword">this</span>);
+        <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-keyword">this</span>)
+            .<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">1.5</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-variable-2">pos</span>[<span class="cm-number">0</span>])
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-variable-2">pos</span>[<span class="cm-number">1</span>]);
+	});
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoMouseMove&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">200px</span> <span class="cm-attribute">height</span>=<span class="cm-string">200px</span><span class="cm-tag cm-bracket">&gt;</span>
+     <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">path</span> <span class="cm-attribute">d</span>=<span class="cm-string">&quot;M0,0 L200,0 L200,200 L0,200 Z&quot;</span> <span class="cm-attribute">stroke</span>=<span class="cm-string">&quot;black&quot;</span> <span class="cm-attribute">stroke-width</span>=<span class="cm-string">&quot;5px&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;none&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">path</span><span class="cm-tag cm-bracket">&gt;</span>&gt;
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 5 - An SVG with an onmousemove event that adds a circle whenever the mouse is moved. The event was added by selection.on from D3.js. </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_1ADApA2jqm" href="#h_1ADApA2jqm" tabindex="-1" role="presentation"></a>d3.clientPoint</h2>
+
+<p><a class="p_ident" id="p_j0JdnhBR55" href="#p_j0JdnhBR55" tabindex="-1" role="presentation"></a>There are some situations where we cannot use <code>selection.on</code> to add an event. However, we may still need to know the position of the mouse. Since we cannot use <code>d3.mouse</code> or <code>d3.event</code>, D3.js provides us with an alternate method to find the position of an event, <code>d3.<wbr>clientPoint(container, event)</code>. Just like with <code>d3.mouse</code> we pass in the <code>container</code> (a node), but now we also have to pass in the event to find its location.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_6mK0YuiDo5" href="#p_6mK0YuiDo5" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection#clientPoint">d3.clientPoint(container, event)</a> - Returns the location of the event passed in relative to the specified <code>container</code>. This method accepts any event, not just <code>d3.event</code>, so it is useful for event handlers registered outside of <code>selection.on</code>.</p></li></ul>
+
+<p><a class="p_ident" id="p_uJVHNxV4BN" href="#p_uJVHNxV4BN" tabindex="-1" role="presentation"></a>In Figure 6 we use <code>d3.clientPoint</code> to find the position of the mouse event. The event was created in the HTML and it passes the event to the <code>findPosition</code> function that finds the location.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_4/+9I+0i8L" href="#c_4/+9I+0i8L" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">clientNode</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoClient&quot;</span>).<span class="cm-property">node</span>();
+
+<span class="cm-keyword">function</span> <span class="cm-def">createDot</span>(<span class="cm-def">event</span>){
+    <span class="cm-keyword">let</span> <span class="cm-def">pos</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">clientPoint</span>(<span class="cm-variable">clientNode</span>, <span class="cm-variable-2">event</span>);
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-variable">clientNode</span>)
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">1.5</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-variable-2">pos</span>[<span class="cm-number">0</span>])
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-variable-2">pos</span>[<span class="cm-number">1</span>]);
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoClient&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">200px</span> <span class="cm-attribute">height</span>=<span class="cm-string">200px</span> <span class="cm-attribute">onmousemove</span>=<span class="cm-string">&quot;createDot(event)&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">path</span> <span class="cm-attribute">d</span>=<span class="cm-string">&quot;M0,0 L200,0 L200,200 L0,200 Z&quot;</span> <span class="cm-attribute">stroke</span>=<span class="cm-string">&quot;black&quot;</span> <span class="cm-attribute">stroke-width</span>=<span class="cm-string">&quot;5px&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;none&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">path</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 6 - An SVG with an onmousemove event that adds a circle whenever the mouse is moved. The event was added in the HTML. </figcaption></figure>
+<!--
+## Tooltips
+
+A *tooltip* is a box (usually containing some descriptive text) that appears when the user hovers over an element on the page and disappears when the user moves the mouse off the element.
+
+To create a tool tip we need a `div`.  The `div` will be that box that holds the text.  Below, we create a `div`, give it the class name *tooltip*, and make it transparent.
+
+<pre>
+var tooltip = d3.select("body")
+  .append("div")
+  .attr("class", "tooltip")
+  .style("opacity", 0);
+</pre>
+
+The `tooltip` class sets a number of style properties including, and perhaps most importantly, the `position` property.  The `position` property is set to `absolute` allowing us to change the box's position dynamically in JavaScript using the `left` and `top` properties.
+
+<pre>
+&lt;style&gt;
+  .tooltip {
+    position: absolute;
+    text-align: center;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+  }
+  .box {
+    width: 580px;
+    height: 100px;
+    background: lightblue;
+  }
+&lt;/style&gt;
+</pre>
+
+We then register handers for the `mouseover` and `mouseout` events.  When the user hovers over the blue box below we transition the tooltip to visible using the `opacity` property, set its text with the `html` method, and move it to a location near the mouse click using the `left` and `top` properties.  When the user moves off the code segments, we make the tooltip transparent again.
+
+``` {cm: visible}
+<script>
+var tooltip = d3.select("body")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+d3.selectAll(".box")
+  .on("mouseover", function(d) {
+     tooltip.transition()
+        .duration(200)
+        .style("opacity", .9);
+     tooltip.html("Happy Birthday!")
+        .style("left", (d3.event.pageX) + "px")
+        .style("top", (d3.event.pageY - 10) + "px");
+  })
+  .on("mouseout", function(d) {
+     tooltip.transition()
+        .duration(500)
+        .style("opacity", 0);
+  });
+</script>
+
+<div class="box"></div>
+```
+--><nav><a href="07_02_chords.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="08_02_dispatches.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

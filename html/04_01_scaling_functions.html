@@ -1,0 +1,94 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Scaling Functions</title>
+  <link rel="canonical" href="http://using-d3js.com/04_01_scaling_functions.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 04;</script></head>
+
+<article>
+<nav><a href="03_01_d3_fetch.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_02_continuous_scales.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 04</span>Scaling Functions</h1><script src="https://d3js.org/d3.v4.min.js"></script>
+
+
+<p><a class="p_ident" id="p_LmMv/GqsUd" href="#p_LmMv/GqsUd" tabindex="-1" role="presentation"></a>Scaling functions are used to convert values from one set (the domain) to values in another (the range).  We’ll find them particularly helpful when we want to convert a data element that has been joined to a visual element to a value that can be used to change the appearance of the visual element.  For example, we can scale a population value within the interval [0, 20000] to a value within [1, 5] that can be used to define the radius of a circle.</p>
+
+<p><a class="p_ident" id="p_WGBagoTe3t" href="#p_WGBagoTe3t" tabindex="-1" role="presentation"></a>D3 provides various scaling functions which can classified into 4 types: Continuous, Sequential, Quantized and Ordinal.</p>
+
+<p><a class="p_ident" id="p_2mnzCT8tmy" href="#p_2mnzCT8tmy" tabindex="-1" role="presentation"></a><em>Continuous scaling functions</em> map a <strong>continuous numeric domain</strong> defined by an interval to a <strong>continuous range</strong> defined by another interval. Continuous scaling functions are created using the following methods:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_ZM2Lo7RH6o" href="#p_ZM2Lo7RH6o" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#linear-scales">d3.scaleLinear()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_Twl9tLe2In" href="#p_Twl9tLe2In" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#power-scales">d3.scalePow()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_tNQykiJhpL" href="#p_tNQykiJhpL" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#scaleSqrt">d3.scaleSqrt()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_vkpbOrmppy" href="#p_vkpbOrmppy" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#log-scales">d3.scaleLog()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_o3nw5b3F6h" href="#p_o3nw5b3F6h" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#scaleTime">d3.scaleTime()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_XQ/hKn/nRB" href="#p_XQ/hKn/nRB" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#scaleUtc">d3.scaleUtc()</a></p></li></ul>
+
+<p><a class="p_ident" id="p_mqPs9DFk/k" href="#p_mqPs9DFk/k" tabindex="-1" role="presentation"></a><em>Sequential scaling functions</em> map a <strong>continuous numeric domain</strong> defined by an interval to a <strong>continuous range</strong> <em>defined by an interpolator function</em> which takes as an argument a value within the domain.  Sequential scales are created using:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_rkxCFJdTW5" href="#p_rkxCFJdTW5" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#sequential-scales">d3.scaleSequential(interpolator)</a></p></li></ul>
+
+<p><a class="p_ident" id="p_cHOPsxQn+y" href="#p_cHOPsxQn+y" tabindex="-1" role="presentation"></a><em>Quantize scaling functions</em> map a <strong>continuous numeric domain</strong> defined by an interval to a <strong>discrete range</strong> defined by an array of elements.  The domain is partitioned into k partitions where k is the number of elements in the range.  Each partition is associated with a unique element in the range and all elements with a partitioned are mapped to the element associated with the partition.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_ZELHpVhPLm" href="#p_ZELHpVhPLm" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#quantize-scales">d3.scaleQuantize()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_6sYwtm1ctU" href="#p_6sYwtm1ctU" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#quantile-scales">d3.scaleQuantile()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_sui3Q6mCgk" href="#p_sui3Q6mCgk" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#threshold-scales">d3.scaleThreshold()</a></p></li></ul>
+
+<p><a class="p_ident" id="p_pMTOvKaahp" href="#p_pMTOvKaahp" tabindex="-1" role="presentation"></a><em>Ordinal scaling functions</em> map elements within a <strong>discrete domain</strong> to a <strong>discrete set of elements</strong> within a <strong>continuous range</strong>.  Ordinal scales are created using the following methods:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_QbG3Jmq37X" href="#p_QbG3Jmq37X" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#ordinal-scales">d3.scaleOrdinal()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_SAJq3zNKN3" href="#p_SAJq3zNKN3" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#band-scales">d3.scaleBand()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_4kgO4bT04I" href="#p_4kgO4bT04I" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#point-scales">d3.scalePoint()</a></p></li></ul><nav><a href="03_01_d3_fetch.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_02_continuous_scales.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

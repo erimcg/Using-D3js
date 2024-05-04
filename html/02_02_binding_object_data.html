@@ -1,0 +1,74 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Binding Object Data</title>
+  <link rel="canonical" href="http://using-d3js.com/02_02_binding_object_data.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 02;</script></head>
+
+<article>
+<nav><a href="02_01_binding_data.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="02_03_modifying_data.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 02</span>Binding Object Data</h1><style>
+  button{
+    display: inline;
+    vertical-align: middle;
+  }
+  svg {
+    display: inline-block;
+    vertical-align: middle;
+  }
+</style>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+
+<p><a class="p_ident" id="p_4mmqT/HVRZ" href="#p_4mmqT/HVRZ" tabindex="-1" role="presentation"></a>We are not limited to binding primitive type values to the elements in a visualization.  We can also bind objects (and arrays).  Take for example, the following array containing estimates for the homeless population in five U.S. states in January of 2018 provided by the <a href="https://www.usich.gov/tools-for-action/map/#fn%5B%5D=1400&amp;fn%5B%5D=2900&amp;fn%5B%5D=6000&amp;fn%5B%5D=9900&amp;fn%5B%5D=13500">United States Interagency Council on Homelessness</a>.</p>
+
+<p><a class="p_ident" id="p_Kh0Gn6iyXY" href="#p_Kh0Gn6iyXY" tabindex="-1" role="presentation"></a>The data consists of an array of objects where each object has a <code>state</code> and a <code>population</code> property.</p><pre>
+var homeless = [
+    {state: "California", population: 129972 },
+    {state: "New York", population: 91897 },
+    {state: "Florida", population: 31030 },
+    {state: "Texas", population: 25310 },
+    {state: "Washington", population: 22304 }];
+</pre>
+
+
+<p><a class="p_ident" id="p_epsxQLpmMl" href="#p_epsxQLpmMl" tabindex="-1" role="presentation"></a>We can bind this data to an empty selection and create <code>text</code> and <code>rect</code> elements for each object using <code>join</code>.  Once the visual elements are added we can use the <code>state</code> and <code>population</code> properties of the bound data to set the text labels and to determine the lengths of the rectangles, respectively.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_2QmtTjuFY9" href="#c_2QmtTjuFY9" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">homeless</span> <span class="cm-operator">=</span> [
+    {<span class="cm-property">state</span>: <span class="cm-string">&quot;California&quot;</span>, <span class="cm-property">population</span>: <span class="cm-number">129972</span> },
+    {<span class="cm-property">state</span>: <span class="cm-string">&quot;New York&quot;</span>, <span class="cm-property">population</span>: <span class="cm-number">91897</span> },
+    {<span class="cm-property">state</span>: <span class="cm-string">&quot;Florida&quot;</span>, <span class="cm-property">population</span>: <span class="cm-number">31030</span> },
+    {<span class="cm-property">state</span>: <span class="cm-string">&quot;Texas&quot;</span>, <span class="cm-property">population</span>: <span class="cm-number">25310</span> },
+    {<span class="cm-property">state</span>: <span class="cm-string">&quot;Washington&quot;</span>, <span class="cm-property">population</span>: <span class="cm-number">22304</span> }];
+    
+  <span class="cm-keyword">var</span> <span class="cm-def">bar</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#bargraph1&quot;</span>)
+    .<span class="cm-property">selectAll</span>()
+    .<span class="cm-property">data</span>(<span class="cm-variable">homeless</span>);
+    
+  <span class="cm-variable">bar</span>.<span class="cm-property">join</span>(<span class="cm-string">&quot;text&quot;</span>)
+    .<span class="cm-property">text</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">state</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, <span class="cm-number">96</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'text-anchor'</span>, <span class="cm-string">'end'</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">20</span> <span class="cm-operator">+</span> <span class="cm-number">17</span>);
+    
+  <span class="cm-variable">bar</span>.<span class="cm-property">join</span>(<span class="cm-string">&quot;rect&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;height&quot;</span>, <span class="cm-number">19</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;width&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">population</span><span class="cm-operator">/</span><span class="cm-number">500</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-number">100</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">20</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;bargraph1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;400&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><nav><a href="02_01_binding_data.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="02_03_modifying_data.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

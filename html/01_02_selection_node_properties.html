@@ -1,0 +1,80 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Selection and Node Properties</title>
+  <link rel="canonical" href="http://using-d3js.com/01_02_selection_node_properties.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 01;</script></head>
+
+<article>
+<nav><a href="01_01_creating_selections.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="01_03_modifying_elements.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 01</span>Selection and Node Properties</h1><script src="https://d3js.org/d3.v7.min.js"></script>
+
+
+<p><a class="p_ident" id="p_vRGiKk8jpB" href="#p_vRGiKk8jpB" tabindex="-1" role="presentation"></a>Given a selection, we can retrieve the number of elements in the selection and the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Node">nodes</a> in the selection, and given a node we can retrieve the window owning the node and and style property of the node.  Below we discuss the methods in D3.js that allow us to do these things.</p>
+
+<h2><a class="h_ident" id="h_HstHC8kab8" href="#h_HstHC8kab8" tabindex="-1" role="presentation"></a>Selection.empty and Selection.size</h2>
+
+<p><a class="p_ident" id="p_KH5JWTFY2O" href="#p_KH5JWTFY2O" tabindex="-1" role="presentation"></a>The <code>d3.selection</code> type has two methods that allow us determine if a selection is empty and determine how many elements are in the selection.  Note that unlike other selection methods, these to methods do not return selection objects.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_Zx/tEItS+e" href="#p_Zx/tEItS+e" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_empty">selection.empty()</a> - returns true if the selection is empty</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_3F5r27sLf5" href="#p_3F5r27sLf5" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_size">selection.size()</a> - returns the number of elements in the selection</p></li></ul>
+
+<h2><a class="h_ident" id="h_QA8LlcFalq" href="#h_QA8LlcFalq" tabindex="-1" role="presentation"></a>Selection.node and Selection.nodes</h2>
+
+<p><a class="p_ident" id="p_qUKZLiGEJ3" href="#p_qUKZLiGEJ3" tabindex="-1" role="presentation"></a>The <code>d3.selection</code> type has a pair of methods that allows us to get the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Node">Node</a> objects from a selection.  They are:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_7gM6tZLd5R" href="#p_7gM6tZLd5R" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_node">selection.node()</a> - returns the first non-null element in the selection</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_mu9izRthlS" href="#p_mu9izRthlS" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_nodes">selection.nodes()</a> - returns an array containing all of the non-null elements in the selection</p></li></ul>
+
+<h2><a class="h_ident" id="h_N9snwaEZj6" href="#h_N9snwaEZj6" tabindex="-1" role="presentation"></a>d3.window</h2>
+
+<p><a class="p_ident" id="p_FzxUh2iy0M" href="#p_FzxUh2iy0M" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#window">d3.window(node)</a> returns the window that own’s the node, if it exists.</p>
+
+<p><a class="p_ident" id="p_KIMJ8i7R1y" href="#p_KIMJ8i7R1y" tabindex="-1" role="presentation"></a>Specifically if <code>node</code> is a window, <code>d3.window</code> returns the window node; if <code>node</code> is a document, <code>d3.window</code> returns the document’s default view (i.e. its window); and if <code>node</code> has a ownerDocument property (i.e. the node descends a document node) the function returns the document’s default view.  Otherwise, undefined is returned.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_0MX7xw0yv6" href="#c_0MX7xw0yv6" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">div1</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#div1&quot;</span>).<span class="cm-property">node</span>();
+  
+  <span class="cm-keyword">var</span> <span class="cm-def">win1</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">window</span>(<span class="cm-variable">div1</span>.<span class="cm-property">ownerDocument</span>.<span class="cm-property">defaultView</span>);
+  <span class="cm-keyword">var</span> <span class="cm-def">win2</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">window</span>(<span class="cm-variable">div1</span>.<span class="cm-property">ownerDocument</span>);
+  <span class="cm-keyword">var</span> <span class="cm-def">win3</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">window</span>(<span class="cm-variable">div1</span>);
+  <span class="cm-keyword">var</span> <span class="cm-def">win4</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">window</span>(<span class="cm-string">&quot;blah&quot;</span>);
+  
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">win1</span>);
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">win2</span>);
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">win3</span>);
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">win4</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;div1&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_hASVqRN0yS" href="#h_hASVqRN0yS" tabindex="-1" role="presentation"></a>d3.style</h2>
+
+<p><a class="p_ident" id="p_BSTn+6LjLc" href="#p_BSTn+6LjLc" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/v1.4.0/README.md#style">d3.style(node, name)</a> is a convenience method for retrieving the value of an node’s <code>style</code> property.</p>
+
+<p><a class="p_ident" id="p_fbaDZtVrXH" href="#p_fbaDZtVrXH" tabindex="-1" role="presentation"></a><code>d3.<wbr>style(node, name)</code> takes 2 arguments, a node and a string, and returns the value of named property in the node’s style property.  If the node has an inline style attribute with the given name, its value is returned.  Otherwise the computed value is returned.  See <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/style">HTMLElement.style</a> for the difference between inline style values and computed values. `</p><nav><a href="01_01_creating_selections.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="01_03_modifying_elements.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

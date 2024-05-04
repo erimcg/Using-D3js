@@ -1,0 +1,427 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Treemaps</title>
+  <link rel="canonical" href="http://using-d3js.com/06_03_treemaps.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 06;</script></head>
+
+<article>
+<nav><a href="06_02_trees.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="06_04_partitions.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 06</span>Treemaps</h1><script src="https://d3js.org/d3.v4.min.js"></script>
+<style>
+rect {
+  fill: cadetblue;
+  opacity: 0.3;
+  stroke: white;
+}
+</style>
+
+
+<p><a class="p_ident" id="p_SH/oHKbgzf" href="#p_SH/oHKbgzf" tabindex="-1" role="presentation"></a>A treemap is a rectangular visualization for a hierarchal model as shown below.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_tPFi4Qq/Dr" href="#c_tPFi4Qq/Dr" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">45.25</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">2.25</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">1</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">3</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">3</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">4</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">3</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">6</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">11</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">3</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">2</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">5.25</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">1.50</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">0.25</span>}
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">treemap</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">treemap</span>()
+  .<span class="cm-property">size</span>([<span class="cm-number">580</span>,<span class="cm-number">250</span>])
+  .<span class="cm-property">paddingOuter</span>(<span class="cm-number">10</span>);
+
+<span class="cm-variable">treemap</span>(<span class="cm-variable">root</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1&quot;</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'rect.node'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'rect'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x0</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y0</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'width'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x1</span> <span class="cm-operator">-</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x0</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'height'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y1</span> <span class="cm-operator">-</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y0</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">580</span> <span class="cm-attribute">height</span>=<span class="cm-string">250</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_oErabru04X" href="#p_oErabru04X" tabindex="-1" role="presentation"></a>Each node in the model is represented by a rectangle in the visualization and the rectangles for child nodes are placed within the rectangles for the parent nodes.  For example, in the treemap shown above, each of the darker green inner rectangles represent nodes that are children of a parent node that is represented by the lighter green outer rectangle.</p>
+
+<h2><a class="h_ident" id="h_URbtEhYkJ0" href="#h_URbtEhYkJ0" tabindex="-1" role="presentation"></a>The Treemap Layout</h2>
+
+<p><a class="p_ident" id="p_M8742cPGcI" href="#p_M8742cPGcI" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#treemap">d3.treemap()</a> is a function generator that returns a new treemap layout.  When we call the treemap layout, we pass it the root of a hierarchy model.  It then computes the location for each rectangle and sets 4 properties in each node: <code>x0</code>, <code>y0</code>, <code>x1</code>, and <code>y1</code>.  These properties represent the top left and bottom right corners of the rectangle.</p>
+
+<p><a class="p_ident" id="p_SHQgfO7ucA" href="#p_SHQgfO7ucA" tabindex="-1" role="presentation"></a>The proportion of space that a child’s rectangle covers inside its parent’s rectangle is based on the values in the child’s and the parent’s <code>value</code> attributes.  For example, to fully pack a parent rectangle with rectangles for its children, the parent’s <code>value</code> property should be equal to the sum of the childrens’ <code>value</code> properties.</p>
+
+<p><a class="p_ident" id="p_mYjX4RLlRs" href="#p_mYjX4RLlRs" tabindex="-1" role="presentation"></a>The location of each rectangle is determined by the tiling method used.  D3 supports 6 <a href="https://github.com/d3/d3-hierarchy#treemap-tiling">built-in</a> tiling methods which will be discussed later.  The default tiling method is <a href="https://github.com/d3/d3-hierarchy#treemapSquarify">d3.treemapSquarify</a>.  To change the tiling method we can call <a href="https://github.com/d3/d3-hierarchy#treemap_tile">treemap.tile([tile])</a>.</p>
+
+<p><a class="p_ident" id="p_Q/DSrrhXdy" href="#p_Q/DSrrhXdy" tabindex="-1" role="presentation"></a>The default size of the outermost rectangle is [1,1].  To change the size we can call <a href="https://github.com/d3/d3-hierarchy#treemap_size">treemap.size([width,height])</a>.</p>
+
+<h2><a class="h_ident" id="h_8Ml8fSZKeA" href="#h_8Ml8fSZKeA" tabindex="-1" role="presentation"></a>Creating a Treemap</h2>
+
+<p><a class="p_ident" id="p_mExD6HZWZn" href="#p_mExD6HZWZn" tabindex="-1" role="presentation"></a>To create a treemap we do the following:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_TSWBfMvDSv" href="#p_TSWBfMvDSv" tabindex="-1" role="presentation"></a>Get the root element from a d3.hierarchy model.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_rz/QtGRNMA" href="#p_rz/QtGRNMA" tabindex="-1" role="presentation"></a>If any node in the model doesn’t have a <code>value</code> attribute, add it.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_BfOKY4MO1B" href="#p_BfOKY4MO1B" tabindex="-1" role="presentation"></a>Create a new treemap layout, setting the size and tiling method, if necessary.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_0iy9eiG4/S" href="#p_0iy9eiG4/S" tabindex="-1" role="presentation"></a>Call the treemap layout function, passing it the root of the hierarchy model. This creates <code>x0</code>, <code>y0</code>, <code>x1</code>, and <code>y1</code> properties in each node.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_s1xsmWOAHN" href="#p_s1xsmWOAHN" tabindex="-1" role="presentation"></a>Render the rectangles using the <code>x0</code>, <code>y0</code>, <code>x1</code>, and <code>y1</code> properties.</p></li></ul>
+
+<h2><a class="h_ident" id="h_IGVG9scyYt" href="#h_IGVG9scyYt" tabindex="-1" role="presentation"></a>Setting the Value Properties</h2>
+
+<p><a class="p_ident" id="p_nWiCP5T8uE" href="#p_nWiCP5T8uE" tabindex="-1" role="presentation"></a>The D3 <code>node</code> object has various methods that can be called to set the <code>value</code> properties if the objects in the data passed to <code>d3.hierarchy</code> don’t have value properties.  Both <a href="https://github.com/d3/d3-hierarchy#node_sum">node.sum(function)</a> and <a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#node_eachAfter">node.eachAfter(function)</a> traverse the herarchy in post-order traversal.</p>
+
+<p><a class="p_ident" id="p_YS3CtuXykI" href="#p_YS3CtuXykI" tabindex="-1" role="presentation"></a><code>node.sum</code> is an accumulator method that takes a function as an argument and returns the node.  The function that is passed to <code>node.sum</code> is called for each node and when called, it is passed the data object (not the node itself) associated with the node.  The value set in the node’s <code>value</code> property is equal to the value returned by the <code>sum's</code> function argument plus the sum of the values stored in each child node’s <code>value</code> property.</p>
+
+<p><a class="p_ident" id="p_Eublbh01q+" href="#p_Eublbh01q+" tabindex="-1" role="presentation"></a>In the two examples below, our data consists of a root node for New York City, and 5 child nodes, one for each borough.  Each borough object has a <code>population</code> property, but the root node does not.  None of the nodes have a value property.</p>
+
+<p><a class="p_ident" id="p_60/8lcwWrB" href="#p_60/8lcwWrB" tabindex="-1" role="presentation"></a>We can create value properties in each node in various ways.  The simplest way is to call <code>root.sum</code> and pass it a function which returns the population value if one exists otherwise it returns 0.</p><pre>
+root.sum(d => d.hasOwnProperty("population") ? d.population : 0);
+</pre>
+
+
+<p><a class="p_ident" id="p_boqcDiEaU8" href="#p_boqcDiEaU8" tabindex="-1" role="presentation"></a>Recall, the <code>sum</code> method sets the <code>value</code> properties automatically.  Since the borough nodes have <code>population</code> properties and do not have children, their <code>value</code> property in each node will be set equal to the value in their <code>population</code> property plus 0.  The node for New York City, however does not have a <code>population</code> property but does have children, so the value for its <code>value</code> property will be set to 0 plus the sum of its children’s <code>value</code> properties.</p>
+
+<p><a class="p_ident" id="p_qTIefLmXEU" href="#p_qTIefLmXEU" tabindex="-1" role="presentation"></a>An alternative way to set the <code>value</code> properties is to set them manually using <code>node.eachAfter</code>, as shown below and as illustrated in the second example.</p><pre>
+root.eachAfter(d => {
+  if (!d.hasOwnProperty("children")) {
+    d.value = d.data.population;
+  }
+  else {
+    d.value = 0;
+    for (var i in d.children)
+        d.value += d.children[i].value;
+  }
+});
+
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_9WMVKFncUb" href="#c_9WMVKFncUb" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;New York City&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;Bronx&quot;</span>, <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">1471160</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;Brooklyn&quot;</span>, <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">2648771</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;Manhattan&quot;</span>, <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">1664727</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;Queens&quot;</span>, <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">2358582</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;Staten Island&quot;</span>, <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">479458</span>}
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">drawTreemap</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">id</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>);
+
+  <span class="cm-keyword">if</span> (<span class="cm-variable-2">id</span> <span class="cm-operator">===</span> <span class="cm-string">&quot;demo2&quot;</span>) {
+    <span class="cm-variable-2">root</span>.<span class="cm-property">sum</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">hasOwnProperty</span>(<span class="cm-string">&quot;population&quot;</span>) <span class="cm-operator">?</span> <span class="cm-variable-2">d</span>.<span class="cm-property">population</span> : <span class="cm-number">0</span>);
+  }
+  <span class="cm-keyword">else</span> <span class="cm-keyword">if</span> (<span class="cm-variable-2">id</span> <span class="cm-operator">===</span> <span class="cm-string">&quot;demo3&quot;</span>) {
+    <span class="cm-variable-2">root</span>.<span class="cm-property">eachAfter</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> {
+      <span class="cm-keyword">if</span> (<span class="cm-operator">!</span><span class="cm-variable-2">d</span>.<span class="cm-property">hasOwnProperty</span>(<span class="cm-string">&quot;children&quot;</span>)) {
+        <span class="cm-variable-2">d</span>.<span class="cm-property">value</span> <span class="cm-operator">=</span> <span class="cm-variable-2">d</span>.<span class="cm-property">data</span>.<span class="cm-property">population</span>;
+      }
+      <span class="cm-keyword">else</span> {
+        <span class="cm-variable-2">d</span>.<span class="cm-property">value</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>;
+        <span class="cm-keyword">for</span> (<span class="cm-keyword">var</span> <span class="cm-def">i</span> <span class="cm-keyword">in</span> <span class="cm-variable-2">d</span>.<span class="cm-property">children</span>)
+            <span class="cm-variable-2">d</span>.<span class="cm-property">value</span> <span class="cm-operator">+=</span> <span class="cm-variable-2">d</span>.<span class="cm-property">children</span>[<span class="cm-variable-2">i</span>].<span class="cm-property">value</span>;
+      }
+    });
+  }
+
+  <span class="cm-keyword">let</span> <span class="cm-def">treemap</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">treemap</span>()
+    .<span class="cm-property">size</span>([<span class="cm-number">250</span>,<span class="cm-number">250</span>])
+    .<span class="cm-property">paddingOuter</span>(<span class="cm-number">10</span>);
+
+  <span class="cm-variable-2">treemap</span>(<span class="cm-variable-2">root</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">id</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">'rect.node'</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable-2">root</span>.<span class="cm-property">descendants</span>())
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">'rect'</span>)
+    .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x0</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y0</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'width'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x1</span> <span class="cm-operator">-</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x0</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'height'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y1</span> <span class="cm-operator">-</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y0</span>);
+};
+
+<span class="cm-variable">drawTreemap</span>(<span class="cm-string">&quot;demo2&quot;</span>);
+<span class="cm-variable">drawTreemap</span>(<span class="cm-string">&quot;demo3&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">250</span> <span class="cm-attribute">height</span>=<span class="cm-string">250</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo3&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">250</span> <span class="cm-attribute">height</span>=<span class="cm-string">250</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_IFRNlMyoon" href="#h_IFRNlMyoon" tabindex="-1" role="presentation"></a>Sorting the Nodes</h2>
+
+<p><a class="p_ident" id="p_RRanF1PdtG" href="#p_RRanF1PdtG" tabindex="-1" role="presentation"></a>A treemap visualization is often more informative when sibling rectangles are positioned from largest to smallest.  To accomplish this we simply need to sort the nodes using <a href="https://github.com/d3/d3-hierarchy#node_sort">node.sort(compare)</a> prior to calling the treemap layout. In the example below we set the <code>value</code> properties and then sort the nodes by descending height and for nodes at the same height by descending value.</p><pre>
+var root = d3.hierarchy(data)
+  .sum(d => d.hasOwnProperty("population") ? d.population : 0)
+  .sort((a, b) => b.height - a.height || b.value - a.value);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_n9FV66JYon" href="#c_n9FV66JYon" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;New York City&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;Bronx&quot;</span>, <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">1471160</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;Brooklyn&quot;</span>, <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">2648771</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;Manhattan&quot;</span>, <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">1664727</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;Queens&quot;</span>, <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">2358582</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;Staten Island&quot;</span>, <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">479458</span>}
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>)
+  .<span class="cm-property">sum</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">hasOwnProperty</span>(<span class="cm-string">&quot;population&quot;</span>) <span class="cm-operator">?</span> <span class="cm-variable-2">d</span>.<span class="cm-property">population</span> : <span class="cm-number">0</span>)
+  .<span class="cm-property">sort</span>((<span class="cm-def">a</span>, <span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span>.<span class="cm-property">value</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>.<span class="cm-property">value</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">treemap</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">treemap</span>()
+  .<span class="cm-property">size</span>([<span class="cm-number">250</span>,<span class="cm-number">250</span>])
+  .<span class="cm-property">paddingOuter</span>(<span class="cm-number">10</span>);
+
+<span class="cm-variable">treemap</span>(<span class="cm-variable">root</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo4&quot;</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'rect.node'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'rect'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x0</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y0</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'width'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x1</span> <span class="cm-operator">-</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x0</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'height'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y1</span> <span class="cm-operator">-</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y0</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo4&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">250</span> <span class="cm-attribute">height</span>=<span class="cm-string">250</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_rAhbjwT3UJ" href="#h_rAhbjwT3UJ" tabindex="-1" role="presentation"></a>Tiling Methods</h2>
+
+<p><a class="p_ident" id="p_V0uohT9j03" href="#p_V0uohT9j03" tabindex="-1" role="presentation"></a>D3 provides the following 6 tiling methods:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_9MXLJKgxEq" href="#p_9MXLJKgxEq" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy#treemapBinary">d3.treemapBinary(node, x0, y0, x1, y1)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_aKgcjUG2N7" href="#p_aKgcjUG2N7" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy#treemapDice">d3.treemapDice(node, x0, y0, x1, y1)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_xAB5/WWVv3" href="#p_xAB5/WWVv3" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy#treemapSlice">d3.treemapSlice(node, x0, y0, x1, y1)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_TmZs6Mh2vV" href="#p_TmZs6Mh2vV" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy#treemapSliceDice">d3.treemapSliceDice(node, x0, y0, x1, y1)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_RuSMrWqnJY" href="#p_RuSMrWqnJY" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy#treemapSquarify">d3.treemapSquarify(node, x0, y0, x1, y1)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_qjw2pJETPm" href="#p_qjw2pJETPm" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy#treemapResquarify">d3.treemapResquarify(node, x0, y0, x1, y1)</a></p></li></ul>
+
+<p><a class="p_ident" id="p_VOyreO/wHQ" href="#p_VOyreO/wHQ" tabindex="-1" role="presentation"></a>We can change the tiling method using <a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#treemap_tile">treemap.tile([tile])</a>.  Below are examples of each of the tiling methods on the same data set.  For more information on these tiling methods please consult the D3 API documentation.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_L5IUgCIFRx" href="#c_L5IUgCIFRx" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;New York City&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;Bronx&quot;</span>, <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">1471160</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;Brooklyn&quot;</span>, <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">2648771</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;Manhattan&quot;</span>, <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">1664727</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;Queens&quot;</span>, <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">2358582</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;Staten Island&quot;</span>, <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">479458</span>}
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>)
+  .<span class="cm-property">sum</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">hasOwnProperty</span>(<span class="cm-string">&quot;population&quot;</span>) <span class="cm-operator">?</span> <span class="cm-variable-2">d</span>.<span class="cm-property">population</span> : <span class="cm-number">0</span>)
+  .<span class="cm-property">sort</span>((<span class="cm-def">a</span>, <span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span>.<span class="cm-property">value</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>.<span class="cm-property">value</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">renderRect</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">id</span>, <span class="cm-def">tileMap</span>) {
+
+  <span class="cm-keyword">var</span> <span class="cm-def">treemap</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">treemap</span>()
+    .<span class="cm-property">size</span>([<span class="cm-number">150</span>,<span class="cm-number">150</span>])
+    .<span class="cm-property">tile</span>(<span class="cm-variable-2">tileMap</span>)
+    .<span class="cm-property">paddingOuter</span>(<span class="cm-number">5</span>);
+
+  <span class="cm-variable-2">treemap</span>(<span class="cm-variable">root</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">id</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">'rect.node'</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">'rect'</span>)
+    .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x0</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y0</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'width'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x1</span> <span class="cm-operator">-</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x0</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'height'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y1</span> <span class="cm-operator">-</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y0</span>);
+};
+
+<span class="cm-variable">renderRect</span>(<span class="cm-string">&quot;demo5&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">treemapBinary</span>);
+<span class="cm-variable">renderRect</span>(<span class="cm-string">&quot;demo6&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">treemapDice</span>);
+<span class="cm-variable">renderRect</span>(<span class="cm-string">&quot;demo7&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">treemapSlice</span>);
+<span class="cm-variable">renderRect</span>(<span class="cm-string">&quot;demo8&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">treemapSliceDice</span>);
+<span class="cm-variable">renderRect</span>(<span class="cm-string">&quot;demo9&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">treemapSquarify</span>);
+<span class="cm-variable">renderRect</span>(<span class="cm-string">&quot;demo10&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">treemapResquarify</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo5&quot;</span> <span class="cm-attribute">name</span>=<span class="cm-string">&quot;treemapBinary&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">150</span> <span class="cm-attribute">height</span>=<span class="cm-string">150</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo6&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">150</span> <span class="cm-attribute">height</span>=<span class="cm-string">150</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo7&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">150</span> <span class="cm-attribute">height</span>=<span class="cm-string">150</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">br</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo8&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">150</span> <span class="cm-attribute">height</span>=<span class="cm-string">150</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo9&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">150</span> <span class="cm-attribute">height</span>=<span class="cm-string">150</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo10&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">150</span> <span class="cm-attribute">height</span>=<span class="cm-string">150</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_kFzDeSSSlh" href="#h_kFzDeSSSlh" tabindex="-1" role="presentation"></a>Rounding</h2>
+
+<p><a class="p_ident" id="p_XtoUCX7a0P" href="#p_XtoUCX7a0P" tabindex="-1" role="presentation"></a>Per <a href="https://github.com/d3/d3-3.x-api-reference/blob/master/Treemap-Layout.md#round">D3v3</a> the <a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#treemap_round">treemap.round([round])</a> method takes a boolean as an argument and “sets whether or not the treemap layout will round to exact pixel boundaries. This can be nice to avoid antialiasing artifacts in SVG.”</p>
+
+<h2><a class="h_ident" id="h_nEfKVZ5nWg" href="#h_nEfKVZ5nWg" tabindex="-1" role="presentation"></a>Padding</h2>
+
+<p><a class="p_ident" id="p_/GeoeRlTj4" href="#p_/GeoeRlTj4" tabindex="-1" role="presentation"></a>Each of the padding methods takes either a number or a function as an argument.  By default the inner padding is 0</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_XHvpOZkDH+" href="#p_XHvpOZkDH+" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#treemap_padding">treemap.padding([padding])</a> - sets the inner and outer padding</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_DlOPTncXjU" href="#p_DlOPTncXjU" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#treemap_padding">treemap.paddingInner([padding])</a> - inner padding separates child nodes.  If padding is a function it is called for each node that has children and passes in the current node.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_QGab3u39KU" href="#p_QGab3u39KU" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#treemap_padding">treemap.paddingOuter([padding])</a> - sets the top, right, bottom, and left padding.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_rJwtOgwTr5" href="#p_rJwtOgwTr5" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#treemap_padding">treemap.paddingTop([padding])</a> - separates the top edge of a node from its children.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_pGfnrkqshs" href="#p_pGfnrkqshs" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#treemap_padding">treemap.paddingRight([padding])</a> - separates the right edge of a node from its children.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_rdwYLiAWkY" href="#p_rdwYLiAWkY" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#treemap_padding">treemap.paddingBottom([padding])</a> - separates the bottom edge of a node from its children.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_9nZzi76KKK" href="#p_9nZzi76KKK" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#treemap_padding">treemap.paddingLeft([padding])</a> - separates the left edge of a node from its children.</p></li></ul>
+
+<p><a class="p_ident" id="p_mwKJ2GnxbG" href="#p_mwKJ2GnxbG" tabindex="-1" role="presentation"></a>Below are demonstrations of each of these in the order given above.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_8n8KC19EMV" href="#c_8n8KC19EMV" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">45.25</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">2.25</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">1</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">3</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">3</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">4</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">3</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">6</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">11</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">3</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">2</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">5.25</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">1.50</span>},
+                {<span class="cm-string cm-property">&quot;value&quot;</span>: <span class="cm-number">0.25</span>}
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">renderRect</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">id</span>) {
+
+  <span class="cm-keyword">let</span> <span class="cm-def">treemap</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">treemap</span>()
+    .<span class="cm-property">size</span>([<span class="cm-number">150</span>,<span class="cm-number">150</span>]);
+
+  <span class="cm-keyword">if</span> (<span class="cm-variable-2">id</span> <span class="cm-operator">===</span> <span class="cm-string">&quot;demo12&quot;</span>)
+    <span class="cm-variable-2">treemap</span>.<span class="cm-property">padding</span>(<span class="cm-number">10</span>);
+  <span class="cm-keyword">else</span> <span class="cm-keyword">if</span> (<span class="cm-variable-2">id</span> <span class="cm-operator">===</span> <span class="cm-string">&quot;demo13&quot;</span>)
+    <span class="cm-variable-2">treemap</span>.<span class="cm-property">paddingInner</span>(<span class="cm-number">10</span>);
+  <span class="cm-keyword">else</span> <span class="cm-keyword">if</span> (<span class="cm-variable-2">id</span> <span class="cm-operator">===</span> <span class="cm-string">&quot;demo14&quot;</span>)
+    <span class="cm-variable-2">treemap</span>.<span class="cm-property">paddingOuter</span>(<span class="cm-number">10</span>);
+  <span class="cm-keyword">else</span> <span class="cm-keyword">if</span> (<span class="cm-variable-2">id</span> <span class="cm-operator">===</span> <span class="cm-string">&quot;demo15&quot;</span>)
+    <span class="cm-variable-2">treemap</span>.<span class="cm-property">paddingTop</span>(<span class="cm-number">10</span>);
+  <span class="cm-keyword">else</span> <span class="cm-keyword">if</span> (<span class="cm-variable-2">id</span> <span class="cm-operator">===</span> <span class="cm-string">&quot;demo16&quot;</span>)
+    <span class="cm-variable-2">treemap</span>.<span class="cm-property">paddingRight</span>(<span class="cm-number">10</span>);
+  <span class="cm-keyword">else</span> <span class="cm-keyword">if</span> (<span class="cm-variable-2">id</span> <span class="cm-operator">===</span> <span class="cm-string">&quot;demo17&quot;</span>)
+    <span class="cm-variable-2">treemap</span>.<span class="cm-property">paddingBottom</span>(<span class="cm-number">10</span>);
+  <span class="cm-keyword">else</span> <span class="cm-keyword">if</span> (<span class="cm-variable-2">id</span> <span class="cm-operator">===</span> <span class="cm-string">&quot;demo18&quot;</span>)
+    <span class="cm-variable-2">treemap</span>.<span class="cm-property">paddingLeft</span>(<span class="cm-number">10</span>);
+
+  <span class="cm-variable-2">treemap</span>(<span class="cm-variable">root</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">id</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">'rect.node'</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">'rect'</span>)
+    .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x0</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y0</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'width'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x1</span> <span class="cm-operator">-</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x0</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'height'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y1</span> <span class="cm-operator">-</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y0</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'fill'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">height</span> <span class="cm-operator">==</span> <span class="cm-number">0</span> <span class="cm-operator">?</span> <span class="cm-string">&quot;cadetblue&quot;</span> : <span class="cm-string">&quot;pink&quot;</span>);
+};
+
+<span class="cm-variable">renderRect</span>(<span class="cm-string">&quot;demo12&quot;</span>);
+<span class="cm-variable">renderRect</span>(<span class="cm-string">&quot;demo13&quot;</span>);
+<span class="cm-variable">renderRect</span>(<span class="cm-string">&quot;demo14&quot;</span>);
+<span class="cm-variable">renderRect</span>(<span class="cm-string">&quot;demo15&quot;</span>);
+<span class="cm-variable">renderRect</span>(<span class="cm-string">&quot;demo16&quot;</span>);
+<span class="cm-variable">renderRect</span>(<span class="cm-string">&quot;demo17&quot;</span>);
+<span class="cm-variable">renderRect</span>(<span class="cm-string">&quot;demo18&quot;</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo12&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">150</span> <span class="cm-attribute">height</span>=<span class="cm-string">150</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo13&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">150</span> <span class="cm-attribute">height</span>=<span class="cm-string">150</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo14&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">150</span> <span class="cm-attribute">height</span>=<span class="cm-string">150</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">br</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo15&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">150</span> <span class="cm-attribute">height</span>=<span class="cm-string">150</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo16&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">150</span> <span class="cm-attribute">height</span>=<span class="cm-string">150</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo17&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">150</span> <span class="cm-attribute">height</span>=<span class="cm-string">150</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo18&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">150</span> <span class="cm-attribute">height</span>=<span class="cm-string">150</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><nav><a href="06_02_trees.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="06_04_partitions.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

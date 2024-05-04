@@ -1,0 +1,305 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Symbols</title>
+  <link rel="canonical" href="http://using-d3js.com/05_10_symbols.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 05;</script></head>
+
+<article>
+<nav><a href="05_09_polygons.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="06_01_hierarchal.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 05</span>Symbols</h1><script src="https://d3js.org/d3.v5.min.js"></script>
+<style>
+    svg { background-color: white; display: inline-block;}
+    .sandbox-output{ text-align: center;}
+</style>
+
+
+<p><a class="p_ident" id="p_GujXP0jv4h" href="#p_GujXP0jv4h" tabindex="-1" role="presentation"></a>In this section we will discuss different symbols available and how to make our own. Symbols can be used on their own, but are typically used more when we have other charts.</p>
+
+<h2><a class="h_ident" id="h_Iq1mTp65i3" href="#h_Iq1mTp65i3" tabindex="-1" role="presentation"></a>Symbols</h2>
+
+<p><a class="p_ident" id="p_/SEHgJXs/r" href="#p_/SEHgJXs/r" tabindex="-1" role="presentation"></a>Thus far in most of our examples, when we have nodes that need to be put onto an svg, we append a <code>circle</code>. However, changing the shape of our nodes can supply us with more ways to represent our data.</p>
+
+<p><a class="p_ident" id="p_Q4kGqHpl3V" href="#p_Q4kGqHpl3V" tabindex="-1" role="presentation"></a>For the times we want to use more shapes, we can use <code>symbols</code> instead of <code>circles</code>. <code>Symbols</code>, like many of the other shapes in this chapter, are passed into the <code>d</code> attribute of a <code>path</code> on an svg.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_/Jkopp0HKH" href="#p_/Jkopp0HKH" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#symbol">d3.symbol</a></p></li></ul><pre>
+d3.select("#demoBasic")
+    .append("path")
+    .attr("d", d3.symbol())
+    .attr("transform", "translate(25,25)");
+</pre>
+
+
+<p><a class="p_ident" id="p_uFlGrFLcbQ" href="#p_uFlGrFLcbQ" tabindex="-1" role="presentation"></a>As you may have noticed, we had to apply a <code>transform /<wbr> translate</code> on our symbol. This is because all symbols are rooted at (0,0) so in order to get them to the correct place, we must translate them.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_FGGkzfWKYv" href="#c_FGGkzfWKYv" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoBasic&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">symbol</span>())
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(25,25)&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoBasic&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;50&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h3><a class="i_ident" id="i_2jmj7l5rSw" href="#i_2jmj7l5rSw" tabindex="-1" role="presentation"></a><code>.size()</code></h3>
+
+<p><a class="p_ident" id="p_DHRxIA1Qfx" href="#p_DHRxIA1Qfx" tabindex="-1" role="presentation"></a>The <code>.size([size])</code> method can be used to change how big the symbol is.</p>
+
+<p><a class="p_ident" id="p_mtC5uX7/AP" href="#p_mtC5uX7/AP" tabindex="-1" role="presentation"></a>It is important to note that size is the <i>square pixels or area</i> of the symbol you are making. Each symbol has its own mathematical way of determining its path based on the size we provide.</p>
+
+<p><a class="p_ident" id="p_zyeJc0AemX" href="#p_zyeJc0AemX" tabindex="-1" role="presentation"></a>If not set, the default <code>size</code> is <code>64</code></p><pre>
+var symbol = d3.symbol().size(100);
+</pre>
+
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_LyOf3cZ63j" href="#p_LyOf3cZ63j" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#symbol_size">symbol.size([size])</a> - takes a number, sets the size in <i>square pixels or the area</i></p></li></ul>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_qpqDTWCvbI" href="#c_qpqDTWCvbI" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">small</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">symbol</span>().<span class="cm-property">type</span>(<span class="cm-variable">d3</span>.<span class="cm-property">symbolCircle</span>).<span class="cm-property">size</span>(<span class="cm-number">100</span>);
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoSmall&quot;</span>)
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">small</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;red&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(50,50)&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">medium</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">symbol</span>().<span class="cm-property">type</span>(<span class="cm-variable">d3</span>.<span class="cm-property">symbolCircle</span>).<span class="cm-property">size</span>(<span class="cm-number">750</span>);
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoMedium&quot;</span>)
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">medium</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;red&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-string">&quot;5px&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(50,50)&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">large</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">symbol</span>().<span class="cm-property">type</span>(<span class="cm-variable">d3</span>.<span class="cm-property">symbolCircle</span>).<span class="cm-property">size</span>(<span class="cm-number">1500</span>);
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoLarge&quot;</span>)
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">large</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;green&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill-opacity&quot;</span>, <span class="cm-string">&quot;0.5&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(50,50)&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">huge</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">symbol</span>().<span class="cm-property">type</span>(<span class="cm-variable">d3</span>.<span class="cm-property">symbolCircle</span>).<span class="cm-property">size</span>(<span class="cm-number">3000</span>);
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoHuge&quot;</span>)
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">huge</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(50,50)&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoSmall&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;100&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoMedium&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;100&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoLarge&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;100&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoHuge&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;100&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_xQp5x3tUFr" href="#h_xQp5x3tUFr" tabindex="-1" role="presentation"></a>Built-in Symbols</h2>
+
+<p><a class="p_ident" id="p_KtMsCFnkrw" href="#p_KtMsCFnkrw" tabindex="-1" role="presentation"></a>D3 comes with 7 symbols built-in. To use them, assign them in the <code>.type(symbol)</code> method on the symbol generator:</p><pre>
+var square = d3.symbol().type(d3.symbolSquare).size(x);
+</pre>
+
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_4AEPdW/dCI" href="#p_4AEPdW/dCI" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#symbol_type">symbol.type([type])</a> - Takes a symbol type, sets the generators symbol that it will generate.</p></li></ul>
+
+<p><a class="p_ident" id="p_a8fK6Bn8LB" href="#p_a8fK6Bn8LB" tabindex="-1" role="presentation"></a>The default symbol, if not set, is <code>d3.symbolCircle</code>.</p>
+
+<p><a class="p_ident" id="p_CuDTbVBx+G" href="#p_CuDTbVBx+G" tabindex="-1" role="presentation"></a>Make sure to remember that the <code>.size()</code> is the <i>square pixels or area</i> of the shape and the dimensions will change differently based on the shape.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_0va5jbtME9" href="#p_0va5jbtME9" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#symbols">d3.symbols</a> - An array of all the built-in symbols, useful for setting up scales</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_b1bt+t64JF" href="#p_b1bt+t64JF" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#symbolCircle">d3.symbolCircle</a> - A normal circle, default symbol</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_WvKMotfhdE" href="#p_WvKMotfhdE" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#symbolCross">d3.symbolCross</a> - A cross or plus</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_EY3UUPVIFs" href="#p_EY3UUPVIFs" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#symbolDiamond">d3.symbolDiamond</a> - A diamond</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_hKesnDwdz8" href="#p_hKesnDwdz8" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#symbolSquare">d3.symbolSquare</a> - A square</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_ha6siVnxOp" href="#p_ha6siVnxOp" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#symbolStar">d3.symbolStar</a> - A 5 point star</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_vrDo8sdOWS" href="#p_vrDo8sdOWS" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#symbolTriangle">d3.symbolTriangle</a> - An equilateral triangle</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_GsaJGVSs3h" href="#p_GsaJGVSs3h" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#symbolWye">d3.symbolWye</a> - A wye or Latin Y</p></li></ul>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_lQ5cRHaaF2" href="#c_lQ5cRHaaF2" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+    <span class="cm-keyword">var</span> <span class="cm-def">circle</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">symbol</span>().<span class="cm-property">type</span>(<span class="cm-variable">d3</span>.<span class="cm-property">symbolCircle</span>).<span class="cm-property">size</span>(<span class="cm-number">1000</span>);
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoCircle&quot;</span>)
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">circle</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(42.5,42.5)&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">cross</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">symbol</span>().<span class="cm-property">type</span>(<span class="cm-variable">d3</span>.<span class="cm-property">symbolCross</span>).<span class="cm-property">size</span>(<span class="cm-number">1000</span>);
+        <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoCross&quot;</span>)
+            .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">cross</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(42.5,42.5)&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">diamond</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">symbol</span>().<span class="cm-property">type</span>(<span class="cm-variable">d3</span>.<span class="cm-property">symbolDiamond</span>).<span class="cm-property">size</span>(<span class="cm-number">1000</span>);
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoDiamond&quot;</span>)
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">diamond</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(42.5,42.5)&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">square</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">symbol</span>().<span class="cm-property">type</span>(<span class="cm-variable">d3</span>.<span class="cm-property">symbolSquare</span>).<span class="cm-property">size</span>(<span class="cm-number">1000</span>);
+     <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoSquare&quot;</span>)
+         .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+         .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">square</span>)
+         .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(42.5,42.5)&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">star</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">symbol</span>().<span class="cm-property">type</span>(<span class="cm-variable">d3</span>.<span class="cm-property">symbolStar</span>).<span class="cm-property">size</span>(<span class="cm-number">1000</span>);
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoStar&quot;</span>)
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">star</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(42.5,42.5)&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">triangle</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">symbol</span>().<span class="cm-property">type</span>(<span class="cm-variable">d3</span>.<span class="cm-property">symbolTriangle</span>).<span class="cm-property">size</span>(<span class="cm-number">1000</span>);
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoTriangle&quot;</span>)
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">triangle</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(42.5,42.5)&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">wye</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">symbol</span>().<span class="cm-property">type</span>(<span class="cm-variable">d3</span>.<span class="cm-property">symbolWye</span>).<span class="cm-property">size</span>(<span class="cm-number">1000</span>);
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoWye&quot;</span>)
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">wye</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(42.5,42.5)&quot;</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoCircle&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;85&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;85&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoCross&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;85&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;85&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoDiamond&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;85&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;85&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoSquare&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;85&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;85&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoStar&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;85&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;85&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoTriangle&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;85&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;85&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoWye&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;85&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;85&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_66iIQ5sJIT" href="#h_66iIQ5sJIT" tabindex="-1" role="presentation"></a>Custom Symbols</h2>
+
+<p><a class="p_ident" id="p_0t7NPmohOv" href="#p_0t7NPmohOv" tabindex="-1" role="presentation"></a>D3 allows the creation of new symbols to use. To create a new symbol create a new object that has a function that implements the <code>draw(context, size)</code> interface. Inside of the implementation use <a href="https://www.w3.org/TR/2dcontext/#canvaspathmethods">CanvasPathMethods</a> on the context to devise a new shape. For example a definition of a custom square symbol:</p><pre>
+    // Demonstration only, use d3.symbolSquare if a square is needed
+    var customSymbolSquare = { 
+        draw: function(context, size){
+            let s = Math.sqrt(size)/2;
+            context.moveTo(s,s);
+            context.lineTo(s,-s);
+            context.lineTo(-s,-s);
+            context.lineTo(-s,s);
+            context.closePath();
+        }
+    }
+</pre>
+
+
+<p><a class="p_ident" id="p_kAh5+MJ4jy" href="#p_kAh5+MJ4jy" tabindex="-1" role="presentation"></a>Keep in mind that new symbols are supposed to be centered at (0,0) and have an accurate and dynamic size.</p>
+
+<p><a class="p_ident" id="p_A6M5JLO39j" href="#p_A6M5JLO39j" tabindex="-1" role="presentation"></a>After defining a custom symbol, it can be used any way a built-in symbol can be used:</p><pre>
+    var customSqr = d3.symbol().type(customSymbolSquare).size(500);
+    d3.select("#svgID")
+        .append("path")
+        .attr("d", customSqr)
+        .attr("transform", "translate(x,y)");
+
+</pre>
+
+
+<p><a class="p_ident" id="p_xDT5FD/o/I" href="#p_xDT5FD/o/I" tabindex="-1" role="presentation"></a>Examples of custom symbols (square, right triangle, and semi circle):</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_qPlP1AWc4e" href="#c_qPlP1AWc4e" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-comment">//Custom Square, Example only: use d3.symbolSquare instead</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">customSymbolSquare</span> <span class="cm-operator">=</span> {
+        <span class="cm-property">draw</span>: <span class="cm-keyword">function</span>(<span class="cm-def">context</span>, <span class="cm-def">size</span>){
+        <span class="cm-keyword">let</span> <span class="cm-def">s</span> <span class="cm-operator">=</span> <span class="cm-variable">Math</span>.<span class="cm-property">sqrt</span>(<span class="cm-variable-2">size</span>)<span class="cm-operator">/</span><span class="cm-number">2</span>;
+        <span class="cm-variable-2">context</span>.<span class="cm-property">moveTo</span>(<span class="cm-variable-2">s</span>,<span class="cm-variable-2">s</span>);
+        <span class="cm-variable-2">context</span>.<span class="cm-property">lineTo</span>(<span class="cm-variable-2">s</span>,<span class="cm-operator">-</span><span class="cm-variable-2">s</span>);
+        <span class="cm-variable-2">context</span>.<span class="cm-property">lineTo</span>(<span class="cm-operator">-</span><span class="cm-variable-2">s</span>,<span class="cm-operator">-</span><span class="cm-variable-2">s</span>);
+        <span class="cm-variable-2">context</span>.<span class="cm-property">lineTo</span>(<span class="cm-operator">-</span><span class="cm-variable-2">s</span>,<span class="cm-variable-2">s</span>);
+        <span class="cm-variable-2">context</span>.<span class="cm-property">closePath</span>();
+        }
+    }
+    <span class="cm-keyword">var</span> <span class="cm-def">customSqr</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">symbol</span>().<span class="cm-property">type</span>(<span class="cm-variable">customSymbolSquare</span>).<span class="cm-property">size</span>(<span class="cm-number">500</span>);
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoCustomSquare&quot;</span>)
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">customSqr</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(50,50)&quot;</span>);
+
+    <span class="cm-comment">//Custom Right Triangle, may not be accurately centered at the centroid of the triangle</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">customShapeTri</span> <span class="cm-operator">=</span> {
+        <span class="cm-property">draw</span>: <span class="cm-keyword">function</span>(<span class="cm-def">context</span>, <span class="cm-def">size</span>) {
+          <span class="cm-keyword">let</span> <span class="cm-def">s</span> <span class="cm-operator">=</span> <span class="cm-variable">Math</span>.<span class="cm-property">sqrt</span>(<span class="cm-variable-2">size</span><span class="cm-operator">/</span><span class="cm-number">4</span>);
+          <span class="cm-variable-2">context</span>.<span class="cm-property">moveTo</span>(<span class="cm-operator">-</span><span class="cm-variable-2">s</span>, <span class="cm-variable-2">s</span><span class="cm-operator">*</span><span class="cm-number">2</span>)
+          <span class="cm-variable-2">context</span>.<span class="cm-property">lineTo</span>(<span class="cm-variable-2">s</span><span class="cm-operator">*</span><span class="cm-number">2</span>, <span class="cm-operator">-</span><span class="cm-variable-2">s</span>);
+          <span class="cm-variable-2">context</span>.<span class="cm-property">lineTo</span>(<span class="cm-operator">-</span><span class="cm-variable-2">s</span>, <span class="cm-operator">-</span><span class="cm-variable-2">s</span>);
+          <span class="cm-variable-2">context</span>.<span class="cm-property">closePath</span>();
+        }
+    }
+    <span class="cm-keyword">var</span> <span class="cm-def">customTri</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">symbol</span>().<span class="cm-property">type</span>(<span class="cm-variable">customShapeTri</span>).<span class="cm-property">size</span>(<span class="cm-number">500</span>);
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoCustomTri&quot;</span>)
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">customTri</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(50,50)&quot;</span>);
+
+    <span class="cm-comment">//Custom Semi Circle, accurate center and size</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">customShapeCircle</span> <span class="cm-operator">=</span> {
+        <span class="cm-property">draw</span>: <span class="cm-keyword">function</span>(<span class="cm-def">context</span>, <span class="cm-def">size</span>) {
+          <span class="cm-keyword">let</span> <span class="cm-def">r</span> <span class="cm-operator">=</span> <span class="cm-variable">Math</span>.<span class="cm-property">sqrt</span>(<span class="cm-number">2</span> <span class="cm-operator">*</span> <span class="cm-variable-2">size</span> <span class="cm-operator">/</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>);
+          <span class="cm-keyword">let</span> <span class="cm-def">orgin</span> <span class="cm-operator">=</span> (<span class="cm-number">4</span> <span class="cm-operator">*</span> <span class="cm-variable-2">r</span>) <span class="cm-operator">/</span> (<span class="cm-number">3</span> <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>); <span class="cm-comment">//the orgin of the circle, not of the symbol</span>
+          <span class="cm-variable-2">context</span>.<span class="cm-property">arc</span>(<span class="cm-number">0</span>, <span class="cm-operator">-</span><span class="cm-variable-2">orgin</span>, <span class="cm-variable-2">r</span>, <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>, <span class="cm-number">2</span> <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>, <span class="cm-atom">true</span>);
+          <span class="cm-variable-2">context</span>.<span class="cm-property">closePath</span>();
+        }
+    }
+    <span class="cm-keyword">var</span> <span class="cm-def">customCircle</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">symbol</span>().<span class="cm-property">type</span>(<span class="cm-variable">customShapeCircle</span>).<span class="cm-property">size</span>(<span class="cm-number">500</span>);
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoCustomCircle&quot;</span>)
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">customCircle</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(50,50)&quot;</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoCustomSquare&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;100&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoCustomTri&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;100&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoCustomCircle&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;100&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_A1eHpWz1wb" href="#p_A1eHpWz1wb" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#symbol_context">symbol.context([context])</a></p></li></ul><nav><a href="05_09_polygons.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="06_01_hierarchal.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

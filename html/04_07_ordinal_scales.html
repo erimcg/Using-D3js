@@ -1,0 +1,352 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ordinal Scales</title>
+  <link rel="canonical" href="http://using-d3js.com/04_07_ordinal_scales.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 04;</script></head>
+
+<article>
+<nav><a href="04_06_quantize_scales.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_08_legends.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 04</span>Ordinal Scales</h1><script src="https://d3js.org/d3.v4.min.js"></script>
+
+
+<p><a class="p_ident" id="p_AOn5Mbrsvt" href="#p_AOn5Mbrsvt" tabindex="-1" role="presentation"></a>Unlike continuous, sequential, and quantize scales, ordinal scales work with discrete domains.</p>
+
+<p><a class="p_ident" id="p_T0zlsFtRpY" href="#p_T0zlsFtRpY" tabindex="-1" role="presentation"></a>D3 provides the following ordinal scale generators:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_fyHRsgveVA" href="#p_fyHRsgveVA" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#ordinal-scales">d3.scaleOrdinal([range])</a> - maps a discrete domain to a discrete range.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_dDPImUHM3M" href="#p_dDPImUHM3M" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#band-scales">d3.scaleBand()</a> - maps a discrete domain to a set of discrete points within a continuous interval.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_4kgO4bT04I" href="#p_4kgO4bT04I" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#point-scales">d3.scalePoint()</a></p></li></ul>
+
+<h2><a class="h_ident" id="h_KBpgsYYPiD" href="#h_KBpgsYYPiD" tabindex="-1" role="presentation"></a>Ordinal Scales</h2>
+
+<p><a class="p_ident" id="p_wnePaKTyDj" href="#p_wnePaKTyDj" tabindex="-1" role="presentation"></a>Typically, when creating an ordinal scale, we’ll provide an array of elements for the domain and an array of equal length for the range.  The generator will map each element in the domain, in order, to the elements in the range.</p>
+
+<p><a class="p_ident" id="p_pPMQOmetNx" href="#p_pPMQOmetNx" tabindex="-1" role="presentation"></a>In the example below we join data containing date strings to a set of rect elements that we plot on a time scale.  We create a color scale using scaleOrdinal that maps the years in [1970, 1971, 1972, 1973] to the colors in [“red”, “orange”, “green”, “blue”] as defined below.</p><pre>var colorScale = d3.scaleOrdinal()
+    .domain([1970, 1971, 1972, 1973])
+    .range(["red", "orange", "green", "blue"]);</pre>
+
+
+<p><a class="p_ident" id="p_a5NgLu8j+z" href="#p_a5NgLu8j+z" tabindex="-1" role="presentation"></a>We set their fill color using the colorScale function as shown below.</p><pre>.attr("fill", (d) =&gt; colorScale(parseTime(d.date).getFullYear()))</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_j0yCWPHUZj" href="#c_j0yCWPHUZj" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span> <span class="cm-attribute">src</span>=<span class="cm-string">&quot;https://d3js.org/d3.v4.min.js&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">style</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag">svg</span> { <span class="cm-property">background-color</span>: <span class="cm-keyword">lightblue</span>; }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">style</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+        {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;January 1, 1970&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;A&quot;</span>},
+        {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;April 1, 1970&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;B&quot;</span>},
+        {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;July 1, 1970&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;C&quot;</span>},
+        {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;October 1, 1970&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;D&quot;</span>},
+        {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;January 1, 1971&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;E&quot;</span>},
+        {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;April 1, 1971&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;F&quot;</span>},
+        {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;July 1, 1971&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;G&quot;</span>},
+        {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;October 1, 1971&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;H&quot;</span>},
+        {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;January 1, 1972&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;I&quot;</span>},
+        {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;April 1, 1972&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;J&quot;</span>},
+        {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;July 1, 1972&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;K&quot;</span>},
+        {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;October 1, 1972&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;L&quot;</span>},
+        {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;January 1, 1973&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;M&quot;</span>},
+        {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;April 1, 1973&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;N&quot;</span>},
+        {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;July 1, 1973&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;O&quot;</span>},
+        {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;October 1, 1973&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;P&quot;</span>}
+    ];
+
+    <span class="cm-keyword">var</span> <span class="cm-def">parseTime</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">timeParse</span>(<span class="cm-string">&quot;%B %d, %Y&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">dates</span> <span class="cm-operator">=</span> [];
+    <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">obj</span> <span class="cm-keyword">of</span> <span class="cm-variable">data</span>) {
+        <span class="cm-variable">dates</span>.<span class="cm-property">push</span>(<span class="cm-variable">parseTime</span>(<span class="cm-variable">obj</span>.<span class="cm-property">date</span>));
+    }
+
+    <span class="cm-keyword">var</span> <span class="cm-def">domain</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">extent</span>(<span class="cm-variable">dates</span>);
+    <span class="cm-variable">domain</span> <span class="cm-operator">=</span> [<span class="cm-variable">d3</span>.<span class="cm-property">timeYear</span>.<span class="cm-property">floor</span>(<span class="cm-variable">dates</span>[<span class="cm-number">0</span>]), <span class="cm-variable">d3</span>.<span class="cm-property">timeYear</span>.<span class="cm-property">ceil</span>(<span class="cm-variable">domain</span>[<span class="cm-number">1</span>])];
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleTime</span>()
+        .<span class="cm-property">domain</span>(<span class="cm-variable">domain</span>)
+        .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">555</span>]);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>)
+        .<span class="cm-property">ticks</span>(<span class="cm-variable">d3</span>.<span class="cm-property">timeYear</span>);
+
+    <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+       .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,70)&quot;</span>)
+       .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">years</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">map</span>(<span class="cm-variable">dates</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">getFullYear</span>()).<span class="cm-property">keys</span>();
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">years</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">colorScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleOrdinal</span>()
+        .<span class="cm-property">domain</span>(<span class="cm-variable">years</span>)
+        .<span class="cm-property">range</span>([<span class="cm-string">&quot;red&quot;</span>, <span class="cm-string">&quot;orange&quot;</span>, <span class="cm-string">&quot;green&quot;</span>, <span class="cm-string">&quot;blue&quot;</span>]);
+
+    <span class="cm-variable">svg</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;rect&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+        .<span class="cm-property">enter</span>()
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;rect&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable">parseTime</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">date</span>)))
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-number">40</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;width&quot;</span>, <span class="cm-number">10</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;height&quot;</span>, <span class="cm-number">30</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">colorScale</span>(<span class="cm-variable">parseTime</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">date</span>).<span class="cm-property">getFullYear</span>()));
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_PEVBDgvOoi" href="#p_PEVBDgvOoi" tabindex="-1" role="presentation"></a>Other methods and properties available to an ordinal scaling function are:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_LmSfF7gRSw" href="#p_LmSfF7gRSw" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#ordinal_unknown">unknown([value])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_+E4uLa3Yc4" href="#p_+E4uLa3Yc4" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#ordinal_copy">copy()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_QZ7oOD2eIW" href="#p_QZ7oOD2eIW" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#scaleImplicit">scaleImplicit()</a></p></li></ul>
+
+<h2><a class="h_ident" id="h_Xx//sJZjxJ" href="#h_Xx//sJZjxJ" tabindex="-1" role="presentation"></a>Band Scales</h2>
+
+<p><a class="p_ident" id="p_01Mug2TB2q" href="#p_01Mug2TB2q" tabindex="-1" role="presentation"></a>Band scales map a discrete domain to a set of <em>bands</em> within a continuous range.  The domain is specified using an array of values and the range is specified using a 2-element array to define a continuous interval.</p>
+
+<p><a class="p_ident" id="p_AesodwIpN8" href="#p_AesodwIpN8" tabindex="-1" role="presentation"></a>A band scale creates <em>k</em> uniformly sized bands across the range, where <em>k</em> is the cardinality (size) of the domain.  The width of the bands is called the <em>bandwidth</em> which can be obtained using the <code>bandwidth</code> method.</p>
+
+<p><a class="p_ident" id="p_1eb9zlYgfx" href="#p_1eb9zlYgfx" tabindex="-1" role="presentation"></a>In the example below, we create a band scale using a domain containing 4 colors and a range consisting of the interval [25, 555].</p><pre>var colors = ["red", "orange", "green", "blue"];
+
+var xScale = d3.scaleBand()
+    .domain(colors)
+    .range([25, 555]);
+</pre>
+
+
+<p><a class="p_ident" id="p_ILvG9RuF1Q" href="#p_ILvG9RuF1Q" tabindex="-1" role="presentation"></a>We join the colors to a set of rect elements, set the x-axis location using the band scaling function, and set the width of the rect elements to the bandwidth obtained using the <code>bandwidth</code> method.</p><pre>
+.attr("x", (d) =&gt; xScale(d))
+.attr("width", xScale.bandwidth())
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_8ZZ54taDma" href="#c_8ZZ54taDma" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo2&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">colors</span> <span class="cm-operator">=</span> [<span class="cm-string">&quot;red&quot;</span>, <span class="cm-string">&quot;orange&quot;</span>, <span class="cm-string">&quot;green&quot;</span>, <span class="cm-string">&quot;blue&quot;</span>];
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleBand</span>()
+        .<span class="cm-property">domain</span>(<span class="cm-variable">colors</span>)
+        .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">555</span>]);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>);
+
+    <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+       .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,70)&quot;</span>)
+       .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+
+    <span class="cm-variable">svg</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;rect&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">colors</span>)
+        .<span class="cm-property">enter</span>()
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;rect&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>))
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-number">40</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;width&quot;</span>, <span class="cm-variable">xScale</span>.<span class="cm-property">bandwidth</span>())
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;height&quot;</span>, <span class="cm-number">30</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_HNP9251GY1" href="#p_HNP9251GY1" tabindex="-1" role="presentation"></a>By default there is no padding between the bands. Padding can be added, however, by passing an array containing a value between 0 and 1 to one the following methods.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_xnRJ6n1QUj" href="#p_xnRJ6n1QUj" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_paddingOuter">paddingOuter([padding])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_uiLJghlFk7" href="#p_uiLJghlFk7" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_paddingInner">paddingInner([padding])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_SiD+K8nHoo" href="#p_SiD+K8nHoo" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_padding">padding([padding])</a></p></li></ul>
+
+<p><a class="p_ident" id="p_ydwfdY+GMk" href="#p_ydwfdY+GMk" tabindex="-1" role="presentation"></a>The argument to these functions specifies the ratio of the <em>step distance</em> that should be reserved for padding.  The step distance is the distance between the start of one band and the start of an adjacent band.  That is, the step distance is the sum of the bandwidth and the inner padding width.</p>
+
+<p><a class="p_ident" id="p_/yC6j5bw9w" href="#p_/yC6j5bw9w" tabindex="-1" role="presentation"></a>In the example below we set the outer padding ratio to 0.25 and the inner padding ratio to 0.5.</p><pre>
+var colors = ["red", "orange", "green", "blue"];
+
+var xScale = d3.scaleBand()
+    .domain(colors)
+    .range([25, 555])
+    .paddingOuter([.25])
+    .paddingInner([.5]);
+</pre>
+
+
+<p><a class="p_ident" id="p_y/v3OwS26W" href="#p_y/v3OwS26W" tabindex="-1" role="presentation"></a>We set the location and width as before.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_lAezKGJiTb" href="#c_lAezKGJiTb" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo3&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo3&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">colors</span> <span class="cm-operator">=</span> [<span class="cm-string">&quot;red&quot;</span>, <span class="cm-string">&quot;orange&quot;</span>, <span class="cm-string">&quot;green&quot;</span>, <span class="cm-string">&quot;blue&quot;</span>];
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleBand</span>()
+        .<span class="cm-property">domain</span>(<span class="cm-variable">colors</span>)
+        .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">555</span>])
+        .<span class="cm-property">paddingOuter</span>([<span class="cm-number">.25</span>])
+        .<span class="cm-property">paddingInner</span>([<span class="cm-number">.5</span>]);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>);
+
+    <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+       .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,70)&quot;</span>)
+       .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+
+    <span class="cm-variable">svg</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;rect&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">colors</span>)
+        .<span class="cm-property">enter</span>()
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;rect&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>))
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-number">40</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;width&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>.<span class="cm-property">bandwidth</span>())
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;height&quot;</span>, <span class="cm-number">30</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p>Other methods and properties available to an ordinal scaling function are:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_xM5g8JC28m" href="#p_xM5g8JC28m" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_rangeRound">rangeRound([<i>range</i>])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_SFQt+eEeMT" href="#p_SFQt+eEeMT" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_round">round([<i>round</i>])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_v/neRdnBSL" href="#p_v/neRdnBSL" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_align">align([<i>align</i>])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_TYZCnxaDl+" href="#p_TYZCnxaDl+" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_bandwidth">bandwidth()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_vTcNG2+bNY" href="#p_vTcNG2+bNY" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_step">step()</a></p></li>
+
+<li>
+
+<p><a href="https://github.com/d3/d3-scale/blob/master/README.md#band_copy">copy()</a></p></li></ul>
+
+<h2><a class="h_ident" id="h_H1hN3VvZZ7" href="#h_H1hN3VvZZ7" tabindex="-1" role="presentation"></a>Point Scales</h2>
+
+<p><a class="p_ident" id="p_wV/A/bSRvB" href="#p_wV/A/bSRvB" tabindex="-1" role="presentation"></a>Point scales are band scales where the bandwidth is set to zero.  That is, a point scale maps a discrete domain to a set of points that lie equally spaced within the range. As with band scales, by default, there is no padding.</p>
+
+<p><a class="p_ident" id="p_6CP0fUICGo" href="#p_6CP0fUICGo" tabindex="-1" role="presentation"></a>Below we create a point scale that uses the colors array for the domain and the interval [25, 555] as the range.</p><pre>var colors = ["red", "orange", "green", "blue"];
+
+var xScale = d3.scalePoint()
+ .domain(colors)
+ .range([25, 555]);
+</pre>
+
+
+<p><a class="p_ident" id="p_W2cUJn1tRl" href="#p_W2cUJn1tRl" tabindex="-1" role="presentation"></a>We join the colors data to a set of circle elements and set their center position on the x-axis using the point scale function.</p><pre>
+.attr("cx", (d) =&gt; xScale(d))
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_Dbbt42wj5d" href="#c_Dbbt42wj5d" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo4&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo4&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">colors</span> <span class="cm-operator">=</span> [<span class="cm-string">&quot;red&quot;</span>, <span class="cm-string">&quot;orange&quot;</span>, <span class="cm-string">&quot;green&quot;</span>, <span class="cm-string">&quot;blue&quot;</span>];
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scalePoint</span>()
+        .<span class="cm-property">domain</span>(<span class="cm-variable">colors</span>)
+        .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">555</span>]);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>);
+
+    <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+       .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,70)&quot;</span>)
+       .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+
+    <span class="cm-variable">svg</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">colors</span>)
+        .<span class="cm-property">enter</span>()
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>))
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-number">40</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">20</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p>Other methods and properties available to an point scaling function are:</p>
+
+<ul>
+
+<li>
+
+<p><a href="https://github.com/d3/d3-scale/blob/master/README.md#point_padding">padding([padding])</a></p></li>
+
+<li>
+
+<p><a href="https://github.com/d3/d3-scale/blob/master/README.md#point_rangeRound">rangeRound([<i>range</i>])</a></p></li>
+
+<li>
+
+<p><a href="https://github.com/d3/d3-scale/blob/master/README.md#point_round">round([<i>round</i>])</a></p></li>
+
+<li>
+
+<p><a href="https://github.com/d3/d3-scale/blob/master/README.md#point_align">align([<i>align</i>])</a></p></li>
+
+<li>
+
+<p><a href="https://github.com/d3/d3-scale/blob/master/README.md#point_bandwidth">bandwidth()</a></p></li>
+
+<li>
+
+<p><a href="https://github.com/d3/d3-scale/blob/master/README.md#point_step">step()</a></p></li>
+
+<li>
+
+<p><a href="https://github.com/d3/d3-scale/blob/master/README.md#point_copy">copy()</a></p></li></ul><nav><a href="04_06_quantize_scales.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_08_legends.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

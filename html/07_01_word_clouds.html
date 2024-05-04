@@ -1,0 +1,325 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Word Clouds</title>
+  <link rel="canonical" href="http://using-d3js.com/07_01_word_clouds.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 07;</script></head>
+
+<article>
+<nav><a href="06_05_packs.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="07_02_chords.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 07</span>Word Clouds</h1><script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.js"></script>
+
+
+<p><a class="p_ident" id="p_qgqEg+zqSq" href="#p_qgqEg+zqSq" tabindex="-1" role="presentation"></a>A word cloud is a visualization that displays a set of words in a cluster, with various orientations and sizes.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_uPjjiUhqHG" href="#c_uPjjiUhqHG" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">fill</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleOrdinal</span>(<span class="cm-variable">d3</span>.<span class="cm-property">schemeCategory20</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+    {<span class="cm-property">text</span>: <span class="cm-string">&quot;Hello&quot;</span>, <span class="cm-property">value</span>:<span class="cm-number">6260</span>},
+    {<span class="cm-property">text</span>: <span class="cm-string">&quot;happy&quot;</span>, <span class="cm-property">value</span>:<span class="cm-number">5370</span>},
+    {<span class="cm-property">text</span>: <span class="cm-string">&quot;beautiful&quot;</span>, <span class="cm-property">value</span>:<span class="cm-number">2480</span>},
+    {<span class="cm-property">text</span>: <span class="cm-string">&quot;rainbow&quot;</span>, <span class="cm-property">value</span>:<span class="cm-number">4350</span>},
+    {<span class="cm-property">text</span>: <span class="cm-string">&quot;unicorn&quot;</span>, <span class="cm-property">value</span>:<span class="cm-number">1250</span>},
+    {<span class="cm-property">text</span>: <span class="cm-string">&quot;glitter&quot;</span>, <span class="cm-property">value</span>:<span class="cm-number">3140</span>},
+    {<span class="cm-property">text</span>: <span class="cm-string">&quot;happy&quot;</span>, <span class="cm-property">value</span>:<span class="cm-number">990</span>},
+    {<span class="cm-property">text</span>: <span class="cm-string">&quot;pie&quot;</span>, <span class="cm-property">value</span>:<span class="cm-number">4230</span>}];
+
+<span class="cm-keyword">var</span> <span class="cm-def">layout</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">layout</span>.<span class="cm-property">cloud</span>()
+    .<span class="cm-property">size</span>([<span class="cm-number">400</span>, <span class="cm-number">300</span>])
+    .<span class="cm-property">words</span>(<span class="cm-variable">data</span>)
+    .<span class="cm-property">on</span>(<span class="cm-string">&quot;end&quot;</span>, <span class="cm-variable">draw</span>);
+
+<span class="cm-variable">layout</span>.<span class="cm-property">start</span>();
+
+<span class="cm-keyword">function</span> <span class="cm-def">draw</span>(<span class="cm-def">words</span>) {
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1&quot;</span>)
+      .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable">layout</span>.<span class="cm-property">size</span>()[<span class="cm-number">0</span>] <span class="cm-operator">/</span> <span class="cm-number">2</span> <span class="cm-operator">+</span> <span class="cm-string">&quot;,&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable">layout</span>.<span class="cm-property">size</span>()[<span class="cm-number">1</span>] <span class="cm-operator">/</span> <span class="cm-number">2</span> <span class="cm-operator">+</span> <span class="cm-string">&quot;)&quot;</span>)
+      .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;text&quot;</span>)
+      .<span class="cm-property">data</span>(<span class="cm-variable-2">words</span>)
+      .<span class="cm-property">enter</span>()
+      .<span class="cm-property">append</span>(<span class="cm-string">&quot;text&quot;</span>)
+      .<span class="cm-property">text</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">text</span>)
+      .<span class="cm-property">style</span>(<span class="cm-string">&quot;font-size&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">size</span> <span class="cm-operator">+</span> <span class="cm-string">&quot;px&quot;</span>)
+      .<span class="cm-property">style</span>(<span class="cm-string">&quot;font-family&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">font</span>)
+      .<span class="cm-property">style</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">fill</span>(<span class="cm-variable-2">i</span>))
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-string">&quot;translate(&quot;</span> <span class="cm-operator">+</span> [<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>, <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>] <span class="cm-operator">+</span> <span class="cm-string">&quot;)rotate(&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">d</span>.<span class="cm-property">rotate</span> <span class="cm-operator">+</span> <span class="cm-string">&quot;)&quot;</span>);
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;400&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;300&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_CkSZhGbjkM" href="#p_CkSZhGbjkM" tabindex="-1" role="presentation"></a>D3 doesn’t have a word cloud module, however Jason Davies created one named <a href="https://github.com/jasondavies/d3-cloud">d3-cloud</a>. It can be downloaded from the following CDN.</p><pre>
+https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.js
+</pre>
+
+
+<p><a class="p_ident" id="p_ihmdZQ0vVI" href="#p_ihmdZQ0vVI" tabindex="-1" role="presentation"></a>As with all of these demos we start with a SVG element.</p><pre>
+&lt;svg id="demo1" width="400" height="300"&gt;&lt;/svg&gt;
+</pre>
+
+
+<p><a class="p_ident" id="p_JCIOY8YQ8A" href="#p_JCIOY8YQ8A" tabindex="-1" role="presentation"></a>Our script starts by defining a color scale that we’ll use to color the words.</p><pre>
+var fill = d3.scaleOrdinal(d3.schemeCategory20);
+</pre>
+
+
+<p><a class="p_ident" id="p_s381+K4grO" href="#p_s381+K4grO" tabindex="-1" role="presentation"></a>The data that we need is in the form of an array of objects.  Each object in the array must have a property that holds text and a property that holds some value that is used when computing the font size.  The cloud layout function, by default, uses accessor functions that assume the text is in a property named <em>text</em> and the value used to compute the font size is in a property named <em>value</em> as shown in the example below.  In addition, the default font size accessor function sets the font size to the square root of the value assigned to the value property.</p><pre>
+var data = [
+    {text: "Hello", value:6260},
+    {text: "happy", value:5370},
+    {text: "beautiful", value:2480},
+    {text: "rainbow", value:4350},
+    {text: "unicorn", value:1250},
+    {text: "glitter", value:3140},
+    {text: "happy", value:990},
+    {text: "pie", value:4230}];
+</pre>
+
+
+<p><a class="p_ident" id="p_l+o6BArTfF" href="#p_l+o6BArTfF" tabindex="-1" role="presentation"></a>If the data set that we’re using uses other property names, we can change the accessor functions.  We discuss how later.</p>
+
+<p><a class="p_ident" id="p_wFLRSWC39n" href="#p_wFLRSWC39n" tabindex="-1" role="presentation"></a>After we’ve downloaded or created a dataset, we create a cloud layout object that will be used to add position and font properties to each object in the data set.  We create the layout object by calling <a href="https://github.com/jasondavies/d3-cloud#cloud">d3.layout.cloud()</a> and chaining other method calls to it.  The <a href="https://github.com/jasondavies/d3-cloud#size">size</a> method sets the size of the word cloud, the <a href="https://github.com/jasondavies/d3-cloud#words">words</a> method sets the dataset, and the <a href="https://github.com/jasondavies/d3-cloud#on">on</a> method registers a function (draw in this case) to execute when the layout algorithm has completed and the “end” event is dispatched.</p><pre>
+var layout = d3.layout.cloud()
+    .size([400, 300])
+    .words(data)
+    .on("end", draw);
+</pre>
+
+
+<p><a class="p_ident" id="p_3rhOpxo+Dn" href="#p_3rhOpxo+Dn" tabindex="-1" role="presentation"></a>We next start the layout algorithm by calling the <a href="https://github.com/jasondavies/d3-cloud#start">start</a> method on the layout object.</p><pre>
+layout.start();
+</pre>
+
+
+<p><a class="p_ident" id="p_Axd87R4Gv1" href="#p_Axd87R4Gv1" tabindex="-1" role="presentation"></a>When the layout algorithm has completed, our <code>draw</code> method will be called with a new data array passed to it. The layout algorithm adds the following properties (if not already there) to each object in the array.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_MMvpPSWRIX" href="#p_MMvpPSWRIX" tabindex="-1" role="presentation"></a>text - may be undefined if another <a href="https://github.com/jasondavies/d3-cloud#text">text</a> accessor function is used</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_5UgBF1SKib" href="#p_5UgBF1SKib" tabindex="-1" role="presentation"></a>hasText</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_j7Cus69H6B" href="#p_j7Cus69H6B" tabindex="-1" role="presentation"></a>size - set by the <a href="https://github.com/jasondavies/d3-cloud#fontSize">fontSize</a> accessor function</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_VetoXz9Fvp" href="#p_VetoXz9Fvp" tabindex="-1" role="presentation"></a>font - set by the <a href="https://github.com/jasondavies/d3-cloud#font">font</a> accessor function</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_LmDRp497kZ" href="#p_LmDRp497kZ" tabindex="-1" role="presentation"></a>weight - set by the <a href="https://github.com/jasondavies/d3-cloud#fontWeight">fontWeight</a> accessor function</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_/vqxIVRfT1" href="#p_/vqxIVRfT1" tabindex="-1" role="presentation"></a>style - set by the <a href="https://github.com/jasondavies/d3-cloud#fontStyle">fontStyle</a> accessor function</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_9+XMrBh3Tr" href="#p_9+XMrBh3Tr" tabindex="-1" role="presentation"></a>padding - set by the <a href="https://github.com/jasondavies/d3-cloud#padding">padding</a> accessor function</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_/cGlRajnvl" href="#p_/cGlRajnvl" tabindex="-1" role="presentation"></a>rotate - set by the <a href="https://github.com/jasondavies/d3-cloud#rotate">rotate</a> accessor function</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_EfatjsUqKY" href="#p_EfatjsUqKY" tabindex="-1" role="presentation"></a>x</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_LHwacnrSgq" href="#p_LHwacnrSgq" tabindex="-1" role="presentation"></a>x0</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_FtSvonD/kF" href="#p_FtSvonD/kF" tabindex="-1" role="presentation"></a>x1</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_PQI3Xg4zYl" href="#p_PQI3Xg4zYl" tabindex="-1" role="presentation"></a>xoff</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_lcsL/Sl3x2" href="#p_lcsL/Sl3x2" tabindex="-1" role="presentation"></a>y</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_1NtzmBRtSF" href="#p_1NtzmBRtSF" tabindex="-1" role="presentation"></a>y0</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_beEU1NL9rP" href="#p_beEU1NL9rP" tabindex="-1" role="presentation"></a>y1</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_tdJDe+uH2Q" href="#p_tdJDe+uH2Q" tabindex="-1" role="presentation"></a>yoff</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_c+flRcUZo4" href="#p_c+flRcUZo4" tabindex="-1" role="presentation"></a>height</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_cL7Iqb9ezS" href="#p_cL7Iqb9ezS" tabindex="-1" role="presentation"></a>width</p></li></ul>
+
+<p><a class="p_ident" id="p_gT7UdZsJAe" href="#p_gT7UdZsJAe" tabindex="-1" role="presentation"></a>In the draw method we use d3’s selection, append, join and other methods to add text elements to our svg element.  We position and stylize the text using the properties added to the joined data objects by the cloud layout function.</p><pre>
+function draw(words) {
+    d3.select("#demo1")
+        .append("g")
+        .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+        .selectAll("text")
+        .data(words)
+        .enter()
+        .append("text")
+        .text((d) =&gt; d.text)
+        .style("font-size", (d) =&gt; d.size + "px")
+        .style("font-family", (d) =&gt; d.font)
+        .style("fill", (d, i) =&gt; fill(i))
+        .attr("text-anchor", "middle")
+        .attr("transform", (d) =&gt; "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")");
+}
+</pre>
+
+
+<h2><a class="h_ident" id="h_XfTPn2ycWn" href="#h_XfTPn2ycWn" tabindex="-1" role="presentation"></a>Text and FontSize</h2>
+
+<p><a class="p_ident" id="p_4t6uUqPBQV" href="#p_4t6uUqPBQV" tabindex="-1" role="presentation"></a>If the objects in the initial data array don’t have properties named <em>text</em> and <em>value</em>, we can supply accessor functions to identify which properties to use, and in the case of value, a mathematical expression to define how to size the words.  The method named <a href="https://github.com/jasondavies/d3-cloud#text">text</a> is used to set the text accessor function and the method named <a href="https://github.com/jasondavies/d3-cloud#fontSize">fontSize</a> is used to set the fontSize accessor function.</p>
+
+<p><a class="p_ident" id="p_hX7mo9IwoR" href="#p_hX7mo9IwoR" tabindex="-1" role="presentation"></a>Suppose the data is supplied in the form below.</p><pre>
+var data = [
+    {word: "Hello", frequency:62},
+    {word: "happy", frequency:53},
+    ...
+</pre>
+
+
+<p><a class="p_ident" id="p_GE2w5t0UXv" href="#p_GE2w5t0UXv" tabindex="-1" role="presentation"></a>Then when creating the cloud layout function we could define new accessor functions as shown below.</p><pre>
+var layout = d3.layout.cloud()
+    .text((d) =&gt; d.word)
+    .fontSize((d) =&gt; Math.sqrt(d.frequency *100))
+    ...
+</pre>
+
+
+<h2><a class="h_ident" id="h_kRY1AtpojA" href="#h_kRY1AtpojA" tabindex="-1" role="presentation"></a>Other Accessors</h2>
+
+<p><a class="p_ident" id="p_R8HlrtQrKp" href="#p_R8HlrtQrKp" tabindex="-1" role="presentation"></a>When we create the cloud layout function, we can also specify accessor functions for the font, font weight, font style, padding and rotation angle using the following functions.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_wT8ROdKk7e" href="#p_wT8ROdKk7e" tabindex="-1" role="presentation"></a><a href="https://github.com/jasondavies/d3-cloud#font">layout.font([accessor])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_YxfCnUmcHF" href="#p_YxfCnUmcHF" tabindex="-1" role="presentation"></a><a href="https://github.com/jasondavies/d3-cloud#fontWeight">layout.fontWeight([accessor])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_FevMMOCHUb" href="#p_FevMMOCHUb" tabindex="-1" role="presentation"></a><a href="https://github.com/jasondavies/d3-cloud#fontStyle">layout.fontStyle([accessor])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_qBFI30YEcu" href="#p_qBFI30YEcu" tabindex="-1" role="presentation"></a><a href="https://github.com/jasondavies/d3-cloud#padding">layout.padding([accessor])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_8gfhZ9viP0" href="#p_8gfhZ9viP0" tabindex="-1" role="presentation"></a><a href="https://github.com/jasondavies/d3-cloud#rotate">layout.rotation([accessor])</a></p></li></ul>
+
+<p><a class="p_ident" id="p_4IBTr/lX9I" href="#p_4IBTr/lX9I" tabindex="-1" role="presentation"></a>In the example below we use some of these accessor functions.</p><pre>
+var layout = d3.layout.cloud()
+    .size([400, 300])
+    .words(data)
+    .font("Impact")
+    .padding(5)
+    .rotate(function() { return ~~(Math.random() * 2) * 90; })
+    .on("end", draw);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_vvXQz+V3Cs" href="#c_vvXQz+V3Cs" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">fill</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleOrdinal</span>(<span class="cm-variable">d3</span>.<span class="cm-property">schemeCategory20</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+      {<span class="cm-property">text</span>: <span class="cm-string">&quot;Hello&quot;</span>, <span class="cm-property">value</span>:<span class="cm-number">6260</span>},
+      {<span class="cm-property">text</span>: <span class="cm-string">&quot;happy&quot;</span>, <span class="cm-property">value</span>:<span class="cm-number">5370</span>},
+      {<span class="cm-property">text</span>: <span class="cm-string">&quot;beautiful&quot;</span>, <span class="cm-property">value</span>:<span class="cm-number">2480</span>},
+      {<span class="cm-property">text</span>: <span class="cm-string">&quot;rainbow&quot;</span>, <span class="cm-property">value</span>:<span class="cm-number">4350</span>},
+      {<span class="cm-property">text</span>: <span class="cm-string">&quot;unicorn&quot;</span>, <span class="cm-property">value</span>:<span class="cm-number">1250</span>},
+      {<span class="cm-property">text</span>: <span class="cm-string">&quot;glitter&quot;</span>, <span class="cm-property">value</span>:<span class="cm-number">3140</span>},
+      {<span class="cm-property">text</span>: <span class="cm-string">&quot;happy&quot;</span>, <span class="cm-property">value</span>:<span class="cm-number">990</span>},
+      {<span class="cm-property">text</span>: <span class="cm-string">&quot;pie&quot;</span>, <span class="cm-property">value</span>:<span class="cm-number">4230</span>}];
+
+  <span class="cm-keyword">var</span> <span class="cm-def">layout</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">layout</span>.<span class="cm-property">cloud</span>()
+      .<span class="cm-property">size</span>([<span class="cm-number">400</span>, <span class="cm-number">300</span>])
+      .<span class="cm-property">words</span>(<span class="cm-variable">data</span>)
+      .<span class="cm-property">font</span>(<span class="cm-string">&quot;Impact&quot;</span>)
+      .<span class="cm-property">padding</span>(<span class="cm-number">5</span>)
+      .<span class="cm-property">rotate</span>(<span class="cm-keyword">function</span>() { <span class="cm-keyword">return</span> <span class="cm-operator">~</span><span class="cm-operator">~</span>(<span class="cm-variable">Math</span>.<span class="cm-property">random</span>() <span class="cm-operator">*</span> <span class="cm-number">2</span>) <span class="cm-operator">*</span> <span class="cm-number">90</span>; })
+      .<span class="cm-property">on</span>(<span class="cm-string">&quot;end&quot;</span>, <span class="cm-variable">draw</span>);
+
+  <span class="cm-variable">layout</span>.<span class="cm-property">start</span>();
+
+  <span class="cm-keyword">function</span> <span class="cm-def">draw</span>(<span class="cm-def">words</span>) {
+      <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo2&quot;</span>)
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable">layout</span>.<span class="cm-property">size</span>()[<span class="cm-number">0</span>] <span class="cm-operator">/</span> <span class="cm-number">2</span> <span class="cm-operator">+</span> <span class="cm-string">&quot;,&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable">layout</span>.<span class="cm-property">size</span>()[<span class="cm-number">1</span>] <span class="cm-operator">/</span> <span class="cm-number">2</span> <span class="cm-operator">+</span> <span class="cm-string">&quot;)&quot;</span>)
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;text&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable-2">words</span>)
+        .<span class="cm-property">enter</span>()
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;text&quot;</span>)
+        .<span class="cm-property">text</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">text</span>)
+        .<span class="cm-property">style</span>(<span class="cm-string">&quot;font-size&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">size</span> <span class="cm-operator">+</span> <span class="cm-string">&quot;px&quot;</span>)
+        .<span class="cm-property">style</span>(<span class="cm-string">&quot;font-family&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">font</span>)
+        .<span class="cm-property">style</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">fill</span>(<span class="cm-variable-2">i</span>))
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-string">&quot;translate(&quot;</span> <span class="cm-operator">+</span> [<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>, <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>] <span class="cm-operator">+</span> <span class="cm-string">&quot;)rotate(&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">d</span>.<span class="cm-property">rotate</span> <span class="cm-operator">+</span> <span class="cm-string">&quot;)&quot;</span>);
+  }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;400&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;300&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_VRhSxwKN3Q" href="#h_VRhSxwKN3Q" tabindex="-1" role="presentation"></a>Other Functions</h2>
+
+<p><a class="p_ident" id="p_6zRUMxJcD2" href="#p_6zRUMxJcD2" tabindex="-1" role="presentation"></a>Other functions in the module include:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_zH+m/FCs2k" href="#p_zH+m/FCs2k" tabindex="-1" role="presentation"></a><a href="https://github.com/jasondavies/d3-cloud#stop">layout.stop()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_fQm9phK1Hj" href="#p_fQm9phK1Hj" tabindex="-1" role="presentation"></a><a href="https://github.com/jasondavies/d3-cloud#timeInterval">layout.timeInterval([time])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_MgkiAoRWBw" href="#p_MgkiAoRWBw" tabindex="-1" role="presentation"></a><a href="https://github.com/jasondavies/d3-cloud#spiral">layout.spiral([spiral])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_xHv/tVO7D2" href="#p_xHv/tVO7D2" tabindex="-1" role="presentation"></a><a href="https://github.com/jasondavies/d3-cloud#random">layout.random([random])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_BcjyHggpcL" href="#p_BcjyHggpcL" tabindex="-1" role="presentation"></a><a href="https://github.com/jasondavies/d3-cloud#canvas">layout.canvas([canvas])</a></p></li></ul><nav><a href="06_05_packs.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="07_02_chords.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

@@ -1,0 +1,268 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chord Layout</title>
+  <link rel="canonical" href="http://using-d3js.com/07_02_chords.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 07;</script></head>
+
+<article>
+<nav><a href="07_01_word_clouds.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="08_01_events.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 07</span>Chord Layout</h1><script src="https://d3js.org/d3.v4.min.js"></script>
+<style>
+path {
+  opacity: 0.9;
+  }
+</style>
+
+
+<p><a class="p_ident" id="p_pq4H5KuRlX" href="#p_pq4H5KuRlX" tabindex="-1" role="presentation"></a>The chord layout creates a circular layout for a weighted graph.</p>
+
+<p><a class="p_ident" id="p_p5VOgr/khl" href="#p_p5VOgr/khl" tabindex="-1" role="presentation"></a>The chord library is included in the d3v4 library and can be loaded as a stand-alone library as well.</p><pre>
+&lt;script src="https://d3js.org/d3-chord.v1.min.js"&gt;&lt;/script&gt;
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_VJUkqxzFQB" href="#c_VJUkqxzFQB" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">colors</span> <span class="cm-operator">=</span> [<span class="cm-string">'#e45f56'</span>, <span class="cm-string">'#a3d39c'</span>, <span class="cm-string">'#7accc9'</span>, <span class="cm-string">'#49aaa6'</span>, <span class="cm-string">'#35404f'</span>];
+
+<span class="cm-keyword">var</span> <span class="cm-def">m</span> <span class="cm-operator">=</span> [
+  [<span class="cm-number">0</span>,<span class="cm-number">1.1</span>,<span class="cm-number">1.2</span>,<span class="cm-number">1.3</span>,<span class="cm-number">1.4</span>],
+  [<span class="cm-number">2.75</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>],
+  [<span class="cm-number">1.75</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>],
+  [<span class="cm-number">1.375</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>],
+  [<span class="cm-number">0.125</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>]];
+
+<span class="cm-keyword">var</span> <span class="cm-def">chord</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">chord</span>()
+  .<span class="cm-property">padAngle</span>(<span class="cm-number">0.175</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">chords</span> <span class="cm-operator">=</span> <span class="cm-variable">chord</span>(<span class="cm-variable">m</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">ribbon</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">ribbon</span>()
+  .<span class="cm-property">radius</span>(<span class="cm-number">83</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1 g.links&quot;</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">chords</span>)
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">ribbon</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">colors</span>[<span class="cm-variable-2">d</span>.<span class="cm-property">source</span>.<span class="cm-property">index</span>])
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-number">1</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">arcGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">arc</span>()
+  .<span class="cm-property">innerRadius</span>(<span class="cm-number">85</span>)
+  .<span class="cm-property">outerRadius</span>(<span class="cm-number">90</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1 g.ring&quot;</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">chords</span>.<span class="cm-property">groups</span>)
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">arcGen</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">colors</span>[<span class="cm-variable-2">d</span>.<span class="cm-property">index</span>])
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-number">1</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">200</span> <span class="cm-attribute">height</span>=<span class="cm-string">200</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;ring&quot;</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(100,100)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;links&quot;</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(100,100)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_1nqOJVUXPD" href="#p_1nqOJVUXPD" tabindex="-1" role="presentation"></a>The graph is provided as an adjacency matrix.</p><pre>
+var m = [
+  [0,1.1,1.2,1.3,1.4],
+  [2.75,0,0,0,0],
+  [1.75,0,0,0,0],
+  [1.375,0,0,0,0],
+  [0.125,0,0,0,0]];
+</pre>
+
+
+<p><a class="p_ident" id="p_T7M3EP4/NA" href="#p_T7M3EP4/NA" tabindex="-1" role="presentation"></a>Each row in matrix can be thought of as a set of weights for a set of directed edges that have a common source node. In other words, if <code>m[i][j]</code> has the value <code>k</code>, then we consider there to be an edge from <code>i</code> to <code>j</code> with a weight of <code>k</code>.  A value of 0 at <code>m[i][j]</code> indicates there is no edge from <code>i</code> to <code>j</code>.  In the example above, the first row contains [0,1.1,1.2,1.3,1.4] indicating there are edges from node 0 to nodes 1, 2, 3, and 4, with weights 1.1, 1.2, 1.3, and 1.4, respectively.</p>
+
+<p><a class="p_ident" id="p_BggDrsHdiC" href="#p_BggDrsHdiC" tabindex="-1" role="presentation"></a>Nodes are represented as arcs, separated by padding, on the circumference of the circle.  The angle swept by a node’s arc is proportional to the sum of the weights of the edges that start at the node.  In the example above, there are 5 arcs on the circumference of the circle, hence 5 nodes.  Since the sum of the weights of the nodes leaving node 0 is 5 and the sum of the weights of all of the nodes is 11, then the angle swept by the arc (in radians) for node 0 (the red one) is <code>4/<wbr>11 * (2*PI - padding)</code>.</p>
+
+<p><a class="p_ident" id="p_8BUeRuxjmh" href="#p_8BUeRuxjmh" tabindex="-1" role="presentation"></a>Edges are rendered as ribbons where the weight of an edge is represented by the width of the end of the ribbon near the arc of the source node.  If there are 2 edges between a pair of nodes, they are represented by a single ribbon.  The red ribbon for example, represents 2 edges one from node 0 to node 4 with a weight of 1.4, and an edge from node 4 to node 0 with a weight of 0.125.</p>
+
+<h2><a class="h_ident" id="h_rxGqFM5Ch3" href="#h_rxGqFM5Ch3" tabindex="-1" role="presentation"></a>Creating a Chord Layout Generator</h2>
+
+<p><a class="p_ident" id="p_PDukHBz77+" href="#p_PDukHBz77+" tabindex="-1" role="presentation"></a>We create a chord layout using <a href="https://github.com/d3/d3-chord#chord">d3.chord()</a>.</p><pre>
+var chord = d3.chord()
+  .padAngle(0.175);
+</pre>
+
+
+<p><a class="p_ident" id="p_wExkKdPnKd" href="#p_wExkKdPnKd" tabindex="-1" role="presentation"></a>We can also chain the following methods to override the defaults.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_Y36M+Trg8W" href="#p_Y36M+Trg8W" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-chord#chord_padAngle">chord.padAngle([angle])</a> - sets the pad angle (in radians). The default is 0.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_+Ot3pT1AEf" href="#p_+Ot3pT1AEf" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-chord#chord_sortGroups">chord.sortGroups([compare])</a> - sets the comparator that is used to sort the nodes.  The comparator is passed two numbers representing the total weight of the edges emanating from two nodes.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_h+dgN/ifo8" href="#p_h+dgN/ifo8" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-chord#chord_sortSubgroups">chord.sortSubgroups([compare])</a> - sets the comparator that is used to sort the edges of a node.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_udmoc6V+WC" href="#p_udmoc6V+WC" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-chord#chord_sortChords">chord.sortChords([compare])</a> - sets the comparator that is used to determine the z-order of the chords.</p></li></ul>
+
+<p><a class="p_ident" id="p_ad3LgFSKBx" href="#p_ad3LgFSKBx" tabindex="-1" role="presentation"></a>See below for example uses.</p>
+
+<h2><a class="h_ident" id="h_KWqwHhRt/b" href="#h_KWqwHhRt/b" tabindex="-1" role="presentation"></a>Creating a Set of Chords</h2>
+
+<p><a class="p_ident" id="p_0IM54p07e/" href="#p_0IM54p07e/" tabindex="-1" role="presentation"></a>When we call the chord layout we pass a matrix to it.  The return value is an array of chords.</p><pre>
+var chords = chord(m);
+</pre>
+
+
+<p><a class="p_ident" id="p_fgAOSSE+Zz" href="#p_fgAOSSE+Zz" tabindex="-1" role="presentation"></a>Each chord object has source and target properties that contain objects with the following properties:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_bflPjgO7kj" href="#p_bflPjgO7kj" tabindex="-1" role="presentation"></a>startAngle - the start angle in radians</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_ir0n6vnBj1" href="#p_ir0n6vnBj1" tabindex="-1" role="presentation"></a>endAngle - the end angle in radians</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_BkwyBIjeJJ" href="#p_BkwyBIjeJJ" tabindex="-1" role="presentation"></a>value - the weight</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_MLXfFz9hDm" href="#p_MLXfFz9hDm" tabindex="-1" role="presentation"></a>index - the source node index</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_tMjlfgfpKC" href="#p_tMjlfgfpKC" tabindex="-1" role="presentation"></a>subindex - the target node index</p></li></ul>
+
+<p><a class="p_ident" id="p_0IIi8x2GrF" href="#p_0IIi8x2GrF" tabindex="-1" role="presentation"></a>Given an array of chords, we can render ribbons for the chords using <a href="https://github.com/d3/d3-chord#ribbon">d3.ribbon()</a> as shown below.  There we create a ribbon generator, append a set of <code>path</code> elements to an <code>svg</code> element and use a ribbon generator to compute the path strings from the array of chords that is passed to data.</p><pre>
+var ribbon = d3.ribbon()
+  .radius(83);
+
+d3.select("#demo1 g#links")
+  .selectAll("path")
+  .data(chords)
+  .enter()
+  .append("path")
+  .attr("d", ribbon)
+  .attr("fill", d => colors[d.source.index])
+  .attr("stroke", "gray")
+  .attr("stroke-width", 1);
+</pre>
+
+
+<h2><a class="h_ident" id="h_gKX9CTHA9J" href="#h_gKX9CTHA9J" tabindex="-1" role="presentation"></a>Using the Chord Methods</h2>
+
+<p><a class="p_ident" id="p_nGleO0W/Nj" href="#p_nGleO0W/Nj" tabindex="-1" role="presentation"></a>The original example was contrived so that the default chord layout would create a aesthetically  pleasing visualization.  In the examples below we mix the data up so that the default rendering is not idea, and use the chord methods to produce a result that is similar to the original, aside from the color of the ribbons.</p>
+
+<p><a class="p_ident" id="p_Gfqf2D1rgB" href="#p_Gfqf2D1rgB" tabindex="-1" role="presentation"></a>The first visualization shows what is rendered when no methods are used. The second rendering includes padding. The third sorts the nodes (groups) so that they are rendered according to total weight of edges flowing out from the node, clockwise from largest to smallest. The fourth sorts the chords of each node (subgroup) according to their weight, clockwise from smallest to largest. The last sets the z-order of the chords so that the larger weighted chords are rendered above smaller weighted chords.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_TU6pMUtD6R" href="#c_TU6pMUtD6R" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">colors</span> <span class="cm-operator">=</span> [<span class="cm-string">'#e45f56'</span>, <span class="cm-string">'#a3d39c'</span>, <span class="cm-string">'#7accc9'</span>, <span class="cm-string">'#49aaa6'</span>, <span class="cm-string">'#35404f'</span>];
+
+<span class="cm-keyword">var</span> <span class="cm-def">m</span> <span class="cm-operator">=</span> [
+  [<span class="cm-number">0</span>,<span class="cm-number">1.4</span>,<span class="cm-number">1.2</span>,<span class="cm-number">1.1</span>,<span class="cm-number">1.3</span>],
+  [<span class="cm-number">0.125</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>],
+  [<span class="cm-number">1.75</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>],
+  [<span class="cm-number">2.75</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>],
+  [<span class="cm-number">1.375</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>,<span class="cm-number">0</span>]];
+
+<span class="cm-keyword">var</span> <span class="cm-def">renderVis</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">id</span>, <span class="cm-def">chords</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">ribbon</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">ribbon</span>()
+    .<span class="cm-property">radius</span>(<span class="cm-number">43</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">id</span> <span class="cm-operator">+</span> <span class="cm-string">&quot; g.links&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable-2">chords</span>)
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable-2">ribbon</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">colors</span>[<span class="cm-variable-2">d</span>.<span class="cm-property">source</span>.<span class="cm-property">index</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-number">1</span>);
+
+  <span class="cm-keyword">let</span> <span class="cm-def">arcGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">arc</span>()
+    .<span class="cm-property">innerRadius</span>(<span class="cm-number">45</span>)
+    .<span class="cm-property">outerRadius</span>(<span class="cm-number">50</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">id</span> <span class="cm-operator">+</span> <span class="cm-string">&quot; g.ring&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable-2">chords</span>.<span class="cm-property">groups</span>)
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable-2">arcGen</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">colors</span>[<span class="cm-variable-2">d</span>.<span class="cm-property">index</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-number">1</span>);
+};
+
+<span class="cm-keyword">var</span> <span class="cm-def">chords2</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">chord</span>()(<span class="cm-variable">m</span>);
+<span class="cm-variable">renderVis</span>(<span class="cm-string">&quot;demo2&quot;</span>, <span class="cm-variable">chords2</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">chords3</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">chord</span>().<span class="cm-property">padAngle</span>(<span class="cm-number">0.175</span>)(<span class="cm-variable">m</span>);
+<span class="cm-variable">renderVis</span>(<span class="cm-string">&quot;demo3&quot;</span>, <span class="cm-variable">chords3</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">chords4</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">chord</span>()
+  .<span class="cm-property">padAngle</span>(<span class="cm-number">0.175</span>)
+  .<span class="cm-property">sortGroups</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>)(<span class="cm-variable">m</span>);
+<span class="cm-variable">renderVis</span>(<span class="cm-string">&quot;demo4&quot;</span>, <span class="cm-variable">chords4</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">chords5</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">chord</span>()
+  .<span class="cm-property">padAngle</span>(<span class="cm-number">0.175</span>)
+  .<span class="cm-property">sortGroups</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>)
+  .<span class="cm-property">sortSubgroups</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">a</span> <span class="cm-operator">-</span> <span class="cm-variable-2">b</span>)(<span class="cm-variable">m</span>);
+<span class="cm-variable">renderVis</span>(<span class="cm-string">&quot;demo5&quot;</span>, <span class="cm-variable">chords5</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">chords6</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">chord</span>()
+  .<span class="cm-property">padAngle</span>(<span class="cm-number">0.175</span>)
+  .<span class="cm-property">sortGroups</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>)
+  .<span class="cm-property">sortSubgroups</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">a</span> <span class="cm-operator">-</span> <span class="cm-variable-2">b</span>)
+  .<span class="cm-property">sortChords</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>)(<span class="cm-variable">m</span>);
+<span class="cm-variable">renderVis</span>(<span class="cm-string">&quot;demo6&quot;</span>, <span class="cm-variable">chords6</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">100</span> <span class="cm-attribute">height</span>=<span class="cm-string">100</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;ring&quot;</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(50,50)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;links&quot;</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(50,50)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo3&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">100</span> <span class="cm-attribute">height</span>=<span class="cm-string">100</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;ring&quot;</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(50,50)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;links&quot;</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(50,50)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo4&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">100</span> <span class="cm-attribute">height</span>=<span class="cm-string">100</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;ring&quot;</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(50,50)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;links&quot;</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(50,50)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo5&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">100</span> <span class="cm-attribute">height</span>=<span class="cm-string">100</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;ring&quot;</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(50,50)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;links&quot;</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(50,50)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo6&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">100</span> <span class="cm-attribute">height</span>=<span class="cm-string">100</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;ring&quot;</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(50,50)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;links&quot;</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(50,50)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><nav><a href="07_01_word_clouds.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="08_01_events.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

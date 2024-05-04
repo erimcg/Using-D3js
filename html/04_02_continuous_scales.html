@@ -1,0 +1,294 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Continuous Scales</title>
+  <link rel="canonical" href="http://using-d3js.com/04_02_continuous_scales.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 04;</script></head>
+
+<article>
+<nav><a href="04_01_scaling_functions.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_03_axis.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 04</span>Continuous Scales</h1><script src="https://d3js.org/d3.v4.min.js"></script>
+
+
+<p><a class="p_ident" id="p_uNaLd7hSsC" href="#p_uNaLd7hSsC" tabindex="-1" role="presentation"></a>Recall from the last tutorial that continuous scaling functions map a <strong>continuous numeric domain</strong> defined by an interval to a <strong>continuous range</strong> defined by another interval.</p>
+
+<p><a class="p_ident" id="p_2mnzCT8tmy" href="#p_2mnzCT8tmy" tabindex="-1" role="presentation"></a>Continuous scaling functions are created using the following methods:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_4NNJVbiFhq" href="#p_4NNJVbiFhq" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#linear-scales">continuous d3.scaleLinear()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_SVeIHO1HGP" href="#p_SVeIHO1HGP" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#power-scales">pow d3.scalePow()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_AkbNXFJWGx" href="#p_AkbNXFJWGx" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#scaleSqrt">pow d3.scaleSqrt()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_hAZKkhP3Cy" href="#p_hAZKkhP3Cy" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#log-scales">log d3.scaleLog()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_gaagGawSuQ" href="#p_gaagGawSuQ" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#scaleTime">time d3.scaleTime()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_rTkgbaOpGX" href="#p_rTkgbaOpGX" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#scaleUtc">time d3.scaleUtc()</a></p></li></ul>
+
+<p><a class="p_ident" id="p_OuahUIc37b" href="#p_OuahUIc37b" tabindex="-1" role="presentation"></a>Each of these methods returns a reference to an instances of one of the following Function object types: continuous, pow, log or time.</p>
+
+<p><a class="p_ident" id="p_yyTbMw8vML" href="#p_yyTbMw8vML" tabindex="-1" role="presentation"></a>Each of these Function object types has a set of methods associated with it that are used to get and set various properties of the scaling function.  You can find a <a href="https://github.com/d3/d3/blob/master/API.md#continuous-scales">comprehensive list</a> in the API documentation.   Below is a list of the methods provided by each of the function types.</p><div>
+  <svg id="methodList" width="600" height="300"></svg>
+</div>
+<script>
+var methodNames = [
+  "invert",
+  "domain",
+  "range",
+  "rangeRound",
+  "clamp",
+  "interpolate",
+  "ticks",
+  "tickFormat",
+  "nice",
+  "copy",
+  "exponent",
+  "base"];
+
+var columns = ["methods", "continuous", "pow", "log", "time"];
+
+var contMethods = [0,1,2,3,4,5,6,7,8,9];
+var powMethods = [0,1,2,3,4,5,6,7,8,9,10];
+var logMethods = [0,1,2,3,4,5,6,7,8,9,11];
+var timeMethods = [0,1,2,3,4,5,6,7,8,9];
+
+  var yScale = d3.scaleLinear()
+    .domain([0,11])
+    .range([40,280]);
+
+  d3.select("#methodList")
+     .selectAll("g")
+     .data(columns)
+     .enter()
+     .append("g")
+     .attr("id", (d) => d);
+
+  d3.select("#" + columns[0])
+      .selectAll("text")
+      .data(methodNames)
+      .enter()
+      .append("text")
+      .attr("x", 100)
+      .attr("y", (d,i) => yScale(i))
+      .text((d) => d)
+      .attr('text-anchor', 'end');
+
+function drawCircles(colNum, data, cx) {
+  var u = d3.select("#" + columns[colNum]);
+
+  u.append("text")
+      .attr("x", cx)
+      .attr("y", 20)
+      .attr('text-anchor', 'middle')
+      .text(columns[colNum]);
+
+  u.selectAll("circle")
+      .data(data)
+      .enter()
+      .append("circle")
+      .attr("cx", cx)
+      .attr("cy", (d) => yScale(d))
+      .attr("r", 8)
+      .attr("fill", "pink");
+}
+
+drawCircles(1, contMethods, 150);
+drawCircles(2, powMethods, 220);
+drawCircles(3, logMethods, 290);
+drawCircles(4, timeMethods, 360);
+
+</script>
+
+
+<h2><a class="h_ident" id="h_DwHtVqHjKg" href="#h_DwHtVqHjKg" tabindex="-1" role="presentation"></a>Example</h2>
+
+<p><a class="p_ident" id="p_HLPJk7PMKr" href="#p_HLPJk7PMKr" tabindex="-1" role="presentation"></a>The example below shows a typical pattern for defining and using a continuous scaling function.</p>
+
+<p><a class="p_ident" id="p_p1HQWmCvp4" href="#p_p1HQWmCvp4" tabindex="-1" role="presentation"></a>We’ll use the homeless population that we’ve used in some of our previous examples.</p><pre>
+var data = [
+    {"state": "California","population": 134278 },
+    {"state": "Florida","population": 32190 },
+    {"state": "Washington","population": 21112 },
+    {"state": "New York","population": 89503 },
+    {"state": "Texas","population": 23548 }
+];
+</pre>
+
+
+<p><a class="p_ident" id="p_c4ivYyM2pq" href="#p_c4ivYyM2pq" tabindex="-1" role="presentation"></a>Rather than displaying a bar graph as we did in previous examples, let’s create 5 circles in a row, one circle for each state, where the radius of a circles is proportional to the size of the homeless population in the respective state.</p>
+
+<p><a class="p_ident" id="p_LjZjD+erKU" href="#p_LjZjD+erKU" tabindex="-1" role="presentation"></a>Since we want to maintain the proportional differences between data points we’ll use the <code>scaleLinear</code> method. The <code>scaleLinear</code> method returns a reference to a <code>continuous</code> object on which we can call the <code>domain</code> and <code>range</code> methods to set the domain and range of the scaling function.</p>
+
+<p><a class="p_ident" id="p_+szUKD3fSj" href="#p_+szUKD3fSj" tabindex="-1" role="presentation"></a>Below we create two scaling functions, one to be used when computing the radii and the other to compute where along the x-axis to place the circle.</p><pre>
+var rScale = d3.scaleLinear()
+    .domain([0,140000])
+    .range([1,30]);
+
+var xScale = d3.scaleLinear()
+    .domain([0,4])
+    .range([50,550]);
+    </pre>
+
+
+<p><a class="p_ident" id="p_28Sif3XTmw" href="#p_28Sif3XTmw" tabindex="-1" role="presentation"></a>Below we create 5 circles, set their properties, and create 5 text elements to display the state names.  The calls to the scaling functions are in bold font.</p><pre>
+var u = d3.select("#homeless1")
+    .selectAll("circle")
+    .data(data)
+    .enter()
+    .append("circle")
+    .attr("cx", (d,i) =&gt; <strong>xScale(i)</strong>)
+    .attr("cy", 50)
+    .attr("r", (d,i) =&gt; <strong>rScale(d.population)</strong>)
+    .attr("fill", "pink");
+
+u = d3.select("#homeless1")
+    .selectAll('text')
+    .data(data)
+    .enter()
+    .append('text')
+    .text((d) =&gt; d.state)
+    .attr('x', (d,i) =&gt; <strong>xScale(i)</strong>)
+    .attr('y', 95)
+    .attr('text-anchor', 'middle');
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="active" ><a class="c_ident" id="c_D4iD85XEZS" href="#c_D4iD85XEZS" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;homeless1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;600&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+      {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;California&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">134278</span> },
+      {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Florida&quot;</span>,   <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">32190</span> },
+      {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Washington&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">21112</span> },
+      {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;New York&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">89503</span> },
+      {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Texas&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">23548</span> }
+  ];
+
+  <span class="cm-keyword">var</span> <span class="cm-def">rScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+      .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">140000</span>])
+      .<span class="cm-property">range</span>([<span class="cm-number">1</span>,<span class="cm-number">30</span>]);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+      .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">4</span>])
+      .<span class="cm-property">range</span>([<span class="cm-number">50</span>,<span class="cm-number">550</span>]);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">u</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#homeless1&quot;</span>)
+      .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+      .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+      .<span class="cm-property">enter</span>()
+      .<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">i</span>))
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-number">50</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">rScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">population</span>))
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>);
+
+  <span class="cm-variable">u</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#homeless1&quot;</span>)
+      .<span class="cm-property">selectAll</span>(<span class="cm-string">'text'</span>)
+      .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+      .<span class="cm-property">enter</span>()
+      .<span class="cm-property">append</span>(<span class="cm-string">'text'</span>)
+      .<span class="cm-property">text</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">state</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">i</span>))
+      .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, <span class="cm-number">95</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">'text-anchor'</span>, <span class="cm-string">'middle'</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_iOH9ljmurj" href="#h_iOH9ljmurj" tabindex="-1" role="presentation"></a>Domain and Range Intervals</h2>
+
+<p><a class="p_ident" id="p_zSu4fxUncz" href="#p_zSu4fxUncz" tabindex="-1" role="presentation"></a>The domain and range intervals can include more than 2 values, but they should have the same number of values. If a domain is specified as [x1, x2, ..., xn] and the range is specified as [y1, y2, ..., yn]  then values between x1 and x2 are mapped to values between y1 and y2, and values between x2 and x3 are mapped to values between y2 and y3, etc.</p>
+
+<h2><a class="h_ident" id="h_6Nde17oPVh" href="#h_6Nde17oPVh" tabindex="-1" role="presentation"></a>Color Scales</h2>
+
+<p><a class="p_ident" id="p_VA89Cu9V/d" href="#p_VA89Cu9V/d" tabindex="-1" role="presentation"></a>The range interval for a continuous scaling function can also specify colors, rather than numbers.</p>
+
+<p><a class="p_ident" id="p_nUWG03IL8G" href="#p_nUWG03IL8G" tabindex="-1" role="presentation"></a>Below we add a third scaling function that we use to compute the colors of the circles.</p><pre>
+var cScale = d3.scaleLinear()
+    .domain([0,140000])
+    .range(["yellow", "red"]);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_prJZpoQrAW" href="#c_prJZpoQrAW" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;homeless2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;600&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+      {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;California&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">134278</span> },
+      {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Florida&quot;</span>,   <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">32190</span> },
+      {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Washington&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">21112</span> },
+      {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;New York&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">89503</span> },
+      {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Texas&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">23548</span> }
+  ];
+  
+  <span class="cm-keyword">var</span> <span class="cm-def">cScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+      .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">140000</span>])
+      .<span class="cm-property">range</span>([<span class="cm-string">&quot;yellow&quot;</span>, <span class="cm-string">&quot;red&quot;</span>]);
+      
+  <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+      .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">4</span>])
+      .<span class="cm-property">range</span>([<span class="cm-number">50</span>,<span class="cm-number">550</span>]);
+      
+  <span class="cm-keyword">var</span> <span class="cm-def">rScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+      .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">140000</span>])
+      .<span class="cm-property">range</span>([<span class="cm-number">1</span>,<span class="cm-number">30</span>]);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">u</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#homeless2&quot;</span>)
+      .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+      .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+      .<span class="cm-property">enter</span>()
+      .<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">i</span>))
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-number">50</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">rScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">population</span>))
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">cScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">population</span>));
+
+  <span class="cm-variable">u</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#homeless2&quot;</span>)
+      .<span class="cm-property">selectAll</span>(<span class="cm-string">'text'</span>)
+      .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+      .<span class="cm-property">enter</span>()
+      .<span class="cm-property">append</span>(<span class="cm-string">'text'</span>)
+      .<span class="cm-property">text</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">state</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">i</span>))
+      .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, <span class="cm-number">95</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">'text-anchor'</span>, <span class="cm-string">'middle'</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_sGrAWTkNJa" href="#h_sGrAWTkNJa" tabindex="-1" role="presentation"></a>Clamping</h2>
+
+<p><a class="p_ident" id="p_w3iP0zCE9b" href="#p_w3iP0zCE9b" tabindex="-1" role="presentation"></a>By default, each of the continuous scaling functions accept values outside of the domain and uses extrapolation to compute a return value.  If we’d like to turn off extrapolation and return only values within the range, we can use the <code>clamp</code> method.</p><pre>
+xScale.clamp(true);
+</pre>
+
+
+<h2><a class="h_ident" id="h_6ERpCiCG2W" href="#h_6ERpCiCG2W" tabindex="-1" role="presentation"></a>Invert</h2>
+
+<p><a class="p_ident" id="p_PIJKCjDAYe" href="#p_PIJKCjDAYe" tabindex="-1" role="presentation"></a>If the scale function has a numeric domain, the <code>invert</code> method maps a value within the range to a value within the domain.</p>
+
+<h2><a class="h_ident" id="h_Q0tcT5ARQB" href="#h_Q0tcT5ARQB" tabindex="-1" role="presentation"></a>Nice</h2>
+
+<p><a class="p_ident" id="p_nOIQ59nFkj" href="#p_nOIQ59nFkj" tabindex="-1" role="presentation"></a>When a domain interval is created using actual data, it is often necessary to extend the domain on both ends so that when data values are scaled, the result is not a boundary of the range.  The <code>nice</code> method does just that; it rounds the endpoints of the domain to <em>nice</em> round values.</p><nav><a href="04_01_scaling_functions.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_03_axis.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

@@ -1,0 +1,371 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Reordering Elements</title>
+  <link rel="canonical" href="http://using-d3js.com/02_04_reordering_elements.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 02;</script></head>
+
+<article>
+<nav><a href="02_03_modifying_data.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="03_01_d3_fetch.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 02</span>Reordering Elements</h1><style>
+    button{
+        display: inline;
+        vertical-align: middle;
+    }
+    svg {
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .lightblue {
+        fill: lightblue;
+    }
+    .pink {
+        fill: pink;
+    }
+    #pink {
+        fill: pink;
+    }
+    .box {
+        display: inline-block;
+        vertical-align: middle;
+        width: 50px;
+        height: 50px;
+        text-align: center;
+        line-height: 50px;
+        margin: 15px;
+        border: 0;
+        padding: 0;
+    }
+    .circle {
+        border-radius: 25px;
+    }
+    .blue-box {
+        background-color: lightblue;
+    }
+    .pink-box {
+        background-color: pink;
+    }
+    .violet-box {
+      background-color: violet;
+    }
+
+
+</style>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+
+<p><a class="p_ident" id="p_vET8Yt8AzD" href="#p_vET8Yt8AzD" tabindex="-1" role="presentation"></a>We can reorder elements in a selection of elements that have data bound to them by using the following two <code>selection</code> methods.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_PYrJuQxdgJ" href="#p_PYrJuQxdgJ" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_sort">selection.sort(compare)</a> - reposition in the DOM the selected elements based on a comparator function</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_sLtYq90soO" href="#p_sLtYq90soO" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_order">selection.order()</a> - reposition in the DOM the selected elements based on the order of the elements in the selection.</p></li></ul>
+
+<h2><a class="h_ident" id="h_VSNn0txAnT" href="#h_VSNn0txAnT" tabindex="-1" role="presentation"></a>Selection.sort</h2>
+
+<p><a class="p_ident" id="p_e2/z+ZddiT" href="#p_e2/z+ZddiT" tabindex="-1" role="presentation"></a>The <a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_sort">selection.sort(compare)</a> method sorts the elements in a selection based on the <em>data</em> that is <em>bound</em> to the elements and <code>compare</code>, a comparator function, and then reinserts the elements into the DOM in the newly sorted order.</p>
+
+<p><a class="p_ident" id="p_yOcOaK2Lhr" href="#p_yOcOaK2Lhr" tabindex="-1" role="presentation"></a>The comparator is a function that takes as arguments a pair of <em>data</em> <code>(a, b)</code> that are bound to a pair of arbitrary elements in the selection.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_tpUoiGcfTJ" href="#p_tpUoiGcfTJ" tabindex="-1" role="presentation"></a>If the function returns a negative number, then the first element is positioned <em>before</em> the second element.</p></li>
+
+<li>
+
+<p>If the function returns a positive number, then the first element is positioned <em>after</em> the second element.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_5by/mRgjTk" href="#p_5by/mRgjTk" tabindex="-1" role="presentation"></a>If the function returns 0, then the order of the elements is unchanged.</p></li></ul>
+
+<p><a class="p_ident" id="p_pz2KiY+88T" href="#p_pz2KiY+88T" tabindex="-1" role="presentation"></a>You can pass <code>sort</code> a user defined comparator or pass it one of the comparators provided by D3.js.  Two comparators provided by D3.js that are commonly used are named <a href="https://github.com/d3/d3-array#ascending">d3.ascending</a> and <a href="https://github.com/d3/d3-array#descending">d3.descending</a> which when passed to <code>sort</code> order the data elements in ascending and descending order, respectively.  If no comparator is passed to <code>sort</code>, it uses <code>d3.ascending</code>.</p>
+
+<p><a class="p_ident" id="p_3srav3ywNW" href="#p_3srav3ywNW" tabindex="-1" role="presentation"></a>Note that <code>sort</code>, only repositions the elements in the DOM.  If the elements need to be repositioned on the screen, based on their new order in the DOM, then the <code>attr</code> method should be called after <code>sort</code>.</p>
+
+<h3><a class="i_ident" id="i_mmDlizjBmZ" href="#i_mmDlizjBmZ" tabindex="-1" role="presentation"></a>Sorting Circles</h3>
+
+<p><a class="p_ident" id="p_6IiuHJ/Fr/" href="#p_6IiuHJ/Fr/" tabindex="-1" role="presentation"></a>In the example below we select all of the circles in an SVG, sort them based on their radii, and change their <code>cx</code> property so that they appear in sorted order.</p>
+
+<p><a class="p_ident" id="p_Fu50QnZueG" href="#p_Fu50QnZueG" tabindex="-1" role="presentation"></a>Initially, no data is bound to the circles so we bind to each circle the value of its radius using the <code>selection.datum</code> method.</p><pre>
+d3.selectAll("#sortSVG circle")
+  .datum((d,i,nodes) => +nodes[i].getAttribute("r"))
+</pre>
+
+
+<p><a class="p_ident" id="p_aPVDHHbz0q" href="#p_aPVDHHbz0q" tabindex="-1" role="presentation"></a>We then call <code>selection.sort</code>, passing it a lambda expression which returns the difference between the radii of two elements.</p><pre>
+.sort((a,b) => b - a)
+</pre>
+
+
+<p><a class="p_ident" id="p_/kbuxyQ28s" href="#p_/kbuxyQ28s" tabindex="-1" role="presentation"></a>Last, we position the circles in order by changing their <code>cx</code> attribute based on the order in which they are found in their group.</p><pre>
+.attr("cx", (d, i) => 30 + (i * 50));
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_cXGMkLt/z1" href="#c_cXGMkLt/z1" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">function</span> <span class="cm-def">sortByRadius</span>(){
+  <span class="cm-variable">d3</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;#sortSVG circle&quot;</span>)
+    .<span class="cm-property">datum</span>((<span class="cm-def">d</span>,<span class="cm-def">i</span>,<span class="cm-def">nodes</span>) <span class="cm-operator">=&gt;</span> <span class="cm-operator">+</span><span class="cm-variable-2">nodes</span>[<span class="cm-variable-2">i</span>].<span class="cm-property">getAttribute</span>(<span class="cm-string">&quot;r&quot;</span>))
+    .<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-number">30</span> <span class="cm-operator">+</span> (<span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">50</span>));
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;sortSVG&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;400&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;60&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;5&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;10&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;130&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;180&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;15&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;230&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;sortByRadius()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Sort<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h3><a class="i_ident" id="i_R9fSTp3NID" href="#i_R9fSTp3NID" tabindex="-1" role="presentation"></a>Sorting Bars</h3>
+
+<p><a class="p_ident" id="p_QoxvYKW8Dh" href="#p_QoxvYKW8Dh" tabindex="-1" role="presentation"></a>Sometimes we’ll bind object data to the elements in a selection and sort them according to some property of the bound data.</p>
+
+<p><a class="p_ident" id="p_yZ83Pn3KX5" href="#p_yZ83Pn3KX5" tabindex="-1" role="presentation"></a>In the example below, we bind the objects in the following array to <code>rect</code> elements in an <code>svg</code>.</p><pre>
+var homelessData = [
+  {"state": "California","population": 134278},
+  {"state": "Florida",   "population": 32190},
+  {"state": "Washington","population": 21112},
+  {"state": "New York","population": 89503},
+  {"state": "Texas","population": 23548}
+];
+</pre>
+
+
+<p><a class="p_ident" id="p_KxKdN1ZquE" href="#p_KxKdN1ZquE" tabindex="-1" role="presentation"></a>When the button is pressed, the rectangles and labels are selected, sorted in ascending order according to the values in their bound data’s population properties, and positioned along the y-axis according to their sorted group position.</p><pre>
+  d3.select("#bargraph")
+      .selectAll("rect")
+      .sort((a,b) => d3.ascending(a.population, b.population))
+      .attr("y", (d, i) => i * 20);
+
+  d3.select("#bargraph")
+      .selectAll("text")
+      .sort((a,b) => d3.ascending(a.population, b.population))
+      .attr("y", (d, i) => i * 20 + 17);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_OKPfzcmeVN" href="#c_OKPfzcmeVN" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">homelessData</span> <span class="cm-operator">=</span> [
+  {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;California&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">134278</span>},
+  {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Florida&quot;</span>,   <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">32190</span>},
+  {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Washington&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">21112</span>},
+  {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;New York&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">89503</span>},
+  {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Texas&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">23548</span>}
+];
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#bargraph&quot;</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;rect&quot;</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">homelessData</span>)
+  .<span class="cm-property">join</span>(<span class="cm-string">&quot;rect&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;height&quot;</span>, <span class="cm-number">19</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;width&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">population</span><span class="cm-operator">/</span><span class="cm-number">500</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-number">100</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">20</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#bargraph&quot;</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;text&quot;</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">homelessData</span>)
+  .<span class="cm-property">join</span>(<span class="cm-string">&quot;text&quot;</span>)
+  .<span class="cm-property">text</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">state</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-number">96</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;end&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">20</span> <span class="cm-operator">+</span> <span class="cm-number">17</span>);
+
+<span class="cm-keyword">function</span> <span class="cm-def">sortData</span>() {
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#bargraph&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;rect&quot;</span>)
+    .<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">d3</span>.<span class="cm-property">ascending</span>(<span class="cm-variable-2">a</span>.<span class="cm-property">population</span>, <span class="cm-variable-2">b</span>.<span class="cm-property">population</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">20</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#bargraph&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;text&quot;</span>)
+    .<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">d3</span>.<span class="cm-property">ascending</span>(<span class="cm-variable-2">a</span>.<span class="cm-property">population</span>, <span class="cm-variable-2">b</span>.<span class="cm-property">population</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">20</span> <span class="cm-operator">+</span> <span class="cm-number">17</span>);
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;bargraph&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;400&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;sortData()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Sort<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_2/MU2rIs9x" href="#h_2/MU2rIs9x" tabindex="-1" role="presentation"></a>Selection.order</h2>
+
+<p><a class="p_ident" id="p_T2y06/GRHw" href="#p_T2y06/GRHw" tabindex="-1" role="presentation"></a>We’ve seen earlier that <code>selection.sort</code> can be used to reorder a set of nodes in the DOM that <em>have data bound to them</em> by using a comparator function.  We can also reorder a set of nodes in the DOM by using <code>data</code> and <a href="https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_order">selection.order()</a>.</p>
+
+<p><a class="p_ident" id="p_yk6G8vPZCR" href="#p_yk6G8vPZCR" tabindex="-1" role="presentation"></a>When we use <code>order</code> (which <code>sort</code> uses) to reorder the elements in the DOM, we use an array containing the data that is bound to our selected elements to determine the order of the elements in the DOM.  The order in which the data appears in the array will be the order in which the elements in the selection will be stored in the DOM.</p>
+
+<p><a class="p_ident" id="p_ZZM/kRXg0m" href="#p_ZZM/kRXg0m" tabindex="-1" role="presentation"></a>Once we’ve created the array of data and ordered it, we call <code>data</code>, passing it the newly ordered array as well as a key function.  The key function ensures that the data that is bound to each selected element does not change.  The selection returned by <code>data</code> will have groups of elements that are sorted according to the array passed to <code>data</code>.  We then call the <code>order</code> method to reorder the elements in the DOM based on the order in which they appear in the selection’s groups.</p>
+
+<h3><a class="i_ident" id="i_b2ZGOTGuiv" href="#i_b2ZGOTGuiv" tabindex="-1" role="presentation"></a>Ordering Letters</h3>
+
+<p><a class="p_ident" id="p_sk9ailmNwn" href="#p_sk9ailmNwn" tabindex="-1" role="presentation"></a>In the example below we create six <code>div</code> elements, each displaying a letter (a-f) that has also been bound to it, and order them in the DOM in a random order.</p>
+
+<p><a class="p_ident" id="p_YqbZYcCAnh" href="#p_YqbZYcCAnh" tabindex="-1" role="presentation"></a>When the <code>sort</code> button is pressed, first we sort the letters a-f in an array, in ascending order.  We then select the six <code>div</code> elements and call <code>data</code> on the selection, passing it the sorted array and a key function.  Finally, we call <code>order</code> which sorts the elements in the DOM.</p><pre>
+function sort() {    
+  stats.sort();
+  
+  d3.select("#order")
+    .selectAll("div")
+    .data(stats, (d) => d)
+    .order();
+}
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_6kXVAv8i2S" href="#c_6kXVAv8i2S" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">stats</span> <span class="cm-operator">=</span> [<span class="cm-string">&quot;f&quot;</span>, <span class="cm-string">&quot;b&quot;</span>, <span class="cm-string">&quot;e&quot;</span>, <span class="cm-string">&quot;a&quot;</span>, <span class="cm-string">&quot;c&quot;</span>, <span class="cm-string">&quot;d&quot;</span>];
+<span class="cm-variable">stats</span>.<span class="cm-property">sort</span>(() <span class="cm-operator">=&gt;</span> <span class="cm-variable">Math</span>.<span class="cm-property">random</span>() <span class="cm-operator">-</span> <span class="cm-number">0.5</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#order&quot;</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;div&quot;</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">stats</span>)
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;div&quot;</span>)
+  .<span class="cm-property">style</span>(<span class="cm-string">&quot;display&quot;</span>, <span class="cm-string">&quot;inline-block&quot;</span>)
+  .<span class="cm-property">style</span>(<span class="cm-string">&quot;font-size&quot;</span>, <span class="cm-string">&quot;20px&quot;</span>)
+  .<span class="cm-property">html</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span> <span class="cm-operator">+</span> <span class="cm-string">&quot;&amp;nbsp;&quot;</span>);
+    
+<span class="cm-keyword">function</span> <span class="cm-def">sort</span>() {    
+  <span class="cm-variable">stats</span>.<span class="cm-property">sort</span>();
+  
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#order&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;div&quot;</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable">stats</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>)
+    .<span class="cm-property">order</span>();
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;order&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">br</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;sort()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Sort<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h3><a class="i_ident" id="i_U3aC5EBtKw" href="#i_U3aC5EBtKw" tabindex="-1" role="presentation"></a>Swapping Circles and Squares</h3>
+
+<p><a class="p_ident" id="p_FUiGhJk576" href="#p_FUiGhJk576" tabindex="-1" role="presentation"></a>The following examples shows how we can reorder a pair of circles using <code>order</code>.</p>
+
+<p><a class="p_ident" id="p_fmTkXgO3j5" href="#p_fmTkXgO3j5" tabindex="-1" role="presentation"></a>In this example, we initially bind the values 1-4 to the four circles using an array passed to <code>data</code>.  When the button is pressed, we swap the values at index 1 and index 2.  We then reselect all of the <code>circle</code> elements and rebind the data (with a key function).  This orders the elements in the selection’s group array so that the circles are swapped.  We then call <code>order</code> to swap them in the DOM.</p>
+
+<p><a class="p_ident" id="p_1jnekrDxlU" href="#p_1jnekrDxlU" tabindex="-1" role="presentation"></a>At this point the circles are swapped in the DOM, but still have their original <code>cx</code> property values.  To change the position of the <code>circles</code> in the <code>svg</code> we change their <code>cx</code> properties using the <code>attr</code> method.</p><pre>
+function swap() {  
+  var temp = circleOrder[1];
+  circleOrder[1] = circleOrder[2];
+  circleOrder[2] = temp; 
+
+  d3.select("#orderSVG")
+    .selectAll("circle")
+    .data(circleOrder, (d) => d)
+    .order()
+    .attr("cx", (d, i) => 30 + (i * 50));    
+}
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_c+Ubg54/fe" href="#c_c+Ubg54/fe" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">circleOrder</span> <span class="cm-operator">=</span> [<span class="cm-number">1</span>, <span class="cm-number">2</span>, <span class="cm-number">3</span>, <span class="cm-number">4</span>];
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#orderSVG&quot;</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">circleOrder</span>);
+    
+<span class="cm-keyword">function</span> <span class="cm-def">swap</span>() {  
+  <span class="cm-keyword">var</span> <span class="cm-def">temp</span> <span class="cm-operator">=</span> <span class="cm-variable">circleOrder</span>[<span class="cm-number">1</span>];
+  <span class="cm-variable">circleOrder</span>[<span class="cm-number">1</span>] <span class="cm-operator">=</span> <span class="cm-variable">circleOrder</span>[<span class="cm-number">2</span>];
+  <span class="cm-variable">circleOrder</span>[<span class="cm-number">2</span>] <span class="cm-operator">=</span> <span class="cm-variable-2">temp</span>; 
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#orderSVG&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable">circleOrder</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>)
+    .<span class="cm-property">order</span>()
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-number">30</span> <span class="cm-operator">+</span> (<span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">60</span>));    
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;orderSVG&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;300&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;60&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;90&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;150&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;violet&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;210&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;swap()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Swap<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_jiCqY/5igH" href="#p_jiCqY/5igH" tabindex="-1" role="presentation"></a>Note that you cannot swap arbitrary elements in the DOM using <code>order</code>.  Consider the following example. Here we select the pink and violet <code>div</code> elements and attempt to swap them using two techniques.  The button labeled <em>Swap 1</em> uses the technique shown above and the button labeled <em>Swap 2</em> uses <a href="https://developer.mozilla.org/en-US/docs/Web/API/Node">Node</a> method calls.</p>
+
+<p><a class="p_ident" id="p_Py8C6tylB8" href="#p_Py8C6tylB8" tabindex="-1" role="presentation"></a>The first method fails when there is a square between the two selected divs because the <code>order</code> method reorders the elements in the selection by reinserting the elements in the selection, one by one into the DOM, making them adjacent to one another.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_Vt8ec9X5b5" href="#c_Vt8ec9X5b5" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">circleOrder</span> <span class="cm-operator">=</span> [<span class="cm-number">1</span>, <span class="cm-number">2</span>, <span class="cm-number">3</span>, <span class="cm-number">4</span>];
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#swap2&quot;</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;div&quot;</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">circleOrder</span>);
+    
+<span class="cm-keyword">function</span> <span class="cm-def">swap2</span>() { 
+  <span class="cm-keyword">var</span> <span class="cm-def">arr</span> <span class="cm-operator">=</span> [];
+  
+  <span class="cm-keyword">var</span> <span class="cm-def">pair</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;#box1,#box2&quot;</span>)
+    .<span class="cm-property">each</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> { <span class="cm-variable-2">arr</span>.<span class="cm-property">push</span>(<span class="cm-variable-2">d</span>); });
+  
+  <span class="cm-keyword">var</span> <span class="cm-def">temp</span> <span class="cm-operator">=</span> <span class="cm-variable-2">arr</span>[<span class="cm-number">0</span>];
+  <span class="cm-variable-2">arr</span>[<span class="cm-number">0</span>] <span class="cm-operator">=</span> <span class="cm-variable-2">arr</span>[<span class="cm-number">1</span>];
+  <span class="cm-variable-2">arr</span>[<span class="cm-number">1</span>] <span class="cm-operator">=</span> <span class="cm-variable-2">temp</span>;
+  
+  <span class="cm-variable-2">pair</span>.<span class="cm-property">data</span>(<span class="cm-variable-2">arr</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>)
+    .<span class="cm-property">order</span>();
+}
+
+<span class="cm-keyword">function</span> <span class="cm-def">swap3</span>() {
+  <span class="cm-keyword">var</span> <span class="cm-def">box1</span> <span class="cm-operator">=</span> <span class="cm-variable">document</span>.<span class="cm-property">getElementById</span>(<span class="cm-string">&quot;box1&quot;</span>);  <span class="cm-comment">//violet</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">clone</span> <span class="cm-operator">=</span> <span class="cm-variable-2">box1</span>.<span class="cm-property">cloneNode</span>(<span class="cm-atom">true</span>);
+  <span class="cm-keyword">var</span> <span class="cm-def">box2</span> <span class="cm-operator">=</span> <span class="cm-variable">document</span>.<span class="cm-property">getElementById</span>(<span class="cm-string">&quot;box2&quot;</span>);  <span class="cm-comment">//pink</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">box2_parent</span> <span class="cm-operator">=</span> <span class="cm-variable-2">box2</span>.<span class="cm-property">parentNode</span>;
+  <span class="cm-keyword">var</span> <span class="cm-def">box2_nextSibling</span> <span class="cm-operator">=</span> <span class="cm-variable-2">box2</span>.<span class="cm-property">nextSibling</span>;
+  
+  <span class="cm-variable-2">box1</span>.<span class="cm-property">parentNode</span>.<span class="cm-property">replaceChild</span>(<span class="cm-variable-2">box2</span>, <span class="cm-variable-2">box1</span>);
+  
+  <span class="cm-keyword">if</span> (<span class="cm-variable-2">box2_nextSibling</span> <span class="cm-operator">==</span> <span class="cm-variable-2">box1</span>) {
+  	<span class="cm-variable-2">box2_parent</span>.<span class="cm-property">insertBefore</span>(<span class="cm-variable-2">box1</span>, <span class="cm-variable-2">box2</span>);
+  } 
+  <span class="cm-keyword">else</span> <span class="cm-keyword">if</span> (<span class="cm-variable-2">box2_nextSibling</span>) {
+  	<span class="cm-variable-2">box2_parent</span>.<span class="cm-property">insertBefore</span>(<span class="cm-variable-2">box1</span>, <span class="cm-variable-2">box2_nextSibling</span>);
+  }
+  <span class="cm-keyword">else</span> {
+    <span class="cm-variable-2">box2_parent</span>.<span class="cm-property">append</span>(<span class="cm-variable-2">box1</span>);
+  }
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;swap2&quot;</span> <span class="cm-attribute">style</span>=<span class="cm-string">&quot;display: inline-block;&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box blue-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;box1&quot;</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box violet-box&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box blue-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;box2&quot;</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box blue-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;swap2()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Swap 1<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;swap3()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Swap 2<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span></pre><nav><a href="02_03_modifying_data.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="03_01_d3_fetch.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

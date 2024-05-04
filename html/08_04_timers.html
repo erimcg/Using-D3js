@@ -1,0 +1,190 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Timers</title>
+  <link rel="canonical" href="http://using-d3js.com/08_04_timers.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 08;</script></head>
+
+<article>
+<nav><a href="08_03_require.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="09_01_transitions.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 08</span>Timers</h1><style>
+
+</style>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://d3js.org/d3-timer.v1.min.js"></script>
+
+
+<p><a class="p_ident" id="p_W/+Iyff2kk" href="#p_W/+Iyff2kk" tabindex="-1" role="presentation"></a>In this section we discuss <a href="https://github.com/d3/d3-timer"><code>d3-timer</code></a>.</p>
+
+<p><a class="p_ident" id="p_DlBjnUUkBu" href="#p_DlBjnUUkBu" tabindex="-1" role="presentation"></a>We may wish to have a function that is called repeatedly, every X seconds, or after a certain amount of time. For these situations, D3.js provides <code>d3-timer</code>.</p>
+
+<p><a class="p_ident" id="p_LqnGKMqXSO" href="#p_LqnGKMqXSO" tabindex="-1" role="presentation"></a><code>d3-timer</code> is not included in <code>https://<wbr>d3js.<wbr>org/<wbr>d3.<wbr>v5.<wbr>min.<wbr>js</code>, so it has to be loaded separately:</p> <pre>
+ &lt;script src="https://d3js.org/d3-timer.v1.min.js"></script>
+ </pre>
+
+
+<h2><a class="h_ident" id="h_8NaNU/do9w" href="#h_8NaNU/do9w" tabindex="-1" role="presentation"></a>d3.now</h2>
+
+<p><a class="p_ident" id="p_WDLHrV5DJr" href="#p_WDLHrV5DJr" tabindex="-1" role="presentation"></a>D3.js provides <a href="">d3.now</a> to get the amount of time that a page has been loaded. This time is in milliseconds and is useful if we want an event to trigger at a specific time (such as 5 seconds after the page loads). Internally, it uses <code>performance.now</code> to check the time elapsed, however note that some browsers randomize this timestamp and it is not 100% accurate. If <code>performance.now</code> is not available, <code>d3.now</code> uses <code>Date.now</code> instead.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_sLdp2FWAQy" href="#p_sLdp2FWAQy" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-timer#now">d3.now()</a> - Returns <a href="">performance.now</a> if available, or <a href="">Date.now</a> if not.</p></li></ul>
+
+<h2><a class="h_ident" id="h_w1oB7hHqrI" href="#h_w1oB7hHqrI" tabindex="-1" role="presentation"></a>d3.timer</h2>
+
+<p><a class="p_ident" id="p_eM4pGoSPZB" href="#p_eM4pGoSPZB" tabindex="-1" role="presentation"></a>When making our visualizations we may want a function that continuously keeps executing. This functionality is especially useful in animations or time tracking situations.</p>
+
+<p><a class="p_ident" id="p_+XFIRM81S6" href="#p_+XFIRM81S6" tabindex="-1" role="presentation"></a>Luckily, D3.js provides us with <a href="https://github.com/d3/d3-timer#timer">d3.timer(callback[, delay[, time]])</a> to invoke a <code>callback</code> function every animation frame (~17ms).</p>
+
+<p><a class="p_ident" id="p_nlixEg+UiL" href="#p_nlixEg+UiL" tabindex="-1" role="presentation"></a>To use <code>d3.timer</code> we first pass in a function to use as our callback. This callback is passed in the elapsed time from when the timer was set up to when the callback is being invoked that specific time. <code>d3.timer</code> invokes the callback function once every animation frame (~17ms).</p>
+
+<p><a class="p_ident" id="p_rJxE2ZtakI" href="#p_rJxE2ZtakI" tabindex="-1" role="presentation"></a>Next, we can pass in an optional <code>delay</code> parameter. This <code>delay</code> prevents the timer from calling the callback until <code>delay</code> milliseconds have passed.</p>
+
+<p><a class="p_ident" id="p_91H7K8le8I" href="#p_91H7K8le8I" tabindex="-1" role="presentation"></a>Finally, we can pass in an optional <code>time</code> parameter. The <code>time</code> parameter is at what time the <code>delay</code> starts from. By default <code>time</code> is <code>d3.now</code>.</p>
+
+<p><a class="p_ident" id="p_F8w2DiHzQK" href="#p_F8w2DiHzQK" tabindex="-1" role="presentation"></a>For example setting <code>time</code> to <code>d3.now() + 10</code> and delay to <code>250</code>, will result in an effective delay of 260ms from when the timer is declared to when the first callback function will be called.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_qTYDG6QL0e" href="#p_qTYDG6QL0e" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-timer#timer">d3.timer(callback[, delay[, time]])</a> - Creates a new timer that calls <code>callback</code> every animation frame (~17ms). Can pass in a <code>delay</code> and <code>time</code> that will start the timer after the <code>delay</code> in milliseconds after the <code>time</code> specified. <code>time</code> and <code>delay</code> defaults to <code>d3.now()</code> and <code>0</code>, receptively. The callback is passed the elapsed time from when the timeout was declared to when the callback is invoked.</p></li></ul>
+
+<p><a class="p_ident" id="p_EAp3bXFCf/" href="#p_EAp3bXFCf/" tabindex="-1" role="presentation"></a>In Figure 1 we have a function <code>printTime</code> which displays in a <code>div</code> the string passed in. We also have a <code>d3.timer</code> with the callback function being set to <code>printTime</code>. <code>d3.timer</code> calls <code>printTime</code> every animation frame (~17ms). Each time <code>printTime</code> is called, <code>d3.timer</code> passes in the time elapsed from when that timer was originally declared to when that timer calls <code>printTime</code> that time.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="uneditable" data-cm="visible" ><a class="c_ident" id="c_p74IIUrgl6" href="#c_p74IIUrgl6" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">function</span> <span class="cm-def">printTime1</span>(<span class="cm-def">elapsed</span>){
+        <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1&quot;</span>).<span class="cm-property">text</span>(<span class="cm-variable">Math</span>.<span class="cm-property">round</span>(<span class="cm-variable-2">elapsed</span>) <span class="cm-operator">+</span> <span class="cm-string">&quot;ms&quot;</span>)
+    }
+    <span class="cm-variable">d3</span>.<span class="cm-property">timer</span>(<span class="cm-variable">printTime1</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 1  - A timer set to call printTime every animation frame, which displays how long the timer has been running.  </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_dVfXqQ4qHU" href="#h_dVfXqQ4qHU" tabindex="-1" role="presentation"></a>d3.interval</h2>
+
+<p><a class="p_ident" id="p_aiDqbP8PCG" href="#p_aiDqbP8PCG" tabindex="-1" role="presentation"></a>Running a function every animation frame with <code>d3.timer</code> can be taxing on our computers which can result in visual stutters or timing issues if we use too many. To remedy this for less important functions, we can use a timer that is not called every animation frame, but instead every <code>delay</code> milliseconds. D3.js provides us <code>d3.interval</code> as a solution to this problem.</p>
+
+<p><a class="p_ident" id="p_tj9credS2C" href="#p_tj9credS2C" tabindex="-1" role="presentation"></a>Like <code>d3.timer</code>, <code>d3.interval</code> calls a callback function that we supply or define and passes into it the elapsed time.</p>
+
+<p><a class="p_ident" id="p_TCfPmAItRw" href="#p_TCfPmAItRw" tabindex="-1" role="presentation"></a>However, unlike <code>d3.timer</code>, <code>d3.interval</code> does not run every frame, but instead every <code>delay</code> milliseconds. If <code>delay</code> is not passed in, <code>d3.interval</code> will invoke the callback every frame like with <code>d3.timer</code>. <code>d3.interval</code> starts the countdown for the first invocation of the callback after <code>time</code> milliseconds from when the interval was decalred.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_owGzIG5ZCl" href="#p_owGzIG5ZCl" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-timer#interval">d3.interval(callback[, delay[, time]])</a> - Like <code>d3.timer</code> except it runs once every <code>delay</code> milliseconds, not every animation frame. If <code>delay</code> is not set, it is equivalent to <code>d3.timer</code>. The callback is passed the elapsed time.</p></li></ul>
+
+<p><a class="p_ident" id="p_ZR9vv0OVwL" href="#p_ZR9vv0OVwL" tabindex="-1" role="presentation"></a>In Figure 2 we use the <code>printTime</code> function like we did in Figure 1, however now instead of using <code>d3.timer</code>, we use <code>d3.interval</code> to call the function <em>every</em> 500ms.</p>
+
+<p><a class="p_ident" id="p_I6lHzSTrVr" href="#p_I6lHzSTrVr" tabindex="-1" role="presentation"></a>Note that animation frames are not run every millisecond so there is some variance in every delay we use so it usually waits slightly more or less than 500ms.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="uneditable" data-cm="visible" ><a class="c_ident" id="c_FSxm0+EN/8" href="#c_FSxm0+EN/8" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">function</span> <span class="cm-def">printTime2</span>(<span class="cm-def">elapsed</span>){
+        <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo2&quot;</span>).<span class="cm-property">text</span>(<span class="cm-variable">Math</span>.<span class="cm-property">round</span>(<span class="cm-variable-2">elapsed</span>) <span class="cm-operator">+</span> <span class="cm-string">&quot;ms&quot;</span>)
+    }
+    <span class="cm-variable">d3</span>.<span class="cm-property">interval</span>(<span class="cm-variable">printTime2</span>, <span class="cm-number">500</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 2  - An interval set to call printTime every 500ms, which displays how long the interval has been running.  </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_fkvsFplkJf" href="#h_fkvsFplkJf" tabindex="-1" role="presentation"></a>d3.timeout</h2>
+
+<p><a class="p_ident" id="p_2TlFeHOrLe" href="#p_2TlFeHOrLe" tabindex="-1" role="presentation"></a>We may need a function to run just once, but at a later time (such as X seconds after a button is clicked). D3.js provides <code>d3.timeout</code> to help us perform this functionality.</p>
+
+<p>Like <code>d3.timer</code>, <code>d3.timeout</code> calls a callback function that we supply or define and passes into it the elapsed time.</p>
+
+<p><a class="p_ident" id="p_68hlun9+TI" href="#p_68hlun9+TI" tabindex="-1" role="presentation"></a>Instead of running every frame after the <code>delay</code>, <code>d3.timeout</code> runs <em>once</em> after <code>delay</code> milliseconds. Like <code>d3.timer</code>, the <code>delay</code> will start “counting down” after the specified <code>time</code> after the timeout is defined.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_NYhghzY+Uo" href="#p_NYhghzY+Uo" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-timer#timeout">d3.timeout(callback[, delay[, time]])</a> - Like <code>d3.timer</code>, except it only runs once. The callback is passed the elapsed time.</p></li></ul>
+
+<p><a class="p_ident" id="p_AGEf04uMX8" href="#p_AGEf04uMX8" tabindex="-1" role="presentation"></a>In Figure 3 we use the <code>printTime</code> function like we did in Figure 1, however now instead of using <code>d3.timer</code>, we use <code>d3.timeout</code> to call the function <em>once</em> after 100ms.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="uneditable" data-cm="visible" ><a class="c_ident" id="c_NUzSX7bnVk" href="#c_NUzSX7bnVk" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">function</span> <span class="cm-def">printTime3</span>(<span class="cm-def">elapsed</span>){
+        <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo3&quot;</span>).<span class="cm-property">text</span>(<span class="cm-variable">Math</span>.<span class="cm-property">round</span>(<span class="cm-variable-2">elapsed</span>) <span class="cm-operator">+</span> <span class="cm-string">&quot;ms&quot;</span>)
+    }
+    <span class="cm-variable">d3</span>.<span class="cm-property">timeout</span>(<span class="cm-variable">printTime3</span>, <span class="cm-number">100</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo3&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 3  - An timeout set to call printTime after 100ms, which displays how long it took for the timeout to call printTime.  </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_r1nItqqcN0" href="#h_r1nItqqcN0" tabindex="-1" role="presentation"></a>timer.stop</h2>
+
+<p><a class="p_ident" id="p_QdUoERcN/b" href="#p_QdUoERcN/b" tabindex="-1" role="presentation"></a>We may need to stop a timer, interval, or timeout from continuing to run. To do this we can invoke <code>timer.stop</code> on a timer, interval, or timeout. <code>timer.stop</code> will immediately stop any the timer, preventing it from invoking its callback any more. Any callbacks that were started before <code>timer.stop</code> was called will continue to execute.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_zyE600eKn3" href="#p_zyE600eKn3" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-timer#timer_stop">timer.stop()</a> - Stops the timer from continuing to run, has no effect if a timer is already stopped.</p></li></ul>
+
+<p><a class="p_ident" id="p_Qxkow6HVhM" href="#p_Qxkow6HVhM" tabindex="-1" role="presentation"></a>In Figure 4 we use the <code>printTime</code> function and a timer like we did in Figure 1, however now we use <code>timer.stop</code> to stop the timer after 250ms by also using <code>d3.timeout</code>.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="uneditable" data-cm="visible" ><a class="c_ident" id="c_TIJ03xCnUS" href="#c_TIJ03xCnUS" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">function</span> <span class="cm-def">printTime4</span>(<span class="cm-def">elapsed</span>){
+        <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo4&quot;</span>).<span class="cm-property">text</span>(<span class="cm-variable">Math</span>.<span class="cm-property">round</span>(<span class="cm-variable-2">elapsed</span>) <span class="cm-operator">+</span> <span class="cm-string">&quot;ms&quot;</span>)
+    }
+    <span class="cm-variable">timer4</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">timer</span>(<span class="cm-variable">printTime4</span>);
+    <span class="cm-variable">d3</span>.<span class="cm-property">timeout</span>(() <span class="cm-operator">=&gt;</span> <span class="cm-variable">timer4</span>.<span class="cm-property">stop</span>(), <span class="cm-number">250</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo4&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 4  - A timer set to constantly call printTime, such as in Figure 1. The timer is then stopped after 250 ms using d3.timeout and timer.stop.  </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_KQU6yiTt+V" href="#h_KQU6yiTt+V" tabindex="-1" role="presentation"></a>timer.restart</h2>
+
+<p><a class="p_ident" id="p_O5mPia0ZQO" href="#p_O5mPia0ZQO" tabindex="-1" role="presentation"></a>All the timers pass into their callbacks the elapsed time from when that timer was set up to when the callback is being called. We may wish to reset the time when the timer was set up (such as whenever a button is repeatedly clicked).</p>
+
+<p><a class="p_ident" id="p_giRdPgGUG7" href="#p_giRdPgGUG7" tabindex="-1" role="presentation"></a>D3.js provides <code>timer.restart</code> to reset the timer, including when the timer was define for the elapsed time. To use this function, we have to redefine our <code>callback</code>, <code>delay</code>, and <code>time</code>.</p>
+
+<p><a class="p_ident" id="p_9v71csVN5Z" href="#p_9v71csVN5Z" tabindex="-1" role="presentation"></a>For <code>d3.timer</code> and <code>d3.timeout</code>, invoking <code>timer.restart</code> stops the old timer immediately and makes a new timer with the specified parameters. If the timer has not invoked its callback at all yet, such as in <code>d3.timeout</code>, it will not execute the first time.</p>
+
+<p><a class="p_ident" id="p_mxlBLt8rJZ" href="#p_mxlBLt8rJZ" tabindex="-1" role="presentation"></a><code>d3.interval</code> <em><strong>is not</strong></em> compatible with <code>timer.restart</code>. If you call <code>timer.restart</code> on an instance of <code>d3.interval</code>, the interval will be converted to an intance of <code>d3.timer</code> instead, running every frame.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_YNwTFzjHPf" href="#p_YNwTFzjHPf" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-timer#timer_restart">timer.restart(callback[, delay[, time]])</a> - Equivalent to calling <code>timer.stop</code> on a timer and creating a new timer with the specified parameters. Only works on <code>d3.timer</code> and <code>d3.timeout</code>. Calling on <code>d3.interval</code> turns the <code>d3.interval</code> into a <code>d3.timer</code>.</p></li></ul>
+
+<p><a class="p_ident" id="p_1Ymlo2ljzX" href="#p_1Ymlo2ljzX" tabindex="-1" role="presentation"></a>In Figure 5 we have a timer and <code>printTime</code> function similar to Figure 1. We then have a <code>d3.timeout</code> which calls the function <code>restartTimers</code> after 2.5 seconds. <code>restartTimers</code> then restarts both the timer and the timeout with their original parameters.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="uneditable" data-cm="visible" ><a class="c_ident" id="c_bJEaNaTK7V" href="#c_bJEaNaTK7V" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">function</span> <span class="cm-def">printTime5</span>(<span class="cm-def">elapsed</span>){
+        <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo5&quot;</span>).<span class="cm-property">text</span>(<span class="cm-variable">Math</span>.<span class="cm-property">round</span>(<span class="cm-variable-2">elapsed</span>) <span class="cm-operator">+</span> <span class="cm-string">&quot;ms&quot;</span>)
+    }
+    <span class="cm-keyword">function</span> <span class="cm-def">restartTimers</span>(){
+        <span class="cm-variable">timer5</span>.<span class="cm-property">restart</span>(<span class="cm-variable">printTime5</span>);
+        <span class="cm-variable">timeout5</span>.<span class="cm-property">restart</span>(() <span class="cm-operator">=&gt;</span> <span class="cm-variable">restartTimers</span>(), <span class="cm-number">2500</span>);
+    }
+    <span class="cm-variable">timer5</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">timer</span>(<span class="cm-variable">printTime5</span>);
+    <span class="cm-variable">timeout5</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">timeout</span>(() <span class="cm-operator">=&gt;</span> <span class="cm-variable">restartTimers</span>(), <span class="cm-number">2500</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo5&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 5  - A timer and timeout reset every 2.5 seconds.  </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_zdLu97d3kJ" href="#h_zdLu97d3kJ" tabindex="-1" role="presentation"></a>d3.timerFlush</h2>
+
+<p><a class="p_ident" id="p_SWsvGHA2/J" href="#p_SWsvGHA2/J" tabindex="-1" role="presentation"></a>If we ever need to invoke the callbacks of all timers with no <code>delay</code>, we can call <code>d3.timerFlush</code>. <code>d3.timerFlush</code> immediately triggers <em>all</em> timers that have no delay.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_1Z8bOqVOKN" href="#p_1Z8bOqVOKN" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-timer#timerFlush">d3.timerFlush()</a> - Immediately invokes the callbacks of any zero-delay timers.</p></li></ul><nav><a href="08_03_require.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="09_01_transitions.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

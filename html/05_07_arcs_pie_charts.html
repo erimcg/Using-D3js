@@ -1,0 +1,884 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Arcs and Pie Charts</title>
+  <link rel="canonical" href="http://using-d3js.com/05_07_arcs_pie_charts.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 05;</script></head>
+
+<article>
+<nav><a href="05_06_stacks.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_08_links.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 05</span>Arcs and Pie Charts</h1><script src="https://d3js.org/d3.v5.min.js"></script>
+<style>
+    svg { background-color: white; }
+</style>
+
+
+<p><a class="p_ident" id="p_JH2TWMidqw" href="#p_JH2TWMidqw" tabindex="-1" role="presentation"></a>In this section we’ll discuss how to compute data for circular and annular paths and how to use that data to draw pie charts.  D3 provides the following methods for computing the generators that we need.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_ChlWmT7dLz" href="#p_ChlWmT7dLz" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#arcs">d3.arc()</a> - returns an arc path generator</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_R+IvEY6y8T" href="#p_R+IvEY6y8T" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#pies">d3.pie()</a> - returns an angle generator</p></li></ul>
+
+<p><a class="p_ident" id="p_HfG66/7Vyu" href="#p_HfG66/7Vyu" tabindex="-1" role="presentation"></a>In each of the following examples, we’ll use a 200px by 200px <code>svg</code> element as defined below.</p><pre>
+&lt;svg id="demo1" width="200" height="200"&gt;&lt;/svg&gt;
+</pre>
+
+
+<p><a class="p_ident" id="p_QG9qnUaiUL" href="#p_QG9qnUaiUL" tabindex="-1" role="presentation"></a>In each, we’ll dynamically center a <code>g</code> element within the <code>svg</code> element using code similar to the code shown below.</p><pre>
+d3.select("#demo1")
+    .append("g")
+    .attr("transform", "translate(100,100)");
+</pre>
+
+
+<p><a class="p_ident" id="p_N4B8SJ7xNO" href="#p_N4B8SJ7xNO" tabindex="-1" role="presentation"></a>It is in these <code>g</code> elements that we’ll render our shapes.</p>
+
+<h2><a class="h_ident" id="h_UQPLxBIJDe" href="#h_UQPLxBIJDe" tabindex="-1" role="presentation"></a>Arcs</h2>
+
+<p><a class="p_ident" id="p_N4kg1llxkk" href="#p_N4kg1llxkk" tabindex="-1" role="presentation"></a>Recall from the <a href="http://www.n0code.net/wp/csci240/the-path-element/">tutorial on Paths</a> that the <code>path</code> element can be used to create lines, polylines, polygons, arcs, circles, ellipses, and other more complex shapes.  Recall also that the <code>d</code> attribute defines the shape of the path.</p>
+
+<p><a class="p_ident" id="p_aizcTR0VCB" href="#p_aizcTR0VCB" tabindex="-1" role="presentation"></a><code>d3.arc()</code> returns a generator that when called automatically generates and returns a string of characters that can be assigned to the <code>d</code> attribute of a <code>path</code> element to define an arc, circle, or annulus.  To create an arc generator simply call <code>d3.arc()</code>.</p><pre>
+var arcGen = d3.arc();
+</pre>
+
+
+<p><a class="p_ident" id="p_v1qbCzzfOj" href="#p_v1qbCzzfOj" tabindex="-1" role="presentation"></a>The <code>d3.arc()</code> method returns a function object that we’ll refer to as the arc generator.  There are a number of methods that we can call on the arc generator object:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_l5h4Wk+6y4" href="#p_l5h4Wk+6y4" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape/blob/master/README.md#arc_startAngle">arc.startAngle([angle])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_pdZMvsYUZE" href="#p_pdZMvsYUZE" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape/blob/master/README.md#arc_endAngle">arc.endAngle([angle])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_G/JCqqJnrO" href="#p_G/JCqqJnrO" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape/blob/master/README.md#arc_innerRadius">arc.innerRadius([radius])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_ab8z0twiL4" href="#p_ab8z0twiL4" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape/blob/master/README.md#arc_cornerRadius">arc.outerRadius([radius])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_AA8ZqU6kSo" href="#p_AA8ZqU6kSo" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape/blob/master/README.md#arc_padAngle">arc.padAngle([angle])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_MExFM33wqz" href="#p_MExFM33wqz" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape/blob/master/README.md#arc_padRadius">arc.padRadius([ardius])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_zvxFIqPiYr" href="#p_zvxFIqPiYr" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape/blob/master/README.md#arc_cornerRadius">arc.cornerRadius([radius])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_tIBw3MMm6f" href="#p_tIBw3MMm6f" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape/blob/master/README.md#arc_centroid">arc.centroid(arguments...)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_WPkuH2XXIB" href="#p_WPkuH2XXIB" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape/blob/master/README.md#arc_context">arc.context([context])</a></p></li></ul>
+
+<p><a class="p_ident" id="p_fsjXnCKxiK" href="#p_fsjXnCKxiK" tabindex="-1" role="presentation"></a>In the example below we set the start and ending angle.  Angles are specified in radians where 0 radians is at 12 o’clock and positive radians trace a path clockwise.  We also specify an inner and outer radius.</p><pre>
+var arcGen = d3.arc()
+    .innerRadius(0)
+    .outerRadius(90)
+    .startAngle(Math.PI/4)
+    .endAngle(3*Math.PI/4);
+</pre>
+
+
+<p><a class="p_ident" id="p_Wa0WLbXTLy" href="#p_Wa0WLbXTLy" tabindex="-1" role="presentation"></a>The arc generator returns the string that is assigned to the <code>d</code> attribute of the path element.  To render the arc (in this case a quarter of a circle) we append a <code>path</code> element to the <code>g</code> element and set its <code>d</code> attribute equal to the string returned by <code>arcGen</code>.</p><pre>
+d3.select("#demo1 g")
+    .append("path")
+    .attr("d", <strong>arcGen</strong>)
+    .attr("fill", "pink")
+    .attr("stroke", "gray")
+    .attr("stroke-width", 1);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_kDQNiH0lRb" href="#c_kDQNiH0lRb" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">arcGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">arc</span>()
+    .<span class="cm-property">innerRadius</span>(<span class="cm-number">0</span>)
+    .<span class="cm-property">outerRadius</span>(<span class="cm-number">90</span>)
+    .<span class="cm-property">startAngle</span>(<span class="cm-variable">Math</span>.<span class="cm-property">PI</span><span class="cm-operator">/</span><span class="cm-number">4</span>)
+    .<span class="cm-property">endAngle</span>(<span class="cm-number">3</span><span class="cm-operator">*</span><span class="cm-variable">Math</span>.<span class="cm-property">PI</span><span class="cm-operator">/</span><span class="cm-number">4</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1 g&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">arcGen</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-number">1</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_0l7CTAkORL" href="#p_0l7CTAkORL" tabindex="-1" role="presentation"></a>To create a circle, set the start angle to 0 and the end angle to 2 * Math.PI.</p><pre>
+var arcGen = d3.arc()
+    .innerRadius(0)
+    .outerRadius(90)
+    <strong>.startAngle(0)</strong>
+    <strong>.endAngle(2*Math.PI);</strong>
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_WyjyZ5CwSu" href="#c_WyjyZ5CwSu" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo2&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">arcGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">arc</span>()
+    .<span class="cm-property">innerRadius</span>(<span class="cm-number">0</span>)
+    .<span class="cm-property">outerRadius</span>(<span class="cm-number">90</span>)
+    .<span class="cm-property">startAngle</span>(<span class="cm-number">0</span>)
+    .<span class="cm-property">endAngle</span>(<span class="cm-number">2</span><span class="cm-operator">*</span><span class="cm-variable">Math</span>.<span class="cm-property">PI</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo2 g&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">arcGen</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-number">1</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_Pfdyz/iTnA" href="#p_Pfdyz/iTnA" tabindex="-1" role="presentation"></a>To create an annulus we simple set the inner Radius to a value other than 0.</p><pre>
+var arcGen = d3.arc()
+    <strong>.innerRadius(70)</strong>
+    .outerRadius(90)
+    .startAngle(0)
+    .endAngle(2*Math.PI);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_zNHTK1DHvc" href="#c_zNHTK1DHvc" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo3&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">arcGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">arc</span>()
+    .<span class="cm-property">innerRadius</span>(<span class="cm-number">70</span>)
+    .<span class="cm-property">outerRadius</span>(<span class="cm-number">90</span>)
+    .<span class="cm-property">startAngle</span>(<span class="cm-number">0</span>)
+    .<span class="cm-property">endAngle</span>(<span class="cm-number">2</span><span class="cm-operator">*</span><span class="cm-variable">Math</span>.<span class="cm-property">PI</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo3 g&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">arcGen</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-number">1</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo3&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_YIh89/Xm8t" href="#h_YIh89/Xm8t" tabindex="-1" role="presentation"></a>Pie Charts</h2>
+
+<p><a class="p_ident" id="p_h61yp525Ss" href="#p_h61yp525Ss" tabindex="-1" role="presentation"></a>One way to create a pie chart is to compute ahead of time angle data for each wedge of the pie chart and record it in an an array like the one below.</p><pre>
+var data = [
+    {startAngle: 0, endAngle: Math.PI/4},
+    {startAngle: Math.PI/4, endAngle: Math.PI/2},
+    {startAngle: Math.PI/2, endAngle: Math.PI},
+    {startAngle: Math.PI, endAngle: 2*Math.PI}
+ ];
+</pre>
+
+
+<p><a class="p_ident" id="p_wBv9jov3zT" href="#p_wBv9jov3zT" tabindex="-1" role="presentation"></a>We’ll also need an arc generator and set the radii properties.</p><pre>
+var arcGen = d3.arc()
+    .innerRadius(0)
+    .outerRadius(90);
+</pre>
+
+
+<p><a class="p_ident" id="p_oTI8zZPckz" href="#p_oTI8zZPckz" tabindex="-1" role="presentation"></a>Next, we create a set of <code>path</code> elements and join the angle property data to them.  As described above, we set the <code>d</code> attribute to the value returned by <code>arcGen</code>.   In this case, when the <code>arcGen</code> function is called for a <code>path</code> element, it looks in the data joined to it for the angle information it needs to compute the path.</p><pre>
+d3.select("#demo4 g")
+    .selectAll("path")
+    .data(<strong>data</strong>)
+    .enter()
+    .append("path")
+    .attr("d", <strong>arcGen</strong>)
+    .attr("fill", "pink")
+    .attr("stroke", "gray")
+    .attr("stroke-width", 1);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_b9tpd0skrC" href="#c_b9tpd0skrC" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo4&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+    {<span class="cm-property">startAngle</span>: <span class="cm-number">0</span>, <span class="cm-property">endAngle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span><span class="cm-operator">/</span><span class="cm-number">4</span>},
+    {<span class="cm-property">startAngle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span><span class="cm-operator">/</span><span class="cm-number">4</span>, <span class="cm-property">endAngle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span><span class="cm-operator">/</span><span class="cm-number">2</span>},
+    {<span class="cm-property">startAngle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span><span class="cm-operator">/</span><span class="cm-number">2</span>, <span class="cm-property">endAngle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>},
+    {<span class="cm-property">startAngle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>, <span class="cm-property">endAngle</span>: <span class="cm-number">2</span><span class="cm-operator">*</span><span class="cm-variable">Math</span>.<span class="cm-property">PI</span>}
+  ];
+
+  <span class="cm-keyword">var</span> <span class="cm-def">arcGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">arc</span>()
+    .<span class="cm-property">innerRadius</span>(<span class="cm-number">0</span>)
+    .<span class="cm-property">outerRadius</span>(<span class="cm-number">90</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo4 g&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">arcGen</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-number">1</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo4&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_Re9HNeSr8K" href="#h_Re9HNeSr8K" tabindex="-1" role="presentation"></a>d3.pie()</h2>
+
+<p><a class="p_ident" id="p_gIN7gWTkuZ" href="#p_gIN7gWTkuZ" tabindex="-1" role="presentation"></a>More often than not, we’ll want to compute the angle data dynamically based on some array of data. The <code>d3.pie()</code> method returns an angle generator function which when called returns an array of objects that contain the angle information we need to render a pie chart.</p><pre>
+var angleGen = d3.pie();
+</pre>
+
+
+<p><a class="p_ident" id="p_kFQAhhD/qi" href="#p_kFQAhhD/qi" tabindex="-1" role="presentation"></a>When the angle generator is called, an array of data is passed to it.</p><pre>
+var data = angleGen([1,1,1,1,4,2,2,4]);
+</pre>
+
+
+<p><a class="p_ident" id="p_gEVyzQ4Ht+" href="#p_gEVyzQ4Ht+" tabindex="-1" role="presentation"></a>The angle generator uses the input data to compute the angles necessary to represent the array of data as a pie chart.  The array returned from the angle generator contains an object for each element in the array passed into the generator, and each object contains the following properties:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_y7yY5aOyON" href="#p_y7yY5aOyON" tabindex="-1" role="presentation"></a>data - input datum</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_gyw9TTtvkd" href="#p_gyw9TTtvkd" tabindex="-1" role="presentation"></a>endAngle - end angle of the arc</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_Svdxx1egHv" href="#p_Svdxx1egHv" tabindex="-1" role="presentation"></a>index - zero-based index of the arc</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_IsTo3WgIfR" href="#p_IsTo3WgIfR" tabindex="-1" role="presentation"></a>padAngle - pad angle of the arc</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_Z4RZpWdGav" href="#p_Z4RZpWdGav" tabindex="-1" role="presentation"></a>startAngle - start angle of the arc</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_GpMAzOH6k0" href="#p_GpMAzOH6k0" tabindex="-1" role="presentation"></a>value - value used to compute angles</p></li></ul><img src="img/screenshots/angle_gen_data.png" alt="" width="679" height="288" />
+
+
+<p><a class="p_ident" id="p_aaX9TvvaIx" href="#p_aaX9TvvaIx" tabindex="-1" role="presentation"></a>Note that the <code>value</code> property contains the value that was used to compute the start and end angles.  The <code>data</code> field may contain an object - not just a numeric value (see <code>pie.value</code> below).</p>
+
+<p><a class="p_ident" id="p_1e74eDSHCy" href="#p_1e74eDSHCy" tabindex="-1" role="presentation"></a>We then create an arc generator and join the <em>new data</em> to the <code>path</code> elements exactly as before.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_T/N6bGsgl1" href="#c_T/N6bGsgl1" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo5&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">angleGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pie</span>();
+
+  <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> <span class="cm-variable">angleGen</span>([<span class="cm-number">1</span>,<span class="cm-number">1</span>,<span class="cm-number">1</span>,<span class="cm-number">1</span>,<span class="cm-number">4</span>,<span class="cm-number">2</span>,<span class="cm-number">2</span>,<span class="cm-number">4</span>]);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">arcGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">arc</span>()
+    .<span class="cm-property">innerRadius</span>(<span class="cm-number">0</span>)
+    .<span class="cm-property">outerRadius</span>(<span class="cm-number">90</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo5 g&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">arcGen</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-number">1</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo5&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_LTyt6bAnH1" href="#p_LTyt6bAnH1" tabindex="-1" role="presentation"></a>The angle generator object has a number of methods that can be called on it.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_UtYD85BB4/" href="#p_UtYD85BB4/" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape/blob/master/README.md#pie_value">pie.value([value])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_0VkP2Yl3D6" href="#p_0VkP2Yl3D6" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape/blob/master/README.md#pie_sort">pie.sort([compare])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_rE5oNmCtDG" href="#p_rE5oNmCtDG" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape/blob/master/README.md#pie_sortValues">pie.sortValues([compare])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_x6x9OkzPtZ" href="#p_x6x9OkzPtZ" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape/blob/master/README.md#pie_startAngle">pie.startAngle([angle])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_/bGNpgZbHP" href="#p_/bGNpgZbHP" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape/blob/master/README.md#pie_endAngle">pie.endAngle([angle])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_MY6IBE7y5Y" href="#p_MY6IBE7y5Y" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape/blob/master/README.md#pie_padAngle">pie.padAngle([angle])</a></p></li></ul>
+
+<h3><a class="i_ident" id="i_rpRA2LFH76" href="#i_rpRA2LFH76" tabindex="-1" role="presentation"></a>pie.value()</h3>
+
+<p><a class="p_ident" id="p_Rj/X37DzGK" href="#p_Rj/X37DzGK" tabindex="-1" role="presentation"></a>The <code>value</code> method is useful when the array that is passed to the angle generator contains objects.  To set the <code>value</code> property of the arcs based on the properties of the objects, we can pass an accessor function object to the <code>value</code> method.  The accessor function is called for each element in the array passed to the angle generator and is passed the data (d), index (i), and data array (data).</p>
+
+<p><a class="p_ident" id="p_r11UVStyHw" href="#p_r11UVStyHw" tabindex="-1" role="presentation"></a>In the example below we have an array of objects that hold the same data as before.</p><pre>
+var input = [
+    {name: "a", size: "1"},
+    {name: "b", size: "1"},
+    {name: "c", size: "1"},
+    {name: "d", size: "1"},
+    {name: "e", size: "4"},
+    {name: "f", size: "2"},
+    {name: "g", size: "2"},
+    {name: "h", size: "4"}
+];
+</pre>
+
+
+<p><a class="p_ident" id="p_kdUqAvaEzf" href="#p_kdUqAvaEzf" tabindex="-1" role="presentation"></a>Then, we create an angle generator using <code>d3.pie</code> and chain a call to the <code>value</code> method to return the value of the property that we want to use when computing the start and end angles of the wedge.  In the case below, we return the value of the <code>size</code> property for each object.</p><pre>
+var angleGen = d3.pie()
+    .value((d) =&gt; d.size);
+</pre>
+
+
+<p><a class="p_ident" id="p_B9AIK21zV4" href="#p_B9AIK21zV4" tabindex="-1" role="presentation"></a>We then call the angle generator, passing to it the data,</p><pre>
+var data = angleGen(input);
+</pre>
+
+
+<p><a class="p_ident" id="p_3+6bW4gs6q" href="#p_3+6bW4gs6q" tabindex="-1" role="presentation"></a>The angle generator returns a new array of objects, one for each element in the original data array, just as in the previous example.  Note how the data field contains the original data object and the value field holds the value that was used to compute the angles.</p><img src="img/screenshots/angle_gen_data2.png" alt="" width="689" height="287" />
+
+
+<p><a class="p_ident" id="p_0vYQL9CkVi" href="#p_0vYQL9CkVi" tabindex="-1" role="presentation"></a>Then, like before, we create an arc generator and append path elements with joined data to the svg.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_mi6HPwQLjw" href="#c_mi6HPwQLjw" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo6&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+
+ <span class="cm-keyword">var</span> <span class="cm-def">input</span> <span class="cm-operator">=</span> [
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;a&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;b&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;c&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;d&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;e&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;4&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;f&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;2&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;g&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;2&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;h&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;4&quot;</span>}
+  ];
+
+  <span class="cm-keyword">var</span> <span class="cm-def">angleGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pie</span>()
+    .<span class="cm-property">value</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">size</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> <span class="cm-variable">angleGen</span>(<span class="cm-variable">input</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">arcGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">arc</span>()
+    .<span class="cm-property">innerRadius</span>(<span class="cm-number">0</span>)
+    .<span class="cm-property">outerRadius</span>(<span class="cm-number">90</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo6 g&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">arcGen</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-number">1</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo6&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h3><a class="i_ident" id="i_Ja2Q1XqcUz" href="#i_Ja2Q1XqcUz" tabindex="-1" role="presentation"></a>pie.sort()</h3>
+
+<p><a class="p_ident" id="p_fzxKej3gfh" href="#p_fzxKej3gfh" tabindex="-1" role="presentation"></a>In order to render the arcs in a different order than the default order, we can sort the input data array or sort the values computed by the value accessor method prior to computing the angle data.  The <code>pie.sort</code> method sorts the input data array and the <code>pie.sortValues</code> method sorts the values computed by the value accessor method.</p>
+
+<p><a class="p_ident" id="p_+FKO+GBOvk" href="#p_+FKO+GBOvk" tabindex="-1" role="presentation"></a>If the input data array contains numeric values, we can use the <code>pie.sort</code> function to reorder the input data prior to computing the angle data.  In the example below we create an angle generator and set a comparator function.</p><pre>
+var angleGen = d3.pie()
+    .sort((a,b) =&gt; a > b ? 1 : -1);
+</pre>
+
+
+<p><a class="p_ident" id="p_oSlX/Vz+xh" href="#p_oSlX/Vz+xh" tabindex="-1" role="presentation"></a>We then call the angle generator, passing in an array of data, to get the angle data.</p><pre>
+var data = angleGen([1,1,1,1,4,2,2,4]);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_i88PrpBqF+" href="#c_i88PrpBqF+" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo7&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">angleGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pie</span>()
+    .<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">a</span> <span class="cm-operator">&gt;</span> <span class="cm-variable-2">b</span> <span class="cm-operator">?</span> <span class="cm-number">1</span> : <span class="cm-operator">-</span><span class="cm-number">1</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> <span class="cm-variable">angleGen</span>([<span class="cm-number">1</span>,<span class="cm-number">1</span>,<span class="cm-number">1</span>,<span class="cm-number">1</span>,<span class="cm-number">4</span>,<span class="cm-number">2</span>,<span class="cm-number">2</span>,<span class="cm-number">4</span>]);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">arcGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">arc</span>()
+    .<span class="cm-property">innerRadius</span>(<span class="cm-number">0</span>)
+    .<span class="cm-property">outerRadius</span>(<span class="cm-number">90</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo7 g&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">arcGen</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-number">1</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo7&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h3><a class="i_ident" id="i_Z57yFYJVeZ" href="#i_Z57yFYJVeZ" tabindex="-1" role="presentation"></a>pie.sortValues()</h3>
+
+<p><a class="p_ident" id="p_3sMbDjtyOI" href="#p_3sMbDjtyOI" tabindex="-1" role="presentation"></a>If the input data array contains object and requires a value accessor function, the <code>pie.sortValues</code> method can be used to sort the values after the accessor function is called.</p>
+
+<p><a class="p_ident" id="p_L9cvl9rQpE" href="#p_L9cvl9rQpE" tabindex="-1" role="presentation"></a>Assume again that we’re using an array of objects as our input data.</p><pre>
+var input = [
+    {name: "a", size: "1"},
+    {name: "b", size: "1"},
+    {name: "c", size: "1"},
+    {name: "d", size: "1"},
+    {name: "e", size: "4"},
+    {name: "f", size: "2"},
+    {name: "g", size: "2"},
+    {name: "h", size: "4"}
+];
+</pre>
+
+
+<p><a class="p_ident" id="p_7MVX38z6Gu" href="#p_7MVX38z6Gu" tabindex="-1" role="presentation"></a>We then create an angle generator with an accessor method and a comparator.</p><pre>
+var angleGen = d3.pie()
+    .value((d) =&gt; d.size)
+    .sortValues((a,b) =&gt; a < b ? 1 : -1);
+</pre>
+
+
+<p><a class="p_ident" id="p_VN68dQSc2U" href="#p_VN68dQSc2U" tabindex="-1" role="presentation"></a>And create the angle data by calling the angle generator on the input data.</p><pre>
+var data = angleGen(input);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_BvuU9F8Zdw" href="#c_BvuU9F8Zdw" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo8&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+
+ <span class="cm-keyword">var</span> <span class="cm-def">input</span> <span class="cm-operator">=</span> [
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;a&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;b&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;c&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;d&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;e&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;4&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;f&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;2&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;g&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;2&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;h&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;4&quot;</span>}
+  ];
+
+  <span class="cm-keyword">var</span> <span class="cm-def">angleGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pie</span>()
+    .<span class="cm-property">value</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">size</span>)
+    .<span class="cm-property">sortValues</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">a</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">b</span> <span class="cm-operator">?</span> <span class="cm-number">1</span> : <span class="cm-operator">-</span><span class="cm-number">1</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> <span class="cm-variable">angleGen</span>(<span class="cm-variable">input</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">arcGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">arc</span>()
+    .<span class="cm-property">innerRadius</span>(<span class="cm-number">0</span>)
+    .<span class="cm-property">outerRadius</span>(<span class="cm-number">90</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo8 g&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">arcGen</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-number">1</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo8&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_OOkuq3qN29" href="#h_OOkuq3qN29" tabindex="-1" role="presentation"></a>pie.startAngle() and pie.endAngle()</h2>
+
+<p><a class="p_ident" id="p_PL40ViwYYr" href="#p_PL40ViwYYr" tabindex="-1" role="presentation"></a>If we need to change where the pie graph starts from we can use <code>pie.startAngle()</code> and pass in a new angle. This will change where the entire graph starts from and scale it properly.</p><pre>
+var angleGen
+    .startAngle(Math.PI / 2);
+</pre>
+
+
+<p><a class="p_ident" id="p_H0wvBk0ViX" href="#p_H0wvBk0ViX" tabindex="-1" role="presentation"></a>Similar to <code>pie.startAngle()</code>, if we need to change where the pie graph ends, we can use <code>pie.endAngle()</code></p><pre>
+var angleGen = d3.pie()
+    .startAngle(Math.PI / 4)
+    .endAngle(7 * Math.PI / 4);
+</pre>
+
+
+<p><a class="p_ident" id="p_uTWHyV/MVG" href="#p_uTWHyV/MVG" tabindex="-1" role="presentation"></a>It is important to note that the pie graph is measured in radians, not degrees, so any angle passed in should be in radian form. If you are unsure of what the radian form is, you can use <code>radians = degrees * (Math.<wbr>PI/<wbr>180)</code> to convert degrees into radians.</p>
+
+<p><a class="p_ident" id="p_dgIX6DY0Jg" href="#p_dgIX6DY0Jg" tabindex="-1" role="presentation"></a>By default startAngle = 0 and endAngle = 2π.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_MJp2aaox66" href="#c_MJp2aaox66" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo9&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+
+ <span class="cm-keyword">var</span> <span class="cm-def">input</span> <span class="cm-operator">=</span> [
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;a&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;b&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;c&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;d&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;e&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;4&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;f&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;2&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;g&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;2&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;h&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;4&quot;</span>}
+  ];
+
+  <span class="cm-keyword">var</span> <span class="cm-def">angleGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pie</span>()
+    .<span class="cm-property">startAngle</span>(<span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">/</span> <span class="cm-number">4</span>)
+    .<span class="cm-property">endAngle</span>(<span class="cm-number">7</span> <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">/</span> <span class="cm-number">4</span>)
+    .<span class="cm-property">value</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">size</span>)
+    .<span class="cm-property">sortValues</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">a</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">b</span> <span class="cm-operator">?</span> <span class="cm-number">1</span> : <span class="cm-operator">-</span><span class="cm-number">1</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> <span class="cm-variable">angleGen</span>(<span class="cm-variable">input</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">arcGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">arc</span>()
+    .<span class="cm-property">innerRadius</span>(<span class="cm-number">0</span>)
+    .<span class="cm-property">outerRadius</span>(<span class="cm-number">90</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo9 g&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">arcGen</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-number">1</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo9&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_cBgaOYvwYU" href="#h_cBgaOYvwYU" tabindex="-1" role="presentation"></a>pie.padAngle()</h2>
+
+<p><a class="p_ident" id="p_jQ8GM9Vhlt" href="#p_jQ8GM9Vhlt" tabindex="-1" role="presentation"></a>Sometimes we need to display our graph in a less crowded way, using <code>pie.padAngle()</code> we can make space between our individual sections of the graph, making it seem less crowded.</p>
+
+<p><a class="p_ident" id="p_UhZZsFUoWH" href="#p_UhZZsFUoWH" tabindex="-1" role="presentation"></a>This looks best when we also set our <code>arcGen.<wbr>innerRadius()</code> to have a higher value.</p><pre>
+var angleGen = d3.pie()
+    .padAngle(.05);
+    
+var arcGen = d3.arc()
+    .innerRadius(50)
+    .outerRadius(90);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_ktrJvTkZgo" href="#c_ktrJvTkZgo" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo10&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+
+ <span class="cm-keyword">var</span> <span class="cm-def">input</span> <span class="cm-operator">=</span> [
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;a&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;b&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;c&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;d&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;e&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;4&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;f&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;2&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;g&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;2&quot;</span>},
+    {<span class="cm-property">name</span>: <span class="cm-string">&quot;h&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;4&quot;</span>}
+  ];
+
+  <span class="cm-keyword">var</span> <span class="cm-def">angleGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pie</span>()
+    .<span class="cm-property">startAngle</span>(<span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">/</span> <span class="cm-number">4</span>)
+    .<span class="cm-property">endAngle</span>(<span class="cm-number">7</span> <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">/</span> <span class="cm-number">4</span>)
+    .<span class="cm-property">padAngle</span>(<span class="cm-number">.05</span>)
+    .<span class="cm-property">value</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">size</span>)
+    .<span class="cm-property">sortValues</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">a</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">b</span> <span class="cm-operator">?</span> <span class="cm-number">1</span> : <span class="cm-operator">-</span><span class="cm-number">1</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> <span class="cm-variable">angleGen</span>(<span class="cm-variable">input</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">arcGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">arc</span>()
+    .<span class="cm-property">innerRadius</span>(<span class="cm-number">50</span>)
+    .<span class="cm-property">outerRadius</span>(<span class="cm-number">90</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo10 g&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">arcGen</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-number">1</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo10&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_yCmaFbCBXZ" href="#h_yCmaFbCBXZ" tabindex="-1" role="presentation"></a>Colored Wedges</h2>
+
+<p><a class="p_ident" id="p_Kbs7kjJaY4" href="#p_Kbs7kjJaY4" tabindex="-1" role="presentation"></a>One way to colorize the wedges is to create a color scale with the domain being the domain of values used to compute the angles.</p><pre>
+var colorScale = d3.scaleSequential(d3.interpolate("purple", "orange"))
+  .domain([1,4]);
+</pre>
+
+
+<p><a class="p_ident" id="p_dVqrRRysVV" href="#p_dVqrRRysVV" tabindex="-1" role="presentation"></a>We then simply fill the path element, we use the <code>value</code> property of the elements data object to get the value that was used to compute the angle.</p><pre>
+.attr("fill", (d) =&gt; colorScale(d.value))
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_0nn91OMMFL" href="#c_0nn91OMMFL" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo11&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+    
+  <span class="cm-keyword">var</span> <span class="cm-def">input</span> <span class="cm-operator">=</span> [
+      {<span class="cm-property">name</span>: <span class="cm-string">&quot;a&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+      {<span class="cm-property">name</span>: <span class="cm-string">&quot;b&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+      {<span class="cm-property">name</span>: <span class="cm-string">&quot;c&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+      {<span class="cm-property">name</span>: <span class="cm-string">&quot;d&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+      {<span class="cm-property">name</span>: <span class="cm-string">&quot;e&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;4&quot;</span>},
+      {<span class="cm-property">name</span>: <span class="cm-string">&quot;f&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;2&quot;</span>},
+      {<span class="cm-property">name</span>: <span class="cm-string">&quot;g&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;2&quot;</span>},
+      {<span class="cm-property">name</span>: <span class="cm-string">&quot;h&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;4&quot;</span>}
+  ];
+  
+  <span class="cm-keyword">var</span> <span class="cm-def">angleGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pie</span>()
+        .<span class="cm-property">startAngle</span>(<span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">/</span> <span class="cm-number">4</span>)
+        .<span class="cm-property">endAngle</span>(<span class="cm-number">7</span> <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">/</span> <span class="cm-number">4</span>)
+        .<span class="cm-property">padAngle</span>(<span class="cm-number">.05</span>)
+        .<span class="cm-property">value</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">size</span>)
+        .<span class="cm-property">sortValues</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">a</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">b</span> <span class="cm-operator">?</span> <span class="cm-number">1</span> : <span class="cm-operator">-</span><span class="cm-number">1</span>);;
+
+  <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> <span class="cm-variable">angleGen</span>(<span class="cm-variable">input</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">arcGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">arc</span>()
+    .<span class="cm-property">innerRadius</span>(<span class="cm-number">50</span>)
+    .<span class="cm-property">outerRadius</span>(<span class="cm-number">90</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">colorScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleSequential</span>(<span class="cm-variable">d3</span>.<span class="cm-property">interpolate</span>(<span class="cm-string">&quot;purple&quot;</span>, <span class="cm-string">&quot;orange&quot;</span>))
+    .<span class="cm-property">domain</span>([<span class="cm-number">1</span>,<span class="cm-number">4</span>]);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo11 g&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">arcGen</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">colorScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">value</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-number">1</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo11&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_gIViUGkXpb" href="#h_gIViUGkXpb" tabindex="-1" role="presentation"></a>d3.pointRadial()</h2>
+
+<p><a class="p_ident" id="p_SQL/i18Zts" href="#p_SQL/i18Zts" tabindex="-1" role="presentation"></a>The <a href="https://github.com/d3/d3-shape#pointRadial">d3.pointRadial(angle, radius)</a> function returns an array that contains <code>x</code> and <code>y</code> coordinates. The coordinates represent the point on the circle at <code>angle</code> with a radius set by <code>radius</code>. For the <code>angle</code>, 0 is located at the top (12 o’clock) and the angle progresses clockwise.</p>
+
+<p><a class="p_ident" id="p_2pYmnr8uM1" href="#p_2pYmnr8uM1" tabindex="-1" role="presentation"></a>d3.pointRadial(a, r) returns an array with two elements. The <code>x</code> position is the first element or <code>d3.<wbr>pointRadial(angle, radius)[0]</code> and the <code>y</code> position is <code>d3.<wbr>pointRadial(angle, radius)[1]</code>.</p>
+
+<p><a class="p_ident" id="p_pRh5RcxvIA" href="#p_pRh5RcxvIA" tabindex="-1" role="presentation"></a>Examples of different angles and radii:</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_YqyTHp6nXU" href="#c_YqyTHp6nXU" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-comment">//Visual Illistration of Angles</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">pointRadialArr</span> <span class="cm-operator">=</span> [<span class="cm-number">8</span>];
+    <span class="cm-keyword">var</span> <span class="cm-def">textArr</span> <span class="cm-operator">=</span> [
+        {<span class="cm-property">text</span>: <span class="cm-string">&quot;0&quot;</span>, <span class="cm-property">x</span>: <span class="cm-string">&quot;&quot;</span>, <span class="cm-property">y</span>: <span class="cm-string">&quot;&quot;</span>},
+        {<span class="cm-property">text</span>: <span class="cm-string">&quot;π/4&quot;</span>, <span class="cm-property">x</span>: <span class="cm-string">&quot;&quot;</span>, <span class="cm-property">y</span>: <span class="cm-string">&quot;&quot;</span>},
+        {<span class="cm-property">text</span>: <span class="cm-string">&quot;π/2&quot;</span>, <span class="cm-property">x</span>: <span class="cm-string">&quot;&quot;</span>, <span class="cm-property">y</span>: <span class="cm-string">&quot;&quot;</span>},
+        {<span class="cm-property">text</span>: <span class="cm-string">&quot;3π/4&quot;</span>, <span class="cm-property">x</span>: <span class="cm-string">&quot;&quot;</span>, <span class="cm-property">y</span>: <span class="cm-string">&quot;&quot;</span>},
+        {<span class="cm-property">text</span>: <span class="cm-string">&quot;π&quot;</span>, <span class="cm-property">x</span>: <span class="cm-string">&quot;&quot;</span>, <span class="cm-property">y</span>: <span class="cm-string">&quot;&quot;</span>},
+        {<span class="cm-property">text</span>: <span class="cm-string">&quot;5π/4&quot;</span>, <span class="cm-property">x</span>: <span class="cm-string">&quot;&quot;</span>, <span class="cm-property">y</span>: <span class="cm-string">&quot;&quot;</span>},
+        {<span class="cm-property">text</span>: <span class="cm-string">&quot;3π/2&quot;</span>, <span class="cm-property">x</span>: <span class="cm-string">&quot;&quot;</span>, <span class="cm-property">y</span>: <span class="cm-string">&quot;&quot;</span>},
+        {<span class="cm-property">text</span>: <span class="cm-string">&quot;7π/4&quot;</span>, <span class="cm-property">x</span>: <span class="cm-string">&quot;&quot;</span>, <span class="cm-property">y</span>: <span class="cm-string">&quot;&quot;</span>}];
+
+    <span class="cm-keyword">for</span>(<span class="cm-keyword">let</span> <span class="cm-def">i</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable">i</span> <span class="cm-operator">&lt;</span> <span class="cm-number">8</span>; <span class="cm-variable">i</span> <span class="cm-operator">+=</span> <span class="cm-number">1</span>){
+        <span class="cm-variable">pointRadialArr</span>[<span class="cm-variable">i</span>] <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>( (<span class="cm-variable">i</span> <span class="cm-operator">/</span> <span class="cm-number">4</span>) <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>, <span class="cm-number">60</span>);
+        <span class="cm-variable">textArr</span>[<span class="cm-variable">i</span>].<span class="cm-property">x</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>( (<span class="cm-variable">i</span> <span class="cm-operator">/</span> <span class="cm-number">4</span>) <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>, <span class="cm-number">80</span>)[<span class="cm-number">0</span>];
+        <span class="cm-variable">textArr</span>[<span class="cm-variable">i</span>].<span class="cm-property">y</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>( (<span class="cm-variable">i</span> <span class="cm-operator">/</span> <span class="cm-number">4</span>) <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>, <span class="cm-number">80</span>)[<span class="cm-number">1</span>];
+    }
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoPointRadialA&quot;</span>) <span class="cm-comment">// adds the grey circle</span>
+    	.<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-number">100</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-number">100</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">60</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;grey&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-string">&quot;1.5&quot;</span>);
+
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoPointRadialA&quot;</span>) <span class="cm-comment">// adds the dots</span>
+    	.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;newCircle&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">pointRadialArr</span>)
+        .<span class="cm-property">enter</span>()
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>[<span class="cm-number">0</span>])
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>[<span class="cm-number">1</span>])
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">2.5</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoPointRadialA&quot;</span>) <span class="cm-comment">//adds the tags</span>
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;text&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">textArr</span>)
+        .<span class="cm-property">enter</span>()
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;text&quot;</span>)
+        .<span class="cm-property">text</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">text</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-def">d</span><span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;font-size&quot;</span>, <span class="cm-string">&quot;15px&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+
+    <span class="cm-comment">//Visual Illistration of different Radii</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">pointRadialArr</span> <span class="cm-operator">=</span> [<span class="cm-number">4</span>];
+        <span class="cm-keyword">var</span> <span class="cm-def">textArr</span> <span class="cm-operator">=</span> [<span class="cm-number">4</span>];
+        <span class="cm-keyword">for</span>(<span class="cm-keyword">let</span> <span class="cm-def">i</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable">i</span> <span class="cm-operator">&lt;</span> <span class="cm-number">4</span>; <span class="cm-variable">i</span> <span class="cm-operator">+=</span> <span class="cm-number">1</span>){
+            <span class="cm-variable">pointRadialArr</span>[<span class="cm-variable">i</span>] <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>( (<span class="cm-variable">i</span> <span class="cm-operator">/</span> <span class="cm-number">2</span>) <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>, <span class="cm-variable">i</span> <span class="cm-operator">*</span> <span class="cm-number">20</span> <span class="cm-operator">+</span> <span class="cm-number">20</span>);
+            <span class="cm-variable">textArr</span>[<span class="cm-variable">i</span>] <span class="cm-operator">=</span> {<span class="cm-property">text</span>: <span class="cm-string">&quot;&quot;</span>, <span class="cm-property">x</span>: <span class="cm-string">&quot;&quot;</span>, <span class="cm-property">y</span>: <span class="cm-string">&quot;&quot;</span>}
+            <span class="cm-variable">textArr</span>[<span class="cm-variable">i</span>].<span class="cm-property">text</span> <span class="cm-operator">=</span> <span class="cm-variable">i</span>  <span class="cm-operator">*</span> <span class="cm-number">20</span> <span class="cm-operator">+</span> <span class="cm-number">20</span>;
+            <span class="cm-variable">textArr</span>[<span class="cm-variable">i</span>].<span class="cm-property">x</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>( (<span class="cm-variable">i</span> <span class="cm-operator">/</span> <span class="cm-number">2</span>) <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>, <span class="cm-variable">i</span> <span class="cm-operator">*</span> <span class="cm-number">20</span> <span class="cm-operator">+</span> <span class="cm-number">30</span>)[<span class="cm-number">0</span>];
+            <span class="cm-variable">textArr</span>[<span class="cm-variable">i</span>].<span class="cm-property">y</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>( (<span class="cm-variable">i</span> <span class="cm-operator">/</span> <span class="cm-number">2</span>) <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>, <span class="cm-variable">i</span> <span class="cm-operator">*</span> <span class="cm-number">20</span> <span class="cm-operator">+</span> <span class="cm-number">30</span>)[<span class="cm-number">1</span>];
+        }
+        <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoPointRadialR&quot;</span>) <span class="cm-comment">// adds the grey circles</span>
+            .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+            .<span class="cm-property">data</span>(<span class="cm-variable">textArr</span>)
+            .<span class="cm-property">enter</span>()
+        	.<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-number">100</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-number">100</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">text</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;grey&quot;</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-string">&quot;1.5&quot;</span>);
+
+        <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoPointRadialR&quot;</span>) <span class="cm-comment">// adds the dots</span>
+        	.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;newCircle&quot;</span>)
+            .<span class="cm-property">data</span>(<span class="cm-variable">pointRadialArr</span>)
+            .<span class="cm-property">enter</span>()
+            .<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>[<span class="cm-number">0</span>])
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>[<span class="cm-number">1</span>])
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">2.5</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+
+        <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoPointRadialR&quot;</span>) <span class="cm-comment">//adds the tags</span>
+            .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;text&quot;</span>)
+            .<span class="cm-property">data</span>(<span class="cm-variable">textArr</span>)
+            .<span class="cm-property">enter</span>()
+            .<span class="cm-property">append</span>(<span class="cm-string">&quot;text&quot;</span>)
+            .<span class="cm-property">text</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">text</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-def">d</span><span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;font-size&quot;</span>, <span class="cm-string">&quot;10px&quot;</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>)
+            .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoPointRadialA&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;250&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoPointRadialR&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_MW5jlcGsqo" href="#p_MW5jlcGsqo" tabindex="-1" role="presentation"></a>We can append some <code>text</code> elements to our SVG to label our pie graph with the names of the slices. We will set <code>x</code> and <code>y</code> attributes to point radials with an <code>angle</code> of the data’s startAngle and endAngle and a <code>radius</code> of our inner and outer radii:</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_whS4SUW/lo" href="#c_whS4SUW/lo" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoPointRadialLabel&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">input</span> <span class="cm-operator">=</span> [
+      {<span class="cm-property">name</span>: <span class="cm-string">&quot;a&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+      {<span class="cm-property">name</span>: <span class="cm-string">&quot;b&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+      {<span class="cm-property">name</span>: <span class="cm-string">&quot;c&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+      {<span class="cm-property">name</span>: <span class="cm-string">&quot;d&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;1&quot;</span>},
+      {<span class="cm-property">name</span>: <span class="cm-string">&quot;e&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;4&quot;</span>},
+      {<span class="cm-property">name</span>: <span class="cm-string">&quot;f&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;2&quot;</span>},
+      {<span class="cm-property">name</span>: <span class="cm-string">&quot;g&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;2&quot;</span>},
+      {<span class="cm-property">name</span>: <span class="cm-string">&quot;h&quot;</span>, <span class="cm-property">size</span>: <span class="cm-string">&quot;4&quot;</span>}
+  ];
+
+  <span class="cm-keyword">var</span> <span class="cm-def">angleGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pie</span>()
+        .<span class="cm-property">startAngle</span>(<span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">/</span> <span class="cm-number">4</span>)
+        .<span class="cm-property">endAngle</span>(<span class="cm-number">7</span> <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">/</span> <span class="cm-number">4</span>)
+        .<span class="cm-property">padAngle</span>(<span class="cm-number">.05</span>)
+        .<span class="cm-property">value</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">size</span>)
+        .<span class="cm-property">sortValues</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">a</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">b</span> <span class="cm-operator">?</span> <span class="cm-number">1</span> : <span class="cm-operator">-</span><span class="cm-number">1</span>);;
+
+  <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> <span class="cm-variable">angleGen</span>(<span class="cm-variable">input</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">arcGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">arc</span>()
+    .<span class="cm-property">innerRadius</span>(<span class="cm-number">50</span>)
+    .<span class="cm-property">outerRadius</span>(<span class="cm-number">90</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">colorScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleSequential</span>(<span class="cm-variable">d3</span>.<span class="cm-property">interpolate</span>(<span class="cm-string">&quot;purple&quot;</span>, <span class="cm-string">&quot;orange&quot;</span>))
+    .<span class="cm-property">domain</span>([<span class="cm-number">1</span>,<span class="cm-number">4</span>]);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoPointRadialLabel g&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">arcGen</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">colorScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">value</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-number">1</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoPointRadialLabel&quot;</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;newText&quot;</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+    .<span class="cm-property">enter</span>()
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;text&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>((<span class="cm-variable-2">d</span>.<span class="cm-property">startAngle</span> <span class="cm-operator">+</span> <span class="cm-variable-2">d</span>.<span class="cm-property">endAngle</span>  <span class="cm-operator">-</span> <span class="cm-number">0.1</span>)<span class="cm-operator">/</span><span class="cm-number">2</span> , (<span class="cm-number">50</span><span class="cm-operator">+</span><span class="cm-number">90</span>)<span class="cm-operator">/</span><span class="cm-number">2</span>)[<span class="cm-number">0</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>((<span class="cm-variable-2">d</span>.<span class="cm-property">startAngle</span> <span class="cm-operator">+</span> <span class="cm-variable-2">d</span>.<span class="cm-property">endAngle</span>  <span class="cm-operator">-</span> <span class="cm-number">0.1</span>)<span class="cm-operator">/</span><span class="cm-number">2</span> , (<span class="cm-number">50</span><span class="cm-operator">+</span><span class="cm-number">90</span>)<span class="cm-operator">/</span><span class="cm-number">2</span>)[<span class="cm-number">1</span>])
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>)
+    .<span class="cm-property">text</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;font-size&quot;</span>, <span class="cm-string">&quot;15px&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;white&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>,<span class="cm-string">&quot;translate(100,100)&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoPointRadialLabel&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><nav><a href="05_06_stacks.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_08_links.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

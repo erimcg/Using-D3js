@@ -1,0 +1,249 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hierarchal Models</title>
+  <link rel="canonical" href="http://using-d3js.com/06_01_hierarchal.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 06;</script></head>
+
+<article>
+<nav><a href="05_10_symbols.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="06_02_trees.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 06</span>Hierarchal Models</h1><script src="https://d3js.org/d3.v4.min.js"></script>
+
+
+<p><a class="p_ident" id="p_dmWJPx0eVJ" href="#p_dmWJPx0eVJ" tabindex="-1" role="presentation"></a>D3’s <a href="https://github.com/d3/d3-hierarchy">hierarchy</a> module provides methods to model hierarchal data in memory as node and link objects and to layout (compute coordinates for) the nodes.  In this chapter we discuss model construction and the properties and methods of the node object.  In subsequent chapters we discuss the layout methods that are available in the module.</p>
+
+<h2><a class="h_ident" id="h_+XtDvJfelw" href="#h_+XtDvJfelw" tabindex="-1" role="presentation"></a>Model Construction</h2>
+
+<p><a class="p_ident" id="p_wn8I9NZ4Zv" href="#p_wn8I9NZ4Zv" tabindex="-1" role="presentation"></a>The  <a href="https://github.com/d3/d3-hierarchy#hierarchy">d3.hierarchy(data[,children])</a> method builds a model of hierarchal data in memory. The method has two parameters, the first one is an object containing hierarchal data and the second is an optional function that takes an object as an argument and returns an array of <em>child</em> objects.</p>
+
+<p><a class="p_ident" id="p_znDxPP7blh" href="#p_znDxPP7blh" tabindex="-1" role="presentation"></a>When the <code>d3.hierarchy</code> method is called, it considers the first argument as the <em>root</em> object and creates a node for it.  If a second function argument is passed to the method, it is called with the root object as an argument so that it can determine the children of the root node.  If the second argument is omitted,  the following default function is used to determine the children of the root.</p><pre>
+function children(obj) {
+  return obj.children;
+}
+</pre>
+
+
+<p><a class="p_ident" id="p_jsm2rIdMBX" href="#p_jsm2rIdMBX" tabindex="-1" role="presentation"></a>After <code>d3.hierarchy</code> obtains the array of children for the root object, it creates nodes for each child object and then recursively calls the function argument (or default function) with each of the child objects as an argument.</p>
+
+<p><a class="p_ident" id="p_gGBLrukFqf" href="#p_gGBLrukFqf" tabindex="-1" role="presentation"></a>Below is hierarchal data that is represented in JSON format.  The <em>root</em> object with name “A” has 3 children in an array named “children”.   Within that array are 3 objects with names “B”, “C”, and “D”.  The object with name “C” also has children with the names “E” and “F”.</p><pre>
+  var data = {"name":"A", "size":1, "children":[
+                 {"name":"B", "size":2},
+                 {"name":"C", "size":3, "children":[
+                     {"name":"E", "size":5},
+                     {"name":"F", "size":6}]},
+                 {"name":"D", "size":4}]};
+</pre>
+
+
+<p><a class="p_ident" id="p_dQ/4u/9pKs" href="#p_dQ/4u/9pKs" tabindex="-1" role="presentation"></a>The <code>d3.hierarchy</code> method returns a node object representing the root which we can save in a variable.</p><pre>
+var root = d3.hierarchy(data);
+</pre>
+
+
+<p><a class="p_ident" id="p_jZtHsD7adk" href="#p_jZtHsD7adk" tabindex="-1" role="presentation"></a>We show in the screenshot below the root node as returned by <code>d3.hierarchy</code>.</p><img src="img/screenshots/hierarchal_node.png" alt="" height="300" />
+
+
+<h2><a class="h_ident" id="h_UPqOJYEaSS" href="#h_UPqOJYEaSS" tabindex="-1" role="presentation"></a>Node Properties</h2>
+
+<p><a class="p_ident" id="p_fM5JbRlz0p" href="#p_fM5JbRlz0p" tabindex="-1" role="presentation"></a>Each node in the hierarchal model has the following properties.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_vqUHvdb307" href="#p_vqUHvdb307" tabindex="-1" role="presentation"></a>node.data - the original object from the data source for which the node was created</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_aAb+9/2GZh" href="#p_aAb+9/2GZh" tabindex="-1" role="presentation"></a>node.parent - a reference to the parent node (null for the root node)</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_ggRaMaDGQ7" href="#p_ggRaMaDGQ7" tabindex="-1" role="presentation"></a>node.children - an array of child nodes (null for leaf nodes)</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_MVBUM01/nh" href="#p_MVBUM01/nh" tabindex="-1" role="presentation"></a>node.depth - the length of the path from this node up to the root</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_/O9oYj4n6s" href="#p_/O9oYj4n6s" tabindex="-1" role="presentation"></a>node.height - the greatest distance from this node to a descendant leaf node</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_gFgZtYet49" href="#p_gFgZtYet49" tabindex="-1" role="presentation"></a>node.value - optional - used by sum() and count()</p></li></ul>
+
+<h2><a class="h_ident" id="h_3v0dpf2lNE" href="#h_3v0dpf2lNE" tabindex="-1" role="presentation"></a>Associated Links and Related Nodes</h2>
+
+<p><a class="p_ident" id="p_Fw2vfZ+zB3" href="#p_Fw2vfZ+zB3" tabindex="-1" role="presentation"></a>The node object has various methods that return either an array of associated links or an array of related nodes.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_nZQ79CScbf" href="#p_nZQ79CScbf" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#node_links">node.links()</a> - returns the links to the children of this object; each link object has a source and a target field that hold references to nodes</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_9AUWqjOzJ6" href="#p_9AUWqjOzJ6" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#node_ancestors">node.ancestors()</a> - returns an array of nodes from this node up to the root</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_5VNY07HdRN" href="#p_5VNY07HdRN" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#node_path">node.path(target_node)</a> - returns the shortest path from this node to the target node</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_ymK/ewva6x" href="#p_ymK/ewva6x" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#node_descendants">node.descendants()</a> - returns an array of all descendant nodes in topological order</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_GiJywsCxvn" href="#p_GiJywsCxvn" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#node_descendants">node.leaves()</a> - returns the array of leaf nodes</p></li></ul>
+
+<h2><a class="h_ident" id="h_r3T3xTYqru" href="#h_r3T3xTYqru" tabindex="-1" role="presentation"></a>Copy</h2>
+
+<p><a class="p_ident" id="p_JMrvKpUCXh" href="#p_JMrvKpUCXh" tabindex="-1" role="presentation"></a>The node object also has a copy method.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_cSEhnmnyIF" href="#p_cSEhnmnyIF" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#node_copy">node.copy()</a> - returns a deep copy of the subtree that has a root at this <em>node</em>.</p></li></ul>
+
+<h2><a class="h_ident" id="h_idAMrLwa1Y" href="#h_idAMrLwa1Y" tabindex="-1" role="presentation"></a>Applying a Function to Each Node in a Subtree</h2>
+
+<p><a class="p_ident" id="p_dy95scr48R" href="#p_dy95scr48R" tabindex="-1" role="presentation"></a>The <code>each</code>, <code>eachBefore</code>, and <code>eachAfter</code> methods invoke an argument function for each descendant node.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_fc6HNM8ERO" href="#p_fc6HNM8ERO" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#node_each">node.each(function)</a> - the subtree rooted at <em>node</em> is traversed in <em>breath-first search</em> order.  The function that is passed as an argument to <code>each</code> is invoked for each node and is passed the <em>node</em>.</p></li></ul>
+
+<p><a class="p_ident" id="p_98S1uTEDpw" href="#p_98S1uTEDpw" tabindex="-1" role="presentation"></a>In the example below we have a hierarchal object consisting of 6 nodes.  Each node has a size property.  After we construct a root node by calling <code>hierarchy</code> we call <code>each</code> on the root node which causes all of the nodes below the root node to be traversed.  When each node is traversed the number stored in the node’s <em>size</em> property along with a space character is concatenated to a string.  After the subtree has been traversed, the string is displayed in a div element.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_n8cSvnxx/l" href="#c_n8cSvnxx/l" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;A&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">1</span>, <span class="cm-string cm-property">&quot;children&quot;</span>:[
+                 {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;B&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">2</span>},
+                 {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;C&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">3</span>, <span class="cm-string cm-property">&quot;children&quot;</span>:[
+                     {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;E&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">5</span>},
+                     {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;F&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">6</span>}]},
+                 {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;D&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">4</span>}]};
+
+  <span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>);
+  <span class="cm-keyword">var</span> <span class="cm-def">count</span> <span class="cm-operator">=</span> <span class="cm-variable">root</span>.<span class="cm-property">descendants</span>().<span class="cm-property">length</span>;
+  <span class="cm-keyword">var</span> <span class="cm-def">i</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>;
+
+  <span class="cm-keyword">var</span> <span class="cm-def">text</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;&quot;</span>;
+  <span class="cm-variable">root</span>.<span class="cm-property">each</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">text</span> <span class="cm-operator">+=</span> <span class="cm-variable-2">d</span>.<span class="cm-property">data</span>.<span class="cm-property">size</span> <span class="cm-operator">+</span> ((<span class="cm-operator">++</span><span class="cm-variable">i</span> <span class="cm-operator">&lt;</span> <span class="cm-variable">count</span>) <span class="cm-operator">?</span> <span class="cm-string">&quot;, &quot;</span> : <span class="cm-string">&quot; &quot;</span>));
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#eachText&quot;</span>).<span class="cm-property">html</span>(<span class="cm-variable">text</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;eachText&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_gR0dIITTza" href="#p_gR0dIITTza" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#node_eachAfter">node.eachAfter(function)</a> - the subtree rooted at <em>node</em> is traversed in <em>postorder traversal</em> order.  The function that is passed as an argument to <code>eachAfter</code> is invoked for each node and is passed the node.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_kwr+yI6gFD" href="#p_kwr+yI6gFD" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#node_eachBefore">node.eachBefore(function)</a> - the subtree rooted at <em>node</em> is traversed in <em>preorder traversal</em> order.  The function that is passed as an argument to <code>eachBefore</code> is invoked for each node and is passed the node.</p></li></ul>
+
+<p><a class="p_ident" id="p_2jmj7l5rSw" href="#p_2jmj7l5rSw" tabindex="-1" role="presentation"></a><a id="setting-value-prop"></a></p>
+
+<h2><a class="h_ident" id="h_R07pWtXz6+" href="#h_R07pWtXz6+" tabindex="-1" role="presentation"></a>Setting the Value Property</h2>
+
+<p><a class="p_ident" id="p_S8uAA/PAtN" href="#p_S8uAA/PAtN" tabindex="-1" role="presentation"></a>The <code>sum</code> and <code>count</code> methods are used to set each descendant node’s <em>value</em> property.  This property is used by some layout methods like <a href="https://github.com/d3/d3-hierarchy#treemap">d3.treemap</a>.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_EgsN2VZp77" href="#p_EgsN2VZp77" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#node_sum">node.sum(value function)</a> - takes a function as an argument and returns the node on which it is called.  The passed function must take an object as an argument and return a non-negative number.</p></li></ul>
+
+<p><a class="p_ident" id="p_sOEo0mene1" href="#p_sOEo0mene1" tabindex="-1" role="presentation"></a>The sum method is an accumulator method.  It traverses the subtree, rooted at the node on which the method is invoked, in <em>postorder</em> traversal order.  This ensures that all child nodes are traversed before a parent node.  When a node is traversed, the function argument is called and the object in the current node’s <em>data</em> property is passed to the function.  The nodes <em>value</em> property is then set to the arithmetic sum of the number returned by the value_function and the numbers in its children’s <em>value</em> properties.</p>
+
+<p><a class="p_ident" id="p_NzWOJ+1miy" href="#p_NzWOJ+1miy" tabindex="-1" role="presentation"></a>Stated another way, the sum method evaluates the leaf nodes first, setting their value properties to the values returned by the value function.  As the traversal moves up the subtree, each node’s value property is set to the sum of the value returned by the value function and the values of the node’s children’s value properties.</p>
+
+<p><a class="p_ident" id="p_ftnIgC4Wdm" href="#p_ftnIgC4Wdm" tabindex="-1" role="presentation"></a>Consider the following example.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_YWjlOWSF6T" href="#c_YWjlOWSF6T" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;A&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">1</span>, <span class="cm-string cm-property">&quot;children&quot;</span>:[
+                 {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;B&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">2</span>},
+                 {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;C&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">3</span>, <span class="cm-string cm-property">&quot;children&quot;</span>:[
+                     {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;E&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">5</span>},
+                     {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;F&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">6</span>}]},
+                 {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;D&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">4</span>}]};
+
+  <span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>);
+  
+  <span class="cm-variable">root</span>.<span class="cm-property">sum</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">size</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#sumText&quot;</span>).<span class="cm-property">html</span>(<span class="cm-string">&quot;root.value: &quot;</span> <span class="cm-operator">+</span> <span class="cm-variable">root</span>.<span class="cm-property">value</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;sumText&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_hy0kvsJ5mr" href="#p_hy0kvsJ5mr" tabindex="-1" role="presentation"></a>When we call sum, we pass it a function.  The function takes as an argument the object in the node’s data property and in our example, returns the number in the object’s size property, which is accumulated with the values of its children.</p><pre>
+  (d) => d.size
+</pre>
+
+
+<p><a class="p_ident" id="p_Vu4oGqjH0e" href="#p_Vu4oGqjH0e" tabindex="-1" role="presentation"></a>When called, sum will create a new property named <em>value</em> in each node.   For each node, the value property will be set to the sum of the number returned by the value function (when called for the node) and the numbers stored in the <em>value</em> properties of the node’s children.</p>
+
+<p><a class="p_ident" id="p_M0F6T4jZTx" href="#p_M0F6T4jZTx" tabindex="-1" role="presentation"></a>After sum is called, we see that the root node’s value property has the value 21, the sum of 1,2,3,4,5 and 6.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_AvAjTkvMOU" href="#p_AvAjTkvMOU" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#node_count">node.count()</a> - traverses the subtree rooted at <em>node</em> and sets each node’s value property to the number of leaves in that node’s subtree.</p></li></ul>
+
+<h2><a class="h_ident" id="h_N46eFjt+7O" href="#h_N46eFjt+7O" tabindex="-1" role="presentation"></a>Sorting</h2>
+
+<p><a class="p_ident" id="p_Ry1cTX9TrX" href="#p_Ry1cTX9TrX" tabindex="-1" role="presentation"></a>The <code>sort</code> method is often called prior to calling a layout method so that the children in the hierarchy are ordered before coordinates for the nodes are computed.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_EZ1Hr0IrDR" href="#p_EZ1Hr0IrDR" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#node_sort">node.sort(comparator)</a> - the children of each descendant are sorted based on a comparator that is passed to the method.</p></li></ul>
+
+<p><a class="p_ident" id="p_piGSgarEu1" href="#p_piGSgarEu1" tabindex="-1" role="presentation"></a>The comparator function takes 2 nodes as arguments and returns a negative number if the first node should be before the second node, returns a negative number if the second node should be before the first node, and returns 0 if the order doesn’t matter.</p>
+
+<p><a class="p_ident" id="p_CxovVUf0gp" href="#p_CxovVUf0gp" tabindex="-1" role="presentation"></a>The <a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#node_sort">d3 documentation</a> includes sort functions that can be used for circle-packing, treemaps, icicles, trees, and dendrograms.</p>
+
+<p><a class="p_ident" id="p_HsUn0TQldG" href="#p_HsUn0TQldG" tabindex="-1" role="presentation"></a>As a final example in this chapter we reverse the order of each node’s children.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_7RmuuI3/sN" href="#c_7RmuuI3/sN" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;A&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">1</span>, <span class="cm-string cm-property">&quot;children&quot;</span>:[
+               {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;B&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">2</span>},
+               {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;C&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">3</span>, <span class="cm-string cm-property">&quot;children&quot;</span>:[
+                   {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;E&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">5</span>},
+                   {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;F&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">6</span>}]},
+               {<span class="cm-string cm-property">&quot;name&quot;</span>:<span class="cm-string">&quot;D&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>:<span class="cm-number">4</span>}]};
+
+  <span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>);
+  <span class="cm-keyword">var</span> <span class="cm-def">count</span> <span class="cm-operator">=</span> <span class="cm-variable">root</span>.<span class="cm-property">descendants</span>().<span class="cm-property">length</span>;
+  
+  <span class="cm-variable">text</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;&quot;</span>;
+  <span class="cm-variable">i</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>;
+
+  <span class="cm-variable">root</span>.<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span>.<span class="cm-property">data</span>.<span class="cm-property">size</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>.<span class="cm-property">data</span>.<span class="cm-property">size</span>)
+  .<span class="cm-property">each</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">text</span> <span class="cm-operator">+=</span> <span class="cm-variable-2">d</span>.<span class="cm-property">data</span>.<span class="cm-property">size</span> <span class="cm-operator">+</span> ((<span class="cm-operator">++</span><span class="cm-variable">i</span> <span class="cm-operator">&lt;</span> <span class="cm-variable">count</span>) <span class="cm-operator">?</span> <span class="cm-string">&quot;, &quot;</span> : <span class="cm-string">&quot;&quot;</span>));
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#sortText&quot;</span>).<span class="cm-property">html</span>(<span class="cm-variable">text</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;sortText&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span></pre><nav><a href="05_10_symbols.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="06_02_trees.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

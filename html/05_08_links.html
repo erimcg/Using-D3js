@@ -1,0 +1,673 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Links</title>
+  <link rel="canonical" href="http://using-d3js.com/05_08_links.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 05;</script></head>
+
+<article>
+<nav><a href="05_07_arcs_pie_charts.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_09_polygons.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 05</span>Links</h1><script src="https://d3js.org/d3.v5.min.js"></script>
+<style>
+    svg { background-color: white; display: inline-block; }
+    .sandbox-output { text-align: center; }
+    .link { fill: none; stroke: black;}
+    .circle { r: 5px; fill: black; stroke: black; }
+</style>
+
+
+<p><a class="p_ident" id="p_xuH4eBV1+7" href="#p_xuH4eBV1+7" tabindex="-1" role="presentation"></a>In this section we’ll discuss how to draw links. Links can be used independently when the coordinates are predefined, or within a <a href="./06_01_hierarchal.html">hierarchical layouts</a>where the points are computed based on the layout.</p>
+
+<h2><a class="h_ident" id="h_AUvNZUxg1S" href="#h_AUvNZUxg1S" tabindex="-1" role="presentation"></a>Links</h2>
+
+<p><a class="p_ident" id="p_f0SoDYxrOU" href="#p_f0SoDYxrOU" tabindex="-1" role="presentation"></a>A link is a path that creatse a smooth Bézier curve from a source point to a target point. When having a large amount of points that need to be shown as being connected, links can be used to easily show their relation.</p>
+
+<p><a class="p_ident" id="p_lHK4zPVcz3" href="#p_lHK4zPVcz3" tabindex="-1" role="presentation"></a>There are three different types of link generators that D3 provides:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_AEvrlBMYcR" href="#p_AEvrlBMYcR" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#linkVertical">d3.linkVertical()</a> - Typically used when the root is on the left/right edge with the children going right/left.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_utuuhWlrvl" href="#p_utuuhWlrvl" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#linkHorizontal">d3.linkHorizontal()</a> - Typically used when the root is on the top/bottom edge with the children going down/up.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_utKrYlSdny" href="#p_utKrYlSdny" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#linkRadial">d3.linkRadial()</a> - Typically used when the root is centered with the children spreading outwards from the root.</p></li></ul>
+
+<p><a class="p_ident" id="p_EPfSQMJteb" href="#p_EPfSQMJteb" tabindex="-1" role="presentation"></a>Figure 1 shows a quick example of each:</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_FfhGZ5w8i6" href="#c_FfhGZ5w8i6" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-comment">//Same data used for both diagrams</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">nodeData</span> <span class="cm-operator">=</span> [
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;D3&quot;</span>,       <span class="cm-property">x</span>: <span class="cm-number">100</span>, <span class="cm-property">y</span>: <span class="cm-number">25</span>},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Scales&quot;</span>,   <span class="cm-property">x</span>: <span class="cm-number">25</span>, <span class="cm-property">y</span>: <span class="cm-number">175</span>},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Shapes&quot;</span>,   <span class="cm-property">x</span>: <span class="cm-number">175</span>, <span class="cm-property">y</span>: <span class="cm-number">175</span>}];
+
+    <span class="cm-keyword">var</span> <span class="cm-def">linkData</span> <span class="cm-operator">=</span> [
+        {<span class="cm-property">source</span>: [<span class="cm-number">100</span>,<span class="cm-number">25</span>], <span class="cm-property">target</span>: [<span class="cm-number">175</span>,<span class="cm-number">175</span>]},   <span class="cm-comment">// D3 -&gt; Shapes</span>
+        {<span class="cm-property">source</span>: [<span class="cm-number">100</span>,<span class="cm-number">25</span>], <span class="cm-property">target</span>: [<span class="cm-number">25</span>,<span class="cm-number">175</span>]}]; <span class="cm-comment">// D3 -&gt; Scales</span>
+     
+    <span class="cm-comment">//Begin making the horizontal link diagram</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">link</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">linkHorizontal</span>()
+            .<span class="cm-property">source</span>(<span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {
+                <span class="cm-keyword">return</span> [<span class="cm-variable-2">d</span>.<span class="cm-property">source</span>[<span class="cm-number">1</span>], <span class="cm-variable-2">d</span>.<span class="cm-property">source</span>[<span class="cm-number">0</span>]];
+            })
+            .<span class="cm-property">target</span>(<span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {
+                <span class="cm-keyword">return</span> [<span class="cm-variable-2">d</span>.<span class="cm-property">target</span>[<span class="cm-number">1</span>], <span class="cm-variable-2">d</span>.<span class="cm-property">target</span>[<span class="cm-number">0</span>]];
+            });
+            
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#quickDemoH&quot;</span>) <span class="cm-comment">//Adding the Circle nodes</span>
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>)
+        .<span class="cm-property">classed</span>(<span class="cm-string">&quot;circle&quot;</span>, <span class="cm-atom">true</span>);
+        
+	<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#quickDemoH&quot;</span>) <span class="cm-comment">//Adding the link paths</span>
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">linkData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">link</span>)
+        .<span class="cm-property">classed</span>(<span class="cm-string">&quot;link&quot;</span>, <span class="cm-atom">true</span>);
+
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#quickDemoH&quot;</span>) <span class="cm-comment">//Adding the text labels</span>
+          .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;text&quot;</span>)
+          .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+          .<span class="cm-property">join</span>(<span class="cm-string">&quot;text&quot;</span>)
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;font-size&quot;</span>, <span class="cm-string">&quot;12px&quot;</span>)
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>)
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>)
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span> <span class="cm-operator">+</span> <span class="cm-number">20</span>)
+          .<span class="cm-property">text</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">id</span>);
+
+    <span class="cm-comment">//Begin making the vertical link diagram</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">link</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">linkVertical</span>();
+    
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#quickDemoV&quot;</span>) <span class="cm-comment">//Adding the circle nodes</span>
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>)
+        .<span class="cm-property">classed</span>(<span class="cm-string">&quot;circle&quot;</span>, <span class="cm-atom">true</span>);
+
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#quickDemoV&quot;</span>) <span class="cm-comment">//Adding the link paths</span>
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">linkData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">link</span>)
+        .<span class="cm-property">classed</span>(<span class="cm-string">&quot;link&quot;</span>, <span class="cm-atom">true</span>);
+
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#quickDemoV&quot;</span>) <span class="cm-comment">//Adding the text label</span>
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;text&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;text&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;font-size&quot;</span>, <span class="cm-string">&quot;12px&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">id</span> <span class="cm-operator">===</span> <span class="cm-string">&quot;D3&quot;</span> <span class="cm-operator">?</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span> <span class="cm-operator">+</span> <span class="cm-number">15</span> : <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>) <span class="cm-comment">//If the node is the D3 node, move it over some so it fits right, otherwise d.x</span>
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span> <span class="cm-operator">+</span> <span class="cm-number">20</span>)
+        .<span class="cm-property">text</span>(<span class="cm-def">n</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">n</span>.<span class="cm-property">id</span>);
+    
+    <span class="cm-comment">//Begin making radial link diagram</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">link</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">linkRadial</span>()
+    				.<span class="cm-property">angle</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xAngleScale</span>(<span class="cm-variable-2">d</span>[<span class="cm-number">0</span>]))
+                    .<span class="cm-property">radius</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yRadiusScale</span>(<span class="cm-variable-2">d</span>[<span class="cm-number">1</span>]));
+    
+    <span class="cm-keyword">var</span> <span class="cm-def">xAngleScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">25</span>,<span class="cm-number">175</span>]).<span class="cm-property">range</span>([<span class="cm-variable">Math</span>.<span class="cm-property">PI</span>, <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span><span class="cm-number">2</span> ]);
+    <span class="cm-keyword">var</span> <span class="cm-def">yRadiusScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">25</span>,<span class="cm-number">175</span>]).<span class="cm-property">range</span>([<span class="cm-number">0</span>, <span class="cm-number">80</span>]);
+    
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#quickDemoR&quot;</span>) <span class="cm-comment">//Adding the circle nodes</span>
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>(<span class="cm-variable">xAngleScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>), <span class="cm-variable">yRadiusScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>))[<span class="cm-number">0</span>])
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>(<span class="cm-variable">xAngleScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>), <span class="cm-variable">yRadiusScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>))[<span class="cm-number">1</span>])
+        .<span class="cm-property">classed</span>(<span class="cm-string">&quot;circle&quot;</span>, <span class="cm-atom">true</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#quickDemoR&quot;</span>) <span class="cm-comment">//Adding the link paths</span>
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">linkData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">link</span>)
+        .<span class="cm-property">classed</span>(<span class="cm-string">&quot;link&quot;</span>, <span class="cm-atom">true</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#quickDemoR&quot;</span>) <span class="cm-comment">//Adding the text label</span>
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;text&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;text&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;font-size&quot;</span>, <span class="cm-string">&quot;12px&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;left&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>(<span class="cm-variable">xAngleScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>), <span class="cm-variable">yRadiusScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>))[<span class="cm-number">0</span>] <span class="cm-operator">+</span> <span class="cm-number">10</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>(<span class="cm-variable">xAngleScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>), <span class="cm-variable">yRadiusScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>))[<span class="cm-number">1</span>])
+        .<span class="cm-property">text</span>(<span class="cm-def">n</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">n</span>.<span class="cm-property">id</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(100,100)&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;quickDemoV&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;quickDemoH&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;quickDemoR&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 1 - A vertical link (left), a horizontal link (center), and a radial link (right).</figcaption></figure>
+
+
+<p><a class="p_ident" id="p_oNRnl9dsc8" href="#p_oNRnl9dsc8" tabindex="-1" role="presentation"></a>A link generator needs an object with a source and a target; within each should be an array with two numbers representing the <code>x</code> and <code>y</code> values of where the link should start and end.</p>
+
+<p><a class="p_ident" id="p_RR8Lw48QQR" href="#p_RR8Lw48QQR" tabindex="-1" role="presentation"></a>An example of a single link object and a default horizontal link generator:</p><pre>
+var linkGen = d3.linkHorizontal();
+var singleLinkData = { source: [25,25], target: [75,75] } ;  
+</pre>
+
+
+<p><a class="p_ident" id="p_ohbab4QVUT" href="#p_ohbab4QVUT" tabindex="-1" role="presentation"></a>We can also take multiples of these objects and put them into an array:</p><pre>
+var multiLinkData = [
+    {source: [50,50], target: [175,25]},
+    {source: [50,50], target: [175,50]},
+    {source: [50,50], target: [175,75]},
+];
+</pre>
+
+
+<p><a class="p_ident" id="p_t1JSHuMfx/" href="#p_t1JSHuMfx/" tabindex="-1" role="presentation"></a>From here we simply select our svg, add data, <code>join</code> <code>path</code>s, and set the <code>d</code> attribute of the <code>path</code>s to the link generator:</p><pre>
+d3.select("#multiLink")
+    .selectAll("path")
+    .data(multiLinkData)
+    .join("path")
+    .attr("d", linkGen)
+    .attr("fill", "none")
+    .attr("stroke", "black");
+</pre>
+
+
+<p><a class="p_ident" id="p_1AGT5sfBAl" href="#p_1AGT5sfBAl" tabindex="-1" role="presentation"></a>In Figure 2, we create a single link from one object and then multiple links from an array of objects.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_ZU7v8BZTox" href="#c_ZU7v8BZTox" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-comment">//Link generator used for both examples</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">linkGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">linkVertical</span>();
+    
+    <span class="cm-comment">//The single object containing a link</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">singleLinkData</span> <span class="cm-operator">=</span> { <span class="cm-property">source</span>: [<span class="cm-number">25</span>,<span class="cm-number">25</span>], <span class="cm-property">target</span>: [<span class="cm-number">175</span>,<span class="cm-number">75</span>] }; 
+        
+    <span class="cm-comment">//Since the single link is not an array of links, we do not add the data of it, we only pass it into the generator    </span>
+	<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#singleLink&quot;</span>) 
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">linkGen</span>(<span class="cm-variable">singleLinkData</span>))
+        .<span class="cm-property">classed</span>(<span class="cm-string">&quot;link&quot;</span>, <span class="cm-atom">true</span>);
+        
+    <span class="cm-comment">//The array of multiple links</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">multiLinkData</span> <span class="cm-operator">=</span> [
+        {<span class="cm-property">source</span>: [<span class="cm-number">100</span>,<span class="cm-number">25</span>], <span class="cm-property">target</span>: [<span class="cm-number">25</span>,<span class="cm-number">75</span>]},
+        {<span class="cm-property">source</span>: [<span class="cm-number">100</span>,<span class="cm-number">25</span>], <span class="cm-property">target</span>: [<span class="cm-number">100</span>,<span class="cm-number">75</span>]},
+        {<span class="cm-property">source</span>: [<span class="cm-number">100</span>,<span class="cm-number">25</span>], <span class="cm-property">target</span>: [<span class="cm-number">175</span>,<span class="cm-number">75</span>]},
+    ];
+    
+    <span class="cm-comment">//Since this is an array of links, we add its data then join to add our paths</span>
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#multiLink&quot;</span>)
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+    	.<span class="cm-property">data</span>(<span class="cm-variable">multiLinkData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">linkGen</span>)
+        .<span class="cm-property">classed</span>(<span class="cm-string">&quot;link&quot;</span>, <span class="cm-atom">true</span>);
+            
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;singleLink&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;multiLink&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 2 - A single link (left) and multiple links(right).</figcaption></figure>
+
+
+<h3><a class="i_ident" id="i_T0EzZLSQeT" href="#i_T0EzZLSQeT" tabindex="-1" role="presentation"></a><code>link.source()</code> and <code>link.target()</code></h3>
+
+<p><a class="p_ident" id="p_yfq1dGPGNd" href="#p_yfq1dGPGNd" tabindex="-1" role="presentation"></a>In most situations, the source and target are not going to be separate and easily accessible from our data like they are in the previous examples. For these times the <code>.source()</code> and <code>.target()</code> can be manually changed to fit whatever data is being used.</p>
+
+<p><a class="p_ident" id="p_nykvm/PWEw" href="#p_nykvm/PWEw" tabindex="-1" role="presentation"></a>Let’s use the following data:</p><pre>
+var nodeData = [
+    {id: "D3",      position: [100, 25],  parentPosition: [100, 25]},
+    {id: "Scales",  position: [25, 175],  parentPosition: [100, 25]},
+    {id: "Shapes",  position: [175, 175], parentPosition: [100, 25]}];
+</pre>
+
+
+<p><a class="p_ident" id="p_tw6pBF6f1M" href="#p_tw6pBF6f1M" tabindex="-1" role="presentation"></a>Now instead of having an array of links, we have an array of nodes with positions and a parent position. We can take this array and create links between each node’s position and its parent position by setting the <code>source</code> and <code>target</code> of our link generator:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_XRTySZ0Vqp" href="#p_XRTySZ0Vqp" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#link_source">link.source([source])</a> - Where the link originates from, by default needs an array where <code>source[0]</code> is <code>x</code> and <code>source[1]</code> is <code>y</code>, however where source looks for <code>x</code> and <code>y</code> can be overridden</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_wuPICAh0lH" href="#p_wuPICAh0lH" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#link_target">link.target([target])</a> - Where the link goes to, same requirements as <code>link.source</code></p></li></ul><pre>
+var link = d3.linkHorizontal()
+        .source(d => d.parentPosition)
+        .target(d => d.position);
+</pre>
+
+
+<p><a class="p_ident" id="p_ePAHxC/Sst" href="#p_ePAHxC/Sst" tabindex="-1" role="presentation"></a>For this example, the link generator will create a link from the parent position to the node position.</p>
+
+<p><a class="p_ident" id="p_J37YCdspbL" href="#p_J37YCdspbL" tabindex="-1" role="presentation"></a>In Figure 3, we create links by setting <code>source</code> and <code>target</code> to <code>position</code> and <code>parentPosition</code>, respectively.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_NB4zzRGIba" href="#c_NB4zzRGIba" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">nodeData</span> <span class="cm-operator">=</span> [
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;D3&quot;</span>,       <span class="cm-property">position</span>: [<span class="cm-number">100</span>, <span class="cm-number">25</span>],   <span class="cm-property">parentPosition</span>: [<span class="cm-number">100</span>, <span class="cm-number">25</span>] },
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Scales&quot;</span>,   <span class="cm-property">position</span>: [<span class="cm-number">25</span>, <span class="cm-number">175</span>],   <span class="cm-property">parentPosition</span>: [<span class="cm-number">100</span>, <span class="cm-number">25</span>] },
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Shapes&quot;</span>,   <span class="cm-property">position</span>: [<span class="cm-number">175</span>, <span class="cm-number">175</span>],  <span class="cm-property">parentPosition</span>: [<span class="cm-number">100</span>, <span class="cm-number">25</span>] }];
+
+    <span class="cm-comment">//Adding in circles where the node positions are</span>
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoSrcTar&quot;</span>)
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;.circle&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>])
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>])
+        .<span class="cm-property">classed</span>(<span class="cm-string">&quot;circle&quot;</span>, <span class="cm-atom">true</span>);
+
+    <span class="cm-comment">//Link generator with .source and .target set</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">link</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">linkVertical</span>()
+        .<span class="cm-property">source</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">parentPosition</span>)
+        .<span class="cm-property">target</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>);
+
+    <span class="cm-comment">//Creating path elements by adding in our data and calling link</span>
+	<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoSrcTar&quot;</span>)
+          .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+          .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+          .<span class="cm-property">join</span>(<span class="cm-string">&quot;path&quot;</span>)
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">link</span>)
+          .<span class="cm-property">classed</span>(<span class="cm-string">&quot;link&quot;</span>, <span class="cm-atom">true</span>);
+          
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoSrcTar&quot;</span>)
+          .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;text&quot;</span>)
+          .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+          .<span class="cm-property">join</span>(<span class="cm-string">&quot;text&quot;</span>)
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;font-size&quot;</span>, <span class="cm-string">&quot;12px&quot;</span>)
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;end&quot;</span>)
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>] <span class="cm-operator">+</span> <span class="cm-number">20</span>)
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>] <span class="cm-operator">+</span> <span class="cm-number">20</span>)
+          .<span class="cm-property">text</span>(<span class="cm-def">n</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">n</span>.<span class="cm-property">id</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoSrcTar&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 3 - Links created by setting source and target.</figcaption></figure>
+
+
+<h3><code>link.x()</code> and <code>link.y()</code></h3>
+
+<p><a class="p_ident" id="p_3puops6pIN" href="#p_3puops6pIN" tabindex="-1" role="presentation"></a>Other times, we may want to have our <code>x</code> and <code>y</code> positions put through a scale so we do not have to manually compute their positions. This can be very helpful in cases where our data is dynamic and we do not always know what exact positions to use.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_ugrdxHVdjb" href="#p_ugrdxHVdjb" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#link_x">link.x([x])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_bTYvsxn+AA" href="#p_bTYvsxn+AA" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#link_y">link.y([y])</a></p></li></ul>
+
+<p><a class="p_ident" id="p_uz6SvowwK/" href="#p_uz6SvowwK/" tabindex="-1" role="presentation"></a>For this example we will use a larger data set:</p><pre>
+var nodeData = [
+    {id: "D3",       position: [2, 0], parentPosition: [2, 0]},
+    {id: "Shapes",   position: [1, 1], parentPosition: [2, 0]},
+    {id: "Scales",   position: [3, 1], parentPosition: [2, 0]},
+    {id: "Links",    position: [0, 2], parentPosition: [1, 1]},
+    {id: "Areas",    position: [1, 2], parentPosition: [1, 1]},
+    {id: "Arcs",     position: [2, 2], parentPosition: [1, 1]},
+    {id: "Ordinal",  position: [3, 2], parentPosition: [3, 1]},
+    {id: "Quantize", position: [4, 2], parentPosition: [3, 1]}];
+</pre>
+
+
+<p><a class="p_ident" id="p_c+MV95qPBJ" href="#p_c+MV95qPBJ" tabindex="-1" role="presentation"></a>In our new data array the positions are no longer absolute and should be put through a <code>d3.linearScale()</code> to get the real values that will be displayed in the svg.</p>
+
+<p><a class="p_ident" id="p_iA4CYMWSme" href="#p_iA4CYMWSme" tabindex="-1" role="presentation"></a>Since we changed how the real <code>x</code> and <code>y</code> positions are computed we will need to set up our link generator to accommodate this; we also need to set up our scales:</p><pre>
+var xScale = d3.scaleLinear().domain([0, 4]).range([25, 175]);
+var yScale = d3.scaleLinear().domain([0,2]).range([25, 175]);
+
+var linkGen = d3.linkVertical()
+    .source(d => d.position)
+    .target(d => d.parentPosition)
+    .x(d => xScale(d[0]))
+    .y(d => yScale(d[1]));
+</pre>
+
+
+<p><a class="p_ident" id="p_+I419IM/61" href="#p_+I419IM/61" tabindex="-1" role="presentation"></a>In Figure 4, we apply a scale to <code>x</code> and <code>y</code>.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_RXnI9ZoIxV" href="#c_RXnI9ZoIxV" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-comment">//Our larger node data</span>
+     <span class="cm-keyword">var</span> <span class="cm-def">nodeData</span> <span class="cm-operator">=</span> [
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;D3&quot;</span>,       <span class="cm-property">position</span>: [<span class="cm-number">2</span>, <span class="cm-number">0</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">2</span>, <span class="cm-number">0</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Shapes&quot;</span>,   <span class="cm-property">position</span>: [<span class="cm-number">1</span>, <span class="cm-number">1</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">2</span>, <span class="cm-number">0</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Scales&quot;</span>,   <span class="cm-property">position</span>: [<span class="cm-number">3</span>, <span class="cm-number">1</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">2</span>, <span class="cm-number">0</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Links&quot;</span>,    <span class="cm-property">position</span>: [<span class="cm-number">0</span>, <span class="cm-number">2</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">1</span>, <span class="cm-number">1</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Areas&quot;</span>,    <span class="cm-property">position</span>: [<span class="cm-number">1</span>, <span class="cm-number">2</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">1</span>, <span class="cm-number">1</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Arcs&quot;</span>,     <span class="cm-property">position</span>: [<span class="cm-number">2</span>, <span class="cm-number">2</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">1</span>, <span class="cm-number">1</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Ordinal&quot;</span>,  <span class="cm-property">position</span>: [<span class="cm-number">3</span>, <span class="cm-number">2</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">3</span>, <span class="cm-number">1</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Quantize&quot;</span>, <span class="cm-property">position</span>: [<span class="cm-number">4</span>, <span class="cm-number">2</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">3</span>, <span class="cm-number">1</span>]}];
+
+    <span class="cm-comment">//x and y scales</span>
+   <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">4</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+   <span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">2</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+
+    <span class="cm-comment">// Adding the circle nodes</span>
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoXY&quot;</span>)
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;.circle&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>]))
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>]))
+        .<span class="cm-property">classed</span>(<span class="cm-string">&quot;circle&quot;</span>, <span class="cm-atom">true</span>);
+
+    <span class="cm-comment">// Our link generator with the new .x() and .y() definitions</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">linkGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">linkVertical</span>()
+    	.<span class="cm-property">source</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>)
+        .<span class="cm-property">target</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">parentPosition</span>)
+        .<span class="cm-property">x</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>[<span class="cm-number">0</span>]))
+        .<span class="cm-property">y</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>[<span class="cm-number">1</span>]));
+
+    <span class="cm-comment">// Adding the links</span>
+	<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoXY&quot;</span>)
+          .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+          .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+          .<span class="cm-property">join</span>(<span class="cm-string">&quot;path&quot;</span>)
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">linkGen</span>)
+          .<span class="cm-property">classed</span>(<span class="cm-string">&quot;link&quot;</span>, <span class="cm-atom">true</span>);
+             
+    <span class="cm-comment">// Adding the text nodes</span>
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoXY&quot;</span>)
+          .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;text&quot;</span>)
+          .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+          .<span class="cm-property">join</span>(<span class="cm-string">&quot;text&quot;</span>)
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;font-size&quot;</span>, <span class="cm-string">&quot;10px&quot;</span>)
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>)
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) { 
+                <span class="cm-keyword">if</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>] <span class="cm-operator">==</span> <span class="cm-number">2</span> <span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>] <span class="cm-operator">==</span> <span class="cm-number">0</span>)
+                    <span class="cm-keyword">return</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>]);
+                <span class="cm-keyword">var</span> <span class="cm-def">xOffset</span> <span class="cm-operator">=</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>]);
+                <span class="cm-keyword">if</span>(<span class="cm-variable-2">xOffset</span> <span class="cm-operator">&gt;</span> <span class="cm-number">100</span>)
+                    <span class="cm-keyword">return</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>]) <span class="cm-operator">+</span><span class="cm-number">25</span>;
+                <span class="cm-keyword">return</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>]) <span class="cm-operator">-</span><span class="cm-number">25</span>;
+                })
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) { 
+                <span class="cm-keyword">if</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>] <span class="cm-operator">==</span> <span class="cm-number">2</span>)
+                    <span class="cm-keyword">return</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>]) <span class="cm-operator">+</span> <span class="cm-number">15</span>;
+                <span class="cm-keyword">if</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>] <span class="cm-operator">==</span> <span class="cm-number">1</span>)
+                    <span class="cm-keyword">return</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>])
+                <span class="cm-keyword">return</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>]) <span class="cm-operator">-</span> <span class="cm-number">10</span>
+                })
+          .<span class="cm-property">text</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">id</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoXY&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 4 - Links with a scale applied to x and y.</figcaption></figure>
+
+
+<h3><a class="i_ident" id="i_U8/jIHt6k6" href="#i_U8/jIHt6k6" tabindex="-1" role="presentation"></a>Using <code>d3.<wbr>linkHorizontal()</code> and <code>d3.<wbr>linkVertical()</code></h3>
+
+<p><a class="p_ident" id="p_UB+/DpTexE" href="#p_UB+/DpTexE" tabindex="-1" role="presentation"></a>We have been using <code>d3.<wbr>linkVertical()</code> for most of this section. <code>d3.<wbr>linkVertical()</code> should be used when your graph is rooted at the top or bottom. Another link generator, <code>d3.<wbr>linkHorizontal()</code> can be used when your graph is rooted to the left or right.</p>
+
+<p><a class="p_ident" id="p_SAFy1VYQH7" href="#p_SAFy1VYQH7" tabindex="-1" role="presentation"></a>It is easy to make a <code>d3.<wbr>linkHorizontal()</code> graph out of an existing <code>d3.<wbr>linkVertical()</code> graph. All we have to do is flip the <code>x</code> and <code>y</code> positions of a <code>d3.<wbr>linkVertical()</code> graph and we will get a <code>d3.<wbr>linkHorizontal()</code> graph.</p>
+
+<p><a class="p_ident" id="p_4k2YB+WBlj" href="#p_4k2YB+WBlj" tabindex="-1" role="presentation"></a>You could do this by making a new array and flipping the <code>x</code> and <code>y</code> values, however an easier way is to flip the <code>x</code> and <code>y</code> in the <code>source</code> and <code>target</code> of <code>d3.<wbr>linkHorizontal()</code>:</p><pre>
+var link = d3.linkHorizontal()
+    .source( d => [d.position[1], d.position[0]] )
+    .target( d => [d.parentPosition[1], d.parentPosition[0]] );
+</pre>
+
+
+<p><a class="p_ident" id="p_aylUDi4YVw" href="#p_aylUDi4YVw" tabindex="-1" role="presentation"></a>Since we flipped the <code>x</code> and <code>y</code> positions in our link generator we will need to make sure to flip them when we are creating the <code>circle</code> and <code>text</code> nodes.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_irBAqWJLgp" href="#p_irBAqWJLgp" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#linkVertical">d3.linkVertical()</a> - The default link generator, assumes root at top or bottom.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_SN3Zqw7VRM" href="#p_SN3Zqw7VRM" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#linkHorizontal">d3.linkHorizontal()</a> - Assumes left to right, converted from <code>d3.<wbr>linkVertical()</code> by flipping <code>x</code> and <code>y</code> positions.</p></li></ul>
+
+<p><a class="p_ident" id="p_NZACdBW2ij" href="#p_NZACdBW2ij" tabindex="-1" role="presentation"></a>In Figure 5, we use <code>d3.<wbr>linkHorizontal</code> to display our chart left-to-right instead.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_OO3HGOSvoo" href="#c_OO3HGOSvoo" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-comment">//Same data used for both diagrams</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">nodeData</span> <span class="cm-operator">=</span> [
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;D3&quot;</span>,       <span class="cm-property">position</span>: [<span class="cm-number">100</span>, <span class="cm-number">25</span>],   <span class="cm-property">parentPosition</span>: [<span class="cm-number">100</span>,<span class="cm-number">25</span>] },
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Scales&quot;</span>,   <span class="cm-property">position</span>: [<span class="cm-number">25</span>, <span class="cm-number">175</span>],   <span class="cm-property">parentPosition</span>: [<span class="cm-number">100</span>, <span class="cm-number">25</span>] },
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Shapes&quot;</span>,   <span class="cm-property">position</span>: [<span class="cm-number">175</span>, <span class="cm-number">175</span>],  <span class="cm-property">parentPosition</span>: [<span class="cm-number">100</span>, <span class="cm-number">25</span>] }];
+     
+    <span class="cm-comment">//Begin making the horizontal link diagram</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">link</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">linkHorizontal</span>()
+        .<span class="cm-property">source</span>( <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> [<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>], <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>]] )
+        .<span class="cm-property">target</span>( <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> [<span class="cm-variable-2">d</span>.<span class="cm-property">parentPosition</span>[<span class="cm-number">1</span>], <span class="cm-variable-2">d</span>.<span class="cm-property">parentPosition</span>[<span class="cm-number">0</span>]] );
+            
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoH&quot;</span>) <span class="cm-comment">//Adding the circle nodes</span>
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>]) <span class="cm-comment">// Flipped X</span>
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>]) <span class="cm-comment">// Flipped Y</span>
+        .<span class="cm-property">classed</span>(<span class="cm-string">&quot;circle&quot;</span>, <span class="cm-atom">true</span>);
+        
+	<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoH&quot;</span>) <span class="cm-comment">//Adding the link paths</span>
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">link</span>)
+        .<span class="cm-property">classed</span>(<span class="cm-string">&quot;link&quot;</span>, <span class="cm-atom">true</span>);
+
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoH&quot;</span>) <span class="cm-comment">//Adding the text labels</span>
+          .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;text&quot;</span>)
+          .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+          .<span class="cm-property">join</span>(<span class="cm-string">&quot;text&quot;</span>)
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;font-size&quot;</span>, <span class="cm-string">&quot;12px&quot;</span>)
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>)
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>]) <span class="cm-comment">// Flipped X</span>
+          .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>]<span class="cm-operator">+</span> <span class="cm-number">20</span>) <span class="cm-comment">// Flipped Y</span>
+          .<span class="cm-property">text</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">id</span>);
+
+    <span class="cm-comment">//Begin making the vertical link diagram</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">link</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">linkVertical</span>();
+    
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoV&quot;</span>) <span class="cm-comment">//Adding the circle nodes</span>
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>])
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>])
+        .<span class="cm-property">classed</span>(<span class="cm-string">&quot;circle&quot;</span>, <span class="cm-atom">true</span>);
+
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoV&quot;</span>) <span class="cm-comment">//Adding the link paths</span>
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">linkData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">link</span>)
+        .<span class="cm-property">classed</span>(<span class="cm-string">&quot;link&quot;</span>, <span class="cm-atom">true</span>);
+
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoV&quot;</span>) <span class="cm-comment">//Adding the text label</span>
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;text&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;text&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;font-size&quot;</span>, <span class="cm-string">&quot;12px&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">id</span> <span class="cm-operator">===</span> <span class="cm-string">&quot;D3&quot;</span> <span class="cm-operator">?</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>] <span class="cm-operator">+</span> <span class="cm-number">15</span> : <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>])
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>] <span class="cm-operator">+</span> <span class="cm-number">20</span>)
+        .<span class="cm-property">text</span>(<span class="cm-def">n</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">n</span>.<span class="cm-property">id</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoH&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoV&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 5 - Horizontal links.</figcaption></figure>
+
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_keNc214+Oa" href="#p_keNc214+Oa" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#linkVertical">d3.linkVertical()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_SIHups2Mcm" href="#p_SIHups2Mcm" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#linkHorizontal">d3.linkHorizontal()</a></p></li></ul>
+
+<h2><a class="h_ident" id="h_2Xk5GBVvdg" href="#h_2Xk5GBVvdg" tabindex="-1" role="presentation"></a>Link Radial</h2>
+
+<p><a class="p_ident" id="p_zzShb+dFnz" href="#p_zzShb+dFnz" tabindex="-1" role="presentation"></a>D3 also provides a circular link generator, <code>d3.linkRadial()</code>. Just as with <code>d3.<wbr>linkHorizontal()</code>, <code>d3.linkRadial()</code> can be easily converted from an existing <code>d3.<wbr>linkVertical()</code> graph.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_yNuy7CkQJV" href="#p_yNuy7CkQJV" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#linkRadial">d3.linkRadial()</a></p></li></ul>
+
+<p><a class="p_ident" id="p_oF1FSCix/Q" href="#p_oF1FSCix/Q" tabindex="-1" role="presentation"></a>To convert a <code>d3.<wbr>linkVertical()</code> into a <code>d3.linkRadial()</code> all we need to do is change our <code>x</code> position to become an <code>angle</code> and our <code>y</code> position will become the <code>radius</code>. We will also need to change our scales to reflect angles and radii. Note that for this example the data set is expanded again.</p><pre>
+var xScale = d3.scaleLinear().domain([0, 8]).range([0, Math.PI * 2]);
+var yScale = d3.scaleLinear().domain([0,2]).range([0, 80]);
+
+var link = d3.linkRadial()
+    .source(d => d.position)
+    .target(d => d.parentPosition)
+    .angle( d => xScale(d[0]))
+    .radius( d => yScale(d[1]));
+</pre>
+
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_9U5vo2qnO9" href="#p_9U5vo2qnO9" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#linkRadial_angle">linkRadial.angle([angle])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_ySC/PNE6et" href="#p_ySC/PNE6et" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#linkRadial_radius">linkRadial.radius([radius])</a></p></li></ul>
+
+<p><a class="p_ident" id="p_3PdjxsLEA/" href="#p_3PdjxsLEA/" tabindex="-1" role="presentation"></a>Our <code>circle</code> and <code>text</code> nodes will no longer be at the right point without changing their coordinates as well, so we will use <code>d3.pointRadial</code>s to place them into the right spot.</p><pre>
+<i>circleSelection</i>
+    .attr("cx", d => d3.pointRadial(xScale(d.position[0]), yScale(d.position[1]) )[0] )
+    .attr("cy", d => d3.pointRadial(xScale(d.position[0]), yScale(d.position[1]) )[1] )
+</pre>
+
+
+<p><a class="p_ident" id="p_T9HPcG4Wye" href="#p_T9HPcG4Wye" tabindex="-1" role="presentation"></a>In Figure 6, we use <code>d3.linkRadial</code> to display our chart radially instead.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_PMrqc+WW/7" href="#c_PMrqc+WW/7" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-comment">//Our larger node data</span>
+     <span class="cm-keyword">var</span> <span class="cm-def">nodeData</span> <span class="cm-operator">=</span> [
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;D3&quot;</span>,       <span class="cm-property">position</span>: [<span class="cm-number">2</span>, <span class="cm-number">0</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">2</span>, <span class="cm-number">0</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Shapes&quot;</span>,   <span class="cm-property">position</span>: [<span class="cm-number">1</span>, <span class="cm-number">1</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">2</span>, <span class="cm-number">0</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Scales&quot;</span>,   <span class="cm-property">position</span>: [<span class="cm-number">3</span>, <span class="cm-number">1</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">2</span>, <span class="cm-number">0</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Layouts&quot;</span>,  <span class="cm-property">position</span>: [<span class="cm-number">6</span>, <span class="cm-number">1</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">2</span>, <span class="cm-number">0</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Links&quot;</span>,    <span class="cm-property">position</span>: [<span class="cm-number">0</span>, <span class="cm-number">2</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">1</span>, <span class="cm-number">1</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Areas&quot;</span>,    <span class="cm-property">position</span>: [<span class="cm-number">1</span>, <span class="cm-number">2</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">1</span>, <span class="cm-number">1</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Arcs&quot;</span>,     <span class="cm-property">position</span>: [<span class="cm-number">2</span>, <span class="cm-number">2</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">1</span>, <span class="cm-number">1</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Ordinal&quot;</span>,  <span class="cm-property">position</span>: [<span class="cm-number">3</span>, <span class="cm-number">2</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">3</span>, <span class="cm-number">1</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Quantize&quot;</span>, <span class="cm-property">position</span>: [<span class="cm-number">4</span>, <span class="cm-number">2</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">3</span>, <span class="cm-number">1</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Tree&quot;</span>, 	 <span class="cm-property">position</span>: [<span class="cm-number">5</span>, <span class="cm-number">2</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">6</span>, <span class="cm-number">1</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Cluster&quot;</span>,	 <span class="cm-property">position</span>: [<span class="cm-number">6</span>, <span class="cm-number">2</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">6</span>, <span class="cm-number">1</span>]},
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Partition&quot;</span>,<span class="cm-property">position</span>: [<span class="cm-number">7</span>, <span class="cm-number">2</span>], <span class="cm-property">parentPosition</span>: [<span class="cm-number">6</span>, <span class="cm-number">1</span>]}];
+
+    <span class="cm-comment">// Updated scales</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">8</span>]).<span class="cm-property">range</span>([<span class="cm-number">0</span>, <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">2</span>]);
+    <span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">2</span>]).<span class="cm-property">range</span>([<span class="cm-number">0</span>, <span class="cm-number">133</span>]);
+
+    <span class="cm-comment">//Adding circles</span>
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoRadial&quot;</span>)
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;circle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>(<span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>]), <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>]) )[<span class="cm-number">0</span>] )
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>(<span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>]), <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>]) )[<span class="cm-number">1</span>] )
+        .<span class="cm-property">classed</span>(<span class="cm-string">&quot;circle&quot;</span>, <span class="cm-atom">true</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(175,175)&quot;</span>);
+
+    <span class="cm-comment">//New radial link generator</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">link</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">linkRadial</span>()
+        .<span class="cm-property">source</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>)
+        .<span class="cm-property">target</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">parentPosition</span>)
+        .<span class="cm-property">angle</span>( <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>[<span class="cm-number">0</span>]))
+        .<span class="cm-property">radius</span>( <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>[<span class="cm-number">1</span>]));
+
+    <span class="cm-comment">//Adding the link paths </span>
+	<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoRadial&quot;</span>)
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;path&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">link</span>)
+        .<span class="cm-property">classed</span>(<span class="cm-string">&quot;link&quot;</span>, <span class="cm-atom">true</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(175,175)&quot;</span>);
+
+    <span class="cm-comment">// Adding text nodes, the x and y have special functions to get them in a place where they do not overlap the links</span>
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demoRadial&quot;</span>)
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;text&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">nodeData</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">&quot;text&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;font-size&quot;</span>, <span class="cm-string">&quot;11px&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {
+        	<span class="cm-keyword">if</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>] <span class="cm-operator">==</span> <span class="cm-number">2</span>)
+        	    <span class="cm-keyword">return</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>(<span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>]), <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>]) <span class="cm-operator">+</span> <span class="cm-number">25</span>)[<span class="cm-number">0</span>];
+            <span class="cm-keyword">if</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>] <span class="cm-operator">==</span> <span class="cm-number">1</span>){
+                <span class="cm-keyword">var</span> <span class="cm-def">xPos</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>(<span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>]), <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>]))[<span class="cm-number">0</span>];
+                <span class="cm-variable-2">xPos</span> <span class="cm-operator">=</span> <span class="cm-variable-2">xPos</span> <span class="cm-operator">&gt;</span> <span class="cm-number">0</span> <span class="cm-operator">?</span> <span class="cm-variable-2">xPos</span> <span class="cm-operator">-</span> <span class="cm-number">25</span> : <span class="cm-variable-2">xPos</span> <span class="cm-operator">+</span> <span class="cm-number">15</span>;
+                <span class="cm-keyword">return</span> <span class="cm-variable-2">xPos</span>;
+            }                   
+            <span class="cm-keyword">return</span> <span class="cm-number">0</span>;})
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>){
+        		<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>] <span class="cm-operator">==</span> <span class="cm-number">2</span> <span class="cm-operator">?</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>(<span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>]), <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>]) <span class="cm-operator">+</span> <span class="cm-number">20</span>)[<span class="cm-number">1</span>] <span class="cm-operator">+</span> <span class="cm-number">4</span> :
+                	   <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>] <span class="cm-operator">==</span> <span class="cm-number">1</span> <span class="cm-operator">?</span> <span class="cm-variable">d3</span>.<span class="cm-property">pointRadial</span>(<span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">0</span>]) <span class="cm-operator">+</span> <span class="cm-number">.15</span>, <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">position</span>[<span class="cm-number">1</span>]) <span class="cm-operator">+</span> <span class="cm-number">10</span>)[<span class="cm-number">1</span>] :
+                        					<span class="cm-number">20</span> 
+                })
+        .<span class="cm-property">text</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">id</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(175,175)&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demoRadial&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;350&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;350&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 6 - Radial links.</figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_tMJUmaYhD5" href="#h_tMJUmaYhD5" tabindex="-1" role="presentation"></a>Canvasses</h2>
+
+<p><a class="p_ident" id="p_AvDXSOpN8a" href="#p_AvDXSOpN8a" tabindex="-1" role="presentation"></a>Our examples in the section all use an <code>SVG</code> as the graphic medium. If we want to work with a Canvas instead, we just pass in the <code>context</code> of a canvas into the <code>.context()</code> accessor of any of our link generators.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_EXG6pO+5zA" href="#p_EXG6pO+5zA" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#link_context">link.context([context])</a></p></li></ul>
+
+<p><a class="p_ident" id="p_S0/lfHuX6B" href="#p_S0/lfHuX6B" tabindex="-1" role="presentation"></a>In Figure 7 we use the same links in Figure 4, but apply them to a canvas instead. Note that we have to use additional CanvasPathMethods for our graphics to display.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_xMrGGxno14" href="#c_xMrGGxno14" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">nodeData</span> <span class="cm-operator">=</span> [
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;D3&quot;</span>,       <span class="cm-property">position</span>: [<span class="cm-number">100</span>, <span class="cm-number">25</span>],   <span class="cm-property">parentPosition</span>: [<span class="cm-number">100</span>,<span class="cm-number">25</span>] },
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Scales&quot;</span>,   <span class="cm-property">position</span>: [<span class="cm-number">25</span>, <span class="cm-number">175</span>],   <span class="cm-property">parentPosition</span>: [<span class="cm-number">100</span>, <span class="cm-number">25</span>] },
+        {<span class="cm-property">id</span>: <span class="cm-string">&quot;Shapes&quot;</span>,   <span class="cm-property">position</span>: [<span class="cm-number">175</span>, <span class="cm-number">175</span>],  <span class="cm-property">parentPosition</span>: [<span class="cm-number">100</span>, <span class="cm-number">25</span>] }];
+     
+    <span class="cm-keyword">var</span> <span class="cm-def">selection</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo7&quot;</span>);
+    <span class="cm-keyword">var</span> <span class="cm-def">context</span> <span class="cm-operator">=</span> <span class="cm-variable">selection</span>.<span class="cm-property">node</span>().<span class="cm-property">getContext</span>(<span class="cm-string">&quot;2d&quot;</span>);
+     
+    <span class="cm-keyword">var</span> <span class="cm-def">link</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">linkVertical</span>()
+        .<span class="cm-property">source</span>( <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> {<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">d</span>); <span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">position</span>;} )
+        .<span class="cm-property">target</span>( <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">parentPosition</span> )
+        .<span class="cm-property">context</span>(<span class="cm-variable">context</span>);
+        
+    <span class="cm-variable">context</span>.<span class="cm-property">beginPath</span>();
+    <span class="cm-variable">context</span>.<span class="cm-property">strokeStyle</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;black&quot;</span>;
+    <span class="cm-variable">context</span>.<span class="cm-property">fillStyle</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;white&quot;</span>;
+    <span class="cm-keyword">for</span>(<span class="cm-variable">node</span> <span class="cm-keyword">of</span> <span class="cm-variable">nodeData</span>) {
+        <span class="cm-variable">link</span>(<span class="cm-variable">node</span>);
+    }
+    <span class="cm-variable">context</span>.<span class="cm-property">fill</span>();
+    <span class="cm-variable">context</span>.<span class="cm-property">stroke</span>();
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">canvas</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo7&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">200</span> <span class="cm-attribute">height</span>=<span class="cm-string">200</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">canvas</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 7 - Canvas version of Figure 4.</figcaption></figure>
+<nav><a href="05_07_arcs_pie_charts.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_09_polygons.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

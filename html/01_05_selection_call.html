@@ -1,0 +1,89 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Selection.call</title>
+  <link rel="canonical" href="http://using-d3js.com/01_05_selection_call.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 01;</script></head>
+
+<article>
+<nav><a href="01_04_create_delete_move_elements.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="02_01_binding_data.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 01</span>Selection.call</h1><style>
+.container {
+    display: inline-block;
+    margin: 0;
+    border: 0;
+    padding: 0;
+}
+.box {
+    display: block;
+    float: left;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    font-size: 0;
+    margin: 0;
+    border: 0;
+    padding: 0;
+    background-color: lightblue;
+    border-radius: 10px;
+}
+.blue-box {
+    background-color: lightblue;
+}
+.pink-box {
+    background-color: pink;
+}
+.aqua-box {
+    background-color: aquamarine;
+}
+
+button{
+    display: inline;
+    vertical-align: middle;
+}
+</style>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+
+<p><a class="p_ident" id="p_RF2ZS6Q7Rk" href="#p_RF2ZS6Q7Rk" tabindex="-1" role="presentation"></a>The <a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_call">selection.call(f [, arguments...])</a> method takes a function <code>f</code> as an argument.  When <code>selection.call</code> is executed, it executes the <code>f</code>, passing to it <em>this</em>, the <code>selection</code> on which <code>call</code> was called.  If <code>f</code> has <em>k</em> parameters, the first one being the selection, then <em>k-1</em> additional arguments must be passed to <code>call</code>.  When <code>f</code> is executed, the additional values passed to <code>call</code> are passed to <code>f</code>.  <code>Selection.call</code> returns the selection on which it was called so it can be called in a chain.</p>
+
+<p><a class="p_ident" id="p_6x26ZMTbXH" href="#p_6x26ZMTbXH" tabindex="-1" role="presentation"></a>This method is useful when you have a set of manipulations that you need to run on multiple selections.</p>
+
+<p><a class="p_ident" id="p_Guot4XeQxR" href="#p_Guot4XeQxR" tabindex="-1" role="presentation"></a>In the example, below we have a method named <code>addElements</code> which adds <code>n</code> aquamarine colored divs before each element in the selection.  Note: this isn’t possible with the <code>selection.insert</code> method which can only insert elements as children of the elements in the selection.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_K35uflP/ej" href="#c_K35uflP/ej" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">function</span> <span class="cm-def">addElements</span>(<span class="cm-def">selection</span>, <span class="cm-def">n</span>) {
+  <span class="cm-keyword">let</span> <span class="cm-def">nodeList</span> <span class="cm-operator">=</span> <span class="cm-variable-2">selection</span>.<span class="cm-property">nodes</span>();
+  <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">i</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable-2">i</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">nodeList</span>.<span class="cm-property">length</span>; <span class="cm-variable-2">i</span><span class="cm-operator">++</span>) {
+    <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">j</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable-2">j</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">n</span>; <span class="cm-variable-2">j</span><span class="cm-operator">++</span>) {
+      <span class="cm-keyword">let</span> <span class="cm-def">newElm</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">create</span>(<span class="cm-string">&quot;div&quot;</span>).<span class="cm-property">node</span>();
+      <span class="cm-variable-2">newElm</span>.<span class="cm-property">className</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;box aqua-box&quot;</span>;
+      <span class="cm-variable-2">nodeList</span>[<span class="cm-variable-2">i</span>].<span class="cm-property">parentNode</span>.<span class="cm-property">insertBefore</span>(<span class="cm-variable-2">newElm</span>, <span class="cm-variable-2">nodeList</span>[<span class="cm-variable-2">i</span>]);
+    }
+  }
+}
+
+<span class="cm-keyword">function</span> <span class="cm-def">addElementsWithCall</span>() {
+    <span class="cm-variable">d3</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;#callBoxes &gt; div&quot;</span>)
+      .<span class="cm-property">call</span>(<span class="cm-variable">addElements</span>, <span class="cm-number">2</span>);
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;addElementsWithCall()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Insert Elements<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;callBoxes&quot;</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;container&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span></pre><nav><a href="01_04_create_delete_move_elements.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="02_01_binding_data.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

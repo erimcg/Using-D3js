@@ -1,0 +1,157 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Zooming</title>
+  <link rel="canonical" href="http://using-d3js.com/09_04_zooming.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 09;</script></head>
+
+<article>
+<nav><a href="09_03_brushes.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="09_05_dragging.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 09</span>Zooming</h1><style>
+
+</style>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_S2mMSKzPYr" href="#p_S2mMSKzPYr" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoom">d3.zoom()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_YqOE3cXC72" href="#p_YqOE3cXC72" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#_zoom">zoom(selection)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_Lr37zrFgb7" href="#p_Lr37zrFgb7" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoom_transform">zoom.transform(selection, transform)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_n8hK8fhV3b" href="#p_n8hK8fhV3b" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoom_translateBy">zoom.translateBy(selection, x, y)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_nF2o+f4ARh" href="#p_nF2o+f4ARh" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoom_translateTo">zoom.translateTo(selection, x, y)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_3mboMopZ4B" href="#p_3mboMopZ4B" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoom_scaleBy">zoom.scaleBy(selection, k)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_Ht8Pm9doh5" href="#p_Ht8Pm9doh5" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoom_scaleTo">zoom.scaleTo(selection, k)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_p6cVcB92xi" href="#p_p6cVcB92xi" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoom_constrain">zoom.constrain([constrain])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_fTL+fjZHyg" href="#p_fTL+fjZHyg" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoom_filter">zoom.filter([filter])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_Daxdc8InbC" href="#p_Daxdc8InbC" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoom_touchable">zoom.touchable([touchable])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_RPHmF/lztW" href="#p_RPHmF/lztW" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoom_wheelDelta">zoom.wheelDelta([delta])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_U8XP+yX/oi" href="#p_U8XP+yX/oi" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoom_extent">zoom.extent([extent])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_7S3d2PGX0x" href="#p_7S3d2PGX0x" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoom_scaleExtent">zoom.scaleExtent([extent])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_Kdc6wGUdq+" href="#p_Kdc6wGUdq+" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoom_translateExtent">zoom.translateExtent([extent])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_XCwbqYhu67" href="#p_XCwbqYhu67" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoom_clickDistance">zoom.clickDistance([distance])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_SD33LpTgwg" href="#p_SD33LpTgwg" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoom_duration">zoom.duration([duration])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_vfU6Ru4ZtG" href="#p_vfU6Ru4ZtG" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoom_interpolate">zoom.interpolate([interpolate])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_pxB/bQXRel" href="#p_pxB/bQXRel" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoom_on">zoom.on(typenames[, listener])</a></p></li></ul>
+
+<h2><a class="h_ident" id="h_EIHqG4nHHy" href="#h_EIHqG4nHHy" tabindex="-1" role="presentation"></a>Zoom Events</h2>
+
+<h2><a class="h_ident" id="h_JmkyrIVxKR" href="#h_JmkyrIVxKR" tabindex="-1" role="presentation"></a>Zoom Transform</h2>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_AD+uyPrnWq" href="#p_AD+uyPrnWq" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoomTransform">d3.zoomTransform(node)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_zPe8JVAeBW" href="#p_zPe8JVAeBW" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#transform_scale">transform.scale(k)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_76r/jSU53U" href="#p_76r/jSU53U" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#transform_translate">transform.translate(x, y)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_o+Dln9YZus" href="#p_o+Dln9YZus" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#transform_apply">transform.apply(point)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_2pkiUztDFb" href="#p_2pkiUztDFb" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#transform_applyX">transform.applyX(x)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_mbZsWVaRe4" href="#p_mbZsWVaRe4" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#transform_applyY">transform.applyY(y)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_bXa3e7xZMf" href="#p_bXa3e7xZMf" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#transform_invert">transform.invert(point)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_2C18sfEu20" href="#p_2C18sfEu20" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#transform_invertX">transform.invertX(x)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_VmBLc9tZPW" href="#p_VmBLc9tZPW" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#transform_invertY">transform.invertY(y)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_eMynXKS2kU" href="#p_eMynXKS2kU" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#transform_rescaleX">transform.rescaleX(x)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_PLXXBwOgBy" href="#p_PLXXBwOgBy" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#transform_rescaleY">transform.rescaleY(y)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_/FQhDEMZLn" href="#p_/FQhDEMZLn" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#transform_toString">transform.toString()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_SYf0DdUvBc" href="#p_SYf0DdUvBc" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-zoom#zoomIdentity">d3.zoomIdentity</a></p></li></ul><nav><a href="09_03_brushes.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="09_05_dragging.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

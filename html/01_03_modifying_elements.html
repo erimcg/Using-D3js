@@ -1,0 +1,264 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Modifying Elements in Selections</title>
+  <link rel="canonical" href="http://using-d3js.com/01_03_modifying_elements.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 01;</script></head>
+
+<article>
+<nav><a href="01_02_selection_node_properties.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="01_04_create_delete_move_elements.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 01</span>Modifying Elements in Selections</h1><style>
+    button{
+        display: inline;
+        vertical-align: middle;
+    }
+    svg {
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .lightblue {
+        fill: lightblue;
+    }
+    .pink {
+        fill: pink;
+    }
+    #pink {
+        fill: pink;
+    }
+    .box {
+        display: inline-block;
+        vertical-align: middle;
+        width: 50px;
+        height: 50px;
+        text-align: center;
+        line-height: 50px;
+        margin: 15px;
+        border: 0;
+        padding: 0;
+    }
+    .circle {
+        border-radius: 25px;
+    }
+    .blue-box {
+        background-color: lightblue;
+    }
+    .pink-box {
+        background-color: pink;
+    }
+
+
+</style>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+
+<p><a class="p_ident" id="p_wEfKN/w+8Y" href="#p_wEfKN/w+8Y" tabindex="-1" role="presentation"></a>Once we have a <code>d3.selection</code> object, we can modify the elements in the selection in unison by calling the <code>d3.selection</code> methods shown below.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_0KveqkSOYn" href="#p_0KveqkSOYn" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_each">selection.each(function)</a> - call a function for each element in the selection</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_TBd/GZXDtj" href="#p_TBd/GZXDtj" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_attr">selection.attr(name[, value])</a> - set, remove, or get an attribute</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_p3iBusDA34" href="#p_p3iBusDA34" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_style">selection.style(name[, value[, priority]])</a> - set, remove, or get a style property</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_XEe2T4k2dL" href="#p_XEe2T4k2dL" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_property">selection.property(name[, value])</a> - set, remove, or get a (raw) property</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_KE5i1S6QqO" href="#p_KE5i1S6QqO" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_classed">selection.classed(names[, value])</a> -  add, remove, and check the existence of CSS classes</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_/OX1c1cNmb" href="#p_/OX1c1cNmb" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_html">selection.html([value])</a> - set, remove, or get the inner HTML content</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_2tZ9LkXTQD" href="#p_2tZ9LkXTQD" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_text">selection.text([value])</a> - set, remove, or get the text content</p></li></ul>
+
+<h2><a class="h_ident" id="h_EOGzYtdbOi" href="#h_EOGzYtdbOi" tabindex="-1" role="presentation"></a>Selection.each</h2>
+
+<p><a class="p_ident" id="p_DJD5p5pEW8" href="#p_DJD5p5pEW8" tabindex="-1" role="presentation"></a>The <code>selection.each</code> method allows us to call a function for each element in a selection. The argument to <code>each</code> is a function and as with <code>selection.filter</code>, we can pass in a named function, unnamed function, or a lambda expression.</p>
+
+<p><a class="p_ident" id="p_CXMQ/jO1kF" href="#p_CXMQ/jO1kF" tabindex="-1" role="presentation"></a>When <code>each</code> is executed, the function that is passed to it is executed once for each element in the selection and each time it is executed it is passed <code>d</code> (the data bound to the element - See <a href="http://using-d3js.com/02_01_binding_data.html">Chapter 2</a>), <code>i</code> (the element’s group index), and <code>nodes</code> (the element’s group.)  <code>nodes[i]</code> is used to retrieve the current element in the selection for which the function is being called.</p>
+
+<p><a class="p_ident" id="p_rOXK84j6Sr" href="#p_rOXK84j6Sr" tabindex="-1" role="presentation"></a>In the example below, a lambda expression is called for each element in the selection and each time checks to see if the index of the element is even, and if so, sets its fill color to pink.</p><pre>
+d3.selectAll("#eachSVG circle").each((d,i,nodes) => {
+    if (i % 2 == 0) {
+        nodes[i].setAttribute("fill", "pink");
+    }});
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_30FsLWvRFt" href="#c_30FsLWvRFt" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">function</span> <span class="cm-def">applyEach</span>(){
+        <span class="cm-variable">d3</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;#eachSVG circle&quot;</span>).<span class="cm-property">each</span>((<span class="cm-def">d</span>,<span class="cm-def">i</span>,<span class="cm-def">nodes</span>) <span class="cm-operator">=&gt;</span> {
+            <span class="cm-keyword">if</span> (<span class="cm-variable-2">i</span> <span class="cm-operator">%</span> <span class="cm-number">2</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>) {
+                <span class="cm-variable-2">nodes</span>[<span class="cm-variable-2">i</span>].<span class="cm-property">setAttribute</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>);
+            }});
+    }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;eachSVG&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;300&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;60&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;130&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;180&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;eachButton&quot;</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;applyEach()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Apply Each<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_om+wfXs6FO" href="#h_om+wfXs6FO" tabindex="-1" role="presentation"></a>Modifying Attributes, Styles, and Properties</h2>
+
+<p><a class="p_ident" id="p_la2KDmqmCa" href="#p_la2KDmqmCa" tabindex="-1" role="presentation"></a>The library’s author designed <code>selection.attr</code>, <code>selection.style</code>, and <code>selection.<wbr>property</code> so that they are called and behave in a consistent manner.  Notice that each of them has an optional <code>value</code> argument.  Whether or not a method sets, removes, or gets a characteristic depends on what is passed in for the <code>value</code> argument.  The pattern is as follows:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_7HHv6tvQzf" href="#p_7HHv6tvQzf" tabindex="-1" role="presentation"></a>If a non-null <code>value</code> argument is provided to a method, the method is used as a setter for all of the elements in the selection.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_osB+cvoMGz" href="#p_osB+cvoMGz" tabindex="-1" role="presentation"></a>If <code>null</code> is passed as the <code>value</code> argument then the method has the effect of clearing or removing the named characteristic from all of the elements in the selection.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_04zJZGQJ4L" href="#p_04zJZGQJ4L" tabindex="-1" role="presentation"></a>If a <code>value</code> argument is not provided, the method is used as a getter for the <em>first</em> non-null element in the selection.</p></li></ul>
+
+<h3><a class="i_ident" id="i_RyKaSbCAQc" href="#i_RyKaSbCAQc" tabindex="-1" role="presentation"></a>Setting Attr, Style, and Property Values</h3>
+
+<p><a class="p_ident" id="p_0snesxm4Fn" href="#p_0snesxm4Fn" tabindex="-1" role="presentation"></a>When the <code>value</code> argument is a non-null value or a function, the methods are used as setters.  If the value argument is a constant, then the characteristic of every element in the selection will be set using the same value.</p>
+
+<p><a class="p_ident" id="p_xkL9SsJTbv" href="#p_xkL9SsJTbv" tabindex="-1" role="presentation"></a>Below is an example of how we can use <code>selection.style</code> to apply the same style to a set of elements.  In the example, boxes are created using div elements with classes named <em>box</em> and <em>pink-box</em> (the CSS is hidden).  The button handler selects all of the boxes and uses <code>selection.style</code> to add a <code>border-radius</code> property to each element in the selection.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_fdmCl+hI1Z" href="#c_fdmCl+hI1Z" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">function</span> <span class="cm-def">addStyle</span>() {
+    <span class="cm-variable">d3</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;#styleExampleSVG .box&quot;</span>)
+      .<span class="cm-property">style</span>(<span class="cm-string">&quot;border-radius&quot;</span>, <span class="cm-string">&quot;10px&quot;</span>);
+  }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;styleExampleSVG&quot;</span> <span class="cm-attribute">style</span>=<span class="cm-string">&quot;display: inline-block;&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box blue-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;styleExampleButton&quot;</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;addStyle()&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-atom">&amp;#x394;</span> Style<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_MvLdWG1Nmn" href="#p_MvLdWG1Nmn" tabindex="-1" role="presentation"></a>If the argument is a function then the function is called for each element in the selection and the values returned from the function are used to set the characteristic of the elements.  When the function is called, it is called with the current datum (d), the current index (i), and the current group (nodes) being passed to the function.</p>
+
+<p><a class="p_ident" id="p_kPfBYNIg/E" href="#p_kPfBYNIg/E" tabindex="-1" role="presentation"></a>For example, the code below sets the radius of the circle elements to 10, 20, and 30, respectively, by using the index that is passed to the function (0, 1, and 2, respectively) in the radius computation.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_H0JiJoBp6N" href="#c_H0JiJoBp6N" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">function</span> <span class="cm-def">setRadii</span>() {
+    <span class="cm-variable">d3</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;#setterExampleSVG circle&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, (<span class="cm-def">d</span>,<span class="cm-def">i</span>,<span class="cm-def">nodes</span>) <span class="cm-operator">=&gt;</span> <span class="cm-number">10</span> <span class="cm-operator">+</span> (<span class="cm-number">10</span> <span class="cm-operator">*</span> <span class="cm-variable-2">i</span>));
+  }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;setterExampleSVG&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;250&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;125&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;setterExampleButton&quot;</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;setRadii()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Set Radii<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h3><a class="i_ident" id="i_kQuF3fqzPQ" href="#i_kQuF3fqzPQ" tabindex="-1" role="presentation"></a>Deleting Attr, Style, and Property Values</h3>
+
+<p><a class="p_ident" id="p_yfFL+r7Fni" href="#p_yfFL+r7Fni" tabindex="-1" role="presentation"></a>When <code>selection.attr</code>, <code>selection.style</code>, or <code>selection.<wbr>property</code> is passed <code>null</code> as the value argument, then the named attribute, style, or property (respectively) specified in the first argument is removed from each element in the selection.</p>
+
+<p><a class="p_ident" id="p_0Vf9tISrGu" href="#p_0Vf9tISrGu" tabindex="-1" role="presentation"></a>In the example below we select the blue box and remove the <code>border-radius</code> property from its style attribute by passing <code>null</code> as the second argument to <code>selection.style</code>.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_VklrKdE4JK" href="#c_VklrKdE4JK" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">function</span> <span class="cm-def">removeStyle</span>() {
+    <span class="cm-variable">d3</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;#removeStyleExampleSVG .blue-box&quot;</span>)
+      .<span class="cm-property">style</span>(<span class="cm-string">&quot;border-radius&quot;</span>, <span class="cm-atom">null</span>);
+  }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;removeStyleExampleSVG&quot;</span> <span class="cm-attribute">style</span>=<span class="cm-string">&quot;display: inline-block;&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box blue-box&quot;</span> <span class="cm-attribute">style</span>=<span class="cm-string">&quot;border-radius: 25px;&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span> <span class="cm-attribute">style</span>=<span class="cm-string">&quot;border-radius: 25px;&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box pink-box&quot;</span> <span class="cm-attribute">style</span>=<span class="cm-string">&quot;border-radius: 25px;&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;styleExampleButton&quot;</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;removeStyle()&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-atom">&amp;#x394;</span> Style<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h3><a class="i_ident" id="i_doj4TVDCja" href="#i_doj4TVDCja" tabindex="-1" role="presentation"></a>Getting Attr, Style, and Property Values</h3>
+
+<p>When <code>selection.attr</code>, <code>selection.style</code>, or <code>selection.<wbr>property</code> is called without a value argument, the method returns the attribute, style property, or raw property (respectively) associated with the name argument of the first non-null element in the selection.</p>
+
+<h2><a class="h_ident" id="h_bt8NYBxcbw" href="#h_bt8NYBxcbw" tabindex="-1" role="presentation"></a>Modifying Classes</h2>
+
+<p><a class="p_ident" id="p_/ntL3gNu9b" href="#p_/ntL3gNu9b" tabindex="-1" role="presentation"></a>The <code>value</code> argument of <code>selection.<wbr>classed</code> is a <code>boolean</code>.  If the value argument is <code>true</code>, the class names that are provided as a first argument are added to the class attribute of each element in the selection.   If the <code>value</code> argument is <code>false</code>, then the classes are removed.</p>
+
+<p><a class="p_ident" id="p_3NvL8r8OUW" href="#p_3NvL8r8OUW" tabindex="-1" role="presentation"></a>In the example below we have a class named <code>lightblue</code> that defines the <code>fill</code> property as <em>lightblue</em>.  In the function <code>addClass</code> we select all of the circle elements using <code>selectAll()</code>, then chain a call to <code>classed()</code> to add the <code>lightblue</code> class to each of the circle elements.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_jNhQDnppV1" href="#c_jNhQDnppV1" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">function</span> <span class="cm-def">addClass</span>() {
+    <span class="cm-variable">d3</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;#classedExampleSVG circle&quot;</span>)
+      .<span class="cm-property">classed</span>(<span class="cm-string">&quot;lightblue&quot;</span>, <span class="cm-atom">true</span>);
+    <span class="cm-variable">classedExampleButtonHandler</span> <span class="cm-operator">=</span> <span class="cm-variable">removeClass</span>;
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#classedExampleButton&quot;</span>).<span class="cm-property">text</span>(<span class="cm-string">'Remove Class'</span>);
+  }
+  <span class="cm-keyword">function</span> <span class="cm-def">removeClass</span>() {
+      <span class="cm-variable">d3</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;#classedExampleSVG circle&quot;</span>)
+        .<span class="cm-property">classed</span>(<span class="cm-string">&quot;lightblue&quot;</span>, <span class="cm-atom">false</span>);
+      <span class="cm-variable">classedExampleButtonHandler</span> <span class="cm-operator">=</span> <span class="cm-variable">addClass</span>;
+      <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#classedExampleButton&quot;</span>).<span class="cm-property">text</span>(<span class="cm-string">'Add Class'</span>);
+  }
+  <span class="cm-keyword">var</span> <span class="cm-def">classedExampleButtonHandler</span> <span class="cm-operator">=</span> <span class="cm-variable">addClass</span>;
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;classedExampleSVG&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;250&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;blue&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;125&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;classedExampleButton&quot;</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;classedExampleButtonHandler()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Add Class<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_d5+hlDGY8w" href="#p_d5+hlDGY8w" tabindex="-1" role="presentation"></a>When <code>selection.<wbr>classed</code> is called without a value argument, the method returns <code>true</code> if the first non-null element in the selection has the classes specified in the <code>name</code> argument, otherwise it returns <code>false</code>.</p>
+
+<h2><a class="h_ident" id="h_3v4a9ItwKQ" href="#h_3v4a9ItwKQ" tabindex="-1" role="presentation"></a>Modifying Text and InnerHTML</h2>
+
+<p><a class="p_ident" id="p_NKUPL0ntsG" href="#p_NKUPL0ntsG" tabindex="-1" role="presentation"></a>When <code>selection.text</code> and <code>selection.html</code> are passed a non-null value for the <code>value</code> argument, they behave similar to <code>selection.attr</code>.  That is, if the value is a constant, then all elements in the selection will have their text or inner HTML, respectively, set to the same value.  If the value is a function then the function is called for each element in the selection and the values returned from the function are used to set the characteristic of the elements.  When the function is called, it is called with the current datum (d), the current index (i), and the current group (nodes) being passed to the function.</p>
+
+<p><a class="p_ident" id="p_cIgi4bV9NQ" href="#p_cIgi4bV9NQ" tabindex="-1" role="presentation"></a>When <code>selection.text</code> and <code>selection.html</code> are passed <code>null</code> as a <code>value</code> argument, then the text content and inner HTML, respectively, are cleared for each element in the selection.</p>
+
+<p>When <code>selection.text</code> or <code>selection.html</code> is called without a <code>value</code> argument, the method returns the text or inner HTML, respectively, of the first non-null element in the selection.</p>
+
+<p><a class="p_ident" id="p_hiDxU9htxY" href="#p_hiDxU9htxY" tabindex="-1" role="presentation"></a>The example below shows how reverse the letters in an element’s text node by using <code>selection.text</code> without any arguments to retrieve the text, and using <code>selection.text</code> again with a non-null argument to set the text.</p>
+
+<p><a class="p_ident" id="p_pgYKYQb7y/" href="#p_pgYKYQb7y/" tabindex="-1" role="presentation"></a>To begin we select the box with the class named <em>box</em> and retrieve its text using <code>selection.text</code>, storing the string in the variable named <code>str</code>.  We then reverse the order of the letters in the string and store the result back in <code>str</code>.  Last, we select the same box again and set its text by passing <code>str</code> to <code>selection.text</code>.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_J3C299K/E8" href="#c_J3C299K/E8" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">function</span> <span class="cm-def">reverseText</span>() {
+    <span class="cm-keyword">let</span> <span class="cm-def">str</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#textContainer .box&quot;</span>).<span class="cm-property">text</span>();
+    <span class="cm-variable-2">str</span> <span class="cm-operator">=</span> <span class="cm-variable-2">str</span>.<span class="cm-property">split</span>(<span class="cm-string">&quot;&quot;</span>).<span class="cm-property">reverse</span>().<span class="cm-property">join</span>(<span class="cm-string">&quot;&quot;</span>);
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#textContainer .box&quot;</span>).<span class="cm-property">text</span>(<span class="cm-variable-2">str</span>);
+  }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;textContainer&quot;</span> <span class="cm-attribute">style</span>=<span class="cm-string">&quot;display: inline-block;&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;box blue-box&quot;</span><span class="cm-tag cm-bracket">&gt;</span>BOX<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;changeTextButton&quot;</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;reverseText()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Reverse Text<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">br</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">br</span><span class="cm-tag cm-bracket">&gt;</span></pre><nav><a href="01_02_selection_node_properties.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="01_04_create_delete_move_elements.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

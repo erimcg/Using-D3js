@@ -1,0 +1,262 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quantize Scales</title>
+  <link rel="canonical" href="http://using-d3js.com/04_06_quantize_scales.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 04;</script></head>
+
+<article>
+<nav><a href="04_05_sequential_scales.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_07_ordinal_scales.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 04</span>Quantize Scales</h1><style>
+    svg { background-color: lightblue; }
+</style>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+
+<p><a class="p_ident" id="p_iFbbdUB4xM" href="#p_iFbbdUB4xM" tabindex="-1" role="presentation"></a>In previous tutorials we discussed continuous and sequential scales.  These scales mapped a continuous domain to a continuous range.  In this tutorial we’ll discuss the scale generators that create scales that map a continuous domain to a discrete range.  There are three types of quantize scales.  Each of them divides the domain into uniform size partitions based on the cardinality of the output range.</p>
+
+<p><a class="p_ident" id="p_FhYo67G5jI" href="#p_FhYo67G5jI" tabindex="-1" role="presentation"></a>The quantize scales in d3 include:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_/X01ggb2f6" href="#p_/X01ggb2f6" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#scaleQuantize">d3.scaleQuantize()</a> - maps values within a continuous domain defined by an interval to one or more elements within a set.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_RzcFO0o08A" href="#p_RzcFO0o08A" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#scaleQuantile">d3.scaleQuantile()</a> - maps a continuous domain defined by a sorted set of elements to an array of elements</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_j0yWDo1j6P" href="#p_j0yWDo1j6P" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-scale/blob/master/README.md#scaleThreshold">d3.scaleThreshold()</a> - maps a continuous domain defined by an array of threshold values to an array of elements</p></li></ul>
+
+<h2><a class="h_ident" id="h_FRXla8DSAW" href="#h_FRXla8DSAW" tabindex="-1" role="presentation"></a>Quantize Scales</h2>
+
+<p><a class="p_ident" id="p_+h0peyQ+Rs" href="#p_+h0peyQ+Rs" tabindex="-1" role="presentation"></a>The scaleQuantize() method generates a scaling function that segments the domain into <em>k</em> uniform segments where <em>k</em> is the number of elements with the range set.  Each segment is mapped to a unique element within the range set.</p>
+
+<p><a class="p_ident" id="p_dvUkyu8yRR" href="#p_dvUkyu8yRR" tabindex="-1" role="presentation"></a>As with the continuous scaling functions the domain and range are specified by calling the domain and range methods respectively.</p>
+
+<p><a class="p_ident" id="p_dIBqYGNhex" href="#p_dIBqYGNhex" tabindex="-1" role="presentation"></a>When a scaling function is passed an value within the domain, the scaling function returns the element in the range that was mapped to the segment containing the argument.</p>
+
+<p><a class="p_ident" id="p_xQ7NseMTtq" href="#p_xQ7NseMTtq" tabindex="-1" role="presentation"></a>By default the scaleQuantize method creates a scaling function that maps values between 0 and 1 to the elements 0 and 1.  That is, if an input value is in the interval [0, 0.5)  the scaling function returns 0, and if an input value is in [0.5, 1] then the scaling function returns 1.</p>
+
+<p><a class="p_ident" id="p_A9dxumjfBA" href="#p_A9dxumjfBA" tabindex="-1" role="presentation"></a>In the example below the following quantile scale is created.</p><pre>
+var colorScale = d3.scaleQuantize()
+    .domain(<strong>[0,100]</strong>)
+    .range(["red", "blue", "green"]);
+</pre>
+
+
+<p><a class="p_ident" id="p_UDpEpFCE7C" href="#p_UDpEpFCE7C" tabindex="-1" role="presentation"></a>100 rect elements are then positioned at random locations along the x-axis between 0 and 80.  The colorScale function is used to set the fill color of the rectangles based on their location on the x-axis.</p><pre>
+.attr("fill", (d) =&gt; colorScale(d))
+</pre>
+
+
+<p><a class="p_ident" id="p_CwUCF6ZosT" href="#p_CwUCF6ZosT" tabindex="-1" role="presentation"></a>Since the quantize scale divides the domain into segments of equal length, the boundaries for the segments are at 33 and 67.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_OPkJpRrjJW" href="#c_OPkJpRrjJW" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+        .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">100</span>])
+        .<span class="cm-property">range</span>([<span class="cm-number">25</span>,<span class="cm-number">555</span>]);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>);
+
+    <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+       .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,70)&quot;</span>)
+       .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">ticks</span> <span class="cm-operator">=</span> [].<span class="cm-property">map</span>.<span class="cm-property">call</span>(<span class="cm-variable">d3</span>.<span class="cm-property">range</span>(<span class="cm-number">3</span>), (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-number">100</span><span class="cm-operator">/</span><span class="cm-number">3</span> <span class="cm-operator">*</span> (<span class="cm-variable-2">d</span><span class="cm-operator">+</span><span class="cm-number">1</span>));
+
+    <span class="cm-keyword">var</span> <span class="cm-def">topAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisTop</span>(<span class="cm-variable">xScale</span>)
+        .<span class="cm-property">tickValues</span>(<span class="cm-variable">ticks</span>);
+
+    <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+       .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,40)&quot;</span>)
+       .<span class="cm-property">call</span>(<span class="cm-variable">topAxis</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">colorScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleQuantize</span>()
+        .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">100</span>])
+        .<span class="cm-property">range</span>([<span class="cm-string">&quot;red&quot;</span>, <span class="cm-string">&quot;blue&quot;</span>, <span class="cm-string">&quot;green&quot;</span>]);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [].<span class="cm-property">map</span>.<span class="cm-property">call</span>(<span class="cm-variable">d3</span>.<span class="cm-property">range</span>(<span class="cm-number">100</span>), (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">Math</span>.<span class="cm-property">random</span>() <span class="cm-operator">*</span> <span class="cm-number">80</span>);
+
+    <span class="cm-variable">svg</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;rect&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+        .<span class="cm-property">enter</span>()
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;rect&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>))
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-number">40</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;width&quot;</span>, <span class="cm-number">3</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;height&quot;</span>, <span class="cm-number">30</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">colorScale</span>(<span class="cm-variable-2">d</span>));
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_3iJgSb14gB" href="#p_3iJgSb14gB" tabindex="-1" role="presentation"></a>Other methods you can call on a quantize scale are:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_X4IgW+35P5" href="#p_X4IgW+35P5" tabindex="-1" role="presentation"></a><a href="">ticks</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_p14GYVIRmK" href="#p_p14GYVIRmK" tabindex="-1" role="presentation"></a><a href="">tickFormat</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_WSnlilqh/e" href="#p_WSnlilqh/e" tabindex="-1" role="presentation"></a><a href="">nice</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_+E4uLa3Yc4" href="#p_+E4uLa3Yc4" tabindex="-1" role="presentation"></a><a href="">copy</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_bw69YOBfhk" href="#p_bw69YOBfhk" tabindex="-1" role="presentation"></a><a href="">invertExtent</a></p></li></ul>
+
+<h2><a class="h_ident" id="h_lCHSbm4FlA" href="#h_lCHSbm4FlA" tabindex="-1" role="presentation"></a>Quantile Scales</h2>
+
+<p><a class="p_ident" id="p_ba0XH04ERG" href="#p_ba0XH04ERG" tabindex="-1" role="presentation"></a>The quantile scale uses a finite set of elements to define the domain and a finite set of elements to define the range.  Although the domain is defined by a finite set of values, the domain is considered a continuous interval between the smallest and largest values in the set.  Given <em>n</em> elements in the domain set and <em>k</em> elements in the range set, the domain is segmented into k intervals such that the first <em>n/k</em> elements in the domain set are mapped to the first element in the range set, the second <em>n/k</em> elements in the domain set are mapped to the second element in the range set, etc.</p>
+
+<p><a class="p_ident" id="p_LHmXCdXAi6" href="#p_LHmXCdXAi6" tabindex="-1" role="presentation"></a>Below we create an array containing 100 random values between 0 and 100.</p><pre>
+var data = [].map.call(d3.range(100), (d) =&gt; Math.random() * 80);
+</pre>
+
+
+<p><a class="p_ident" id="p_4neLXvljOG" href="#p_4neLXvljOG" tabindex="-1" role="presentation"></a>And then create a quantile scale using the array of random values to define the domain.</p><pre>
+var colorScale = d3.scaleQuantile()
+    .domain(<strong>data</strong>)
+    .range(["red", "blue", "green"]);
+</pre>
+
+
+<p><a class="p_ident" id="p_pV4qzWOxqQ" href="#p_pV4qzWOxqQ" tabindex="-1" role="presentation"></a>Since an equal number of values (100/3) in the domain’s data array are assigned to a different color, the boundaries of the buckets would very rarely be at the 33 and 67 marks as was the case for the quantize scaling function.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_HoluV2Cu+k" href="#c_HoluV2Cu+k" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo2&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+        .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">100</span>])
+        .<span class="cm-property">range</span>([<span class="cm-number">25</span>,<span class="cm-number">555</span>]);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>);
+
+    <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+       .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,70)&quot;</span>)
+       .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [].<span class="cm-property">map</span>.<span class="cm-property">call</span>(<span class="cm-variable">d3</span>.<span class="cm-property">range</span>(<span class="cm-number">100</span>), (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">Math</span>.<span class="cm-property">random</span>() <span class="cm-operator">*</span> <span class="cm-number">80</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">colorScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleQuantile</span>()
+        .<span class="cm-property">domain</span>(<span class="cm-variable">data</span>)
+        .<span class="cm-property">range</span>([<span class="cm-string">&quot;red&quot;</span>, <span class="cm-string">&quot;blue&quot;</span>, <span class="cm-string">&quot;green&quot;</span>]);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">ticks</span> <span class="cm-operator">=</span> <span class="cm-variable">colorScale</span>.<span class="cm-property">quantiles</span>();
+
+    <span class="cm-keyword">var</span> <span class="cm-def">topAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisTop</span>(<span class="cm-variable">xScale</span>)
+        .<span class="cm-property">tickValues</span>(<span class="cm-variable">ticks</span>);
+
+    <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+       .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,40)&quot;</span>)
+       .<span class="cm-property">call</span>(<span class="cm-variable">topAxis</span>);
+
+    <span class="cm-variable">svg</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;rect&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+        .<span class="cm-property">enter</span>()
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;rect&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>))
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-number">40</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;width&quot;</span>, <span class="cm-number">3</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;height&quot;</span>, <span class="cm-number">30</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">colorScale</span>(<span class="cm-variable-2">d</span>));
+
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_7YTBL+QeBj" href="#p_7YTBL+QeBj" tabindex="-1" role="presentation"></a>Other methods that can be called on the quantile function are:</p>
+
+<ul>
+
+<li>
+
+<p><a href="">invertExtent</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_/B/5EHCV/J" href="#p_/B/5EHCV/J" tabindex="-1" role="presentation"></a><a href="">quantiles</a></p></li>
+
+<li>
+
+<p><a href="">copy</a></p></li></ul>
+
+<h2><a class="h_ident" id="h_YFGURTwcGj" href="#h_YFGURTwcGj" tabindex="-1" role="presentation"></a>Threshold Scales</h2>
+
+<p><a class="p_ident" id="p_oRem/L+r6t" href="#p_oRem/L+r6t" tabindex="-1" role="presentation"></a>A threshold scale explicitly sets the boundaries for the domain’s <em>k</em> segments.  This is done by passing an array containing the boundary values to the domain method.</p>
+
+<p><a class="p_ident" id="p_W7omHCi9/b" href="#p_W7omHCi9/b" tabindex="-1" role="presentation"></a>In the example below we create a threshold scale that sets the segment boundaries at 40 and 60.</p><pre>
+var colorScale = d3.scaleThreshold()
+    .domain(<strong>[40,60]</strong>)
+    .range(["red", "blue", "green"]);
+</pre>
+
+
+<p><a class="p_ident" id="p_B1hN+h0mhm" href="#p_B1hN+h0mhm" tabindex="-1" role="presentation"></a>We then, as before create 100 rect elements and randomly position them between 0 and 80 on the x-axis.  We use the colorScale function to determine the fill color for the rect elements.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_GOpl4HtvA7" href="#c_GOpl4HtvA7" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo3&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+        .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">100</span>])
+        .<span class="cm-property">range</span>([<span class="cm-number">25</span>,<span class="cm-number">555</span>]);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>);
+
+    <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+       .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,70)&quot;</span>)
+       .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">threshold</span> <span class="cm-operator">=</span> [<span class="cm-number">40</span>,<span class="cm-number">60</span>];
+
+    <span class="cm-keyword">var</span> <span class="cm-def">topAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisTop</span>(<span class="cm-variable">xScale</span>)
+        .<span class="cm-property">tickValues</span>(<span class="cm-variable">threshold</span>);
+
+    <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+       .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,40)&quot;</span>)
+       .<span class="cm-property">call</span>(<span class="cm-variable">topAxis</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">colorScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleThreshold</span>()
+        .<span class="cm-property">domain</span>(<span class="cm-variable">threshold</span>)
+        .<span class="cm-property">range</span>([<span class="cm-string">&quot;red&quot;</span>, <span class="cm-string">&quot;blue&quot;</span>, <span class="cm-string">&quot;green&quot;</span>]);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [].<span class="cm-property">map</span>.<span class="cm-property">call</span>(<span class="cm-variable">d3</span>.<span class="cm-property">range</span>(<span class="cm-number">100</span>), (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">Math</span>.<span class="cm-property">random</span>() <span class="cm-operator">*</span> <span class="cm-number">80</span>);
+
+    <span class="cm-variable">svg</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;rect&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+        .<span class="cm-property">enter</span>()
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;rect&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>))
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-number">40</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;width&quot;</span>, <span class="cm-number">3</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;height&quot;</span>, <span class="cm-number">30</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">colorScale</span>(<span class="cm-variable-2">d</span>));
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo3&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><nav><a href="04_05_sequential_scales.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_07_ordinal_scales.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

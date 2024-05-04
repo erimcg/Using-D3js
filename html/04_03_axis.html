@@ -1,0 +1,291 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Axis</title>
+  <link rel="canonical" href="http://using-d3js.com/04_03_axis.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 04;</script></head>
+
+<article>
+<nav><a href="04_02_continuous_scales.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_04_working_with_dates.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 04</span>Axis</h1><style>
+    svg {
+        background-color: lightblue;
+    }
+</style>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+
+<p><a class="p_ident" id="p_W04rmqn0Wc" href="#p_W04rmqn0Wc" tabindex="-1" role="presentation"></a>D3 provide a library that makes drawing axes and the tick marks easy.  To do so you generate a axis <em>function</em> by passing a scale to one fo the following methods.  Then later, you call the function to draw the axis.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_nKGc8VyKDi" href="#p_nKGc8VyKDi" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-axis/blob/master/README.md#axisTop">d3.axisTop(scale)</a> - draw horizontal axis with ticks on top of line</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_zFIV4oJ1GV" href="#p_zFIV4oJ1GV" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-axis/blob/master/README.md#axisBottom">d3.axisBottom(scale)</a> - draw horizontal axis with ticks on bottom of line</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_almeRgjhHY" href="#p_almeRgjhHY" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-axis/blob/master/README.md#axisLeft">d3.axisLeft(scale)</a> - draw vertical axis with ticks on left of line</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_+yM+BqYjFg" href="#p_+yM+BqYjFg" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-axis/blob/master/README.md#axisRight">d3.axisRight(scale)</a> - draw vertical axis with ticks on right of line</p></li></ul>
+
+<p><a class="p_ident" id="p_Lp5SOoSxV+" href="#p_Lp5SOoSxV+" tabindex="-1" role="presentation"></a>Below we show how to create an x-axis in a 600px wide by 100px high svg element. To start, we’ve created a scaling function and pass the scaling function to one of the axis generators.</p><pre>
+var xScale = d3.scaleLinear()
+    .domain([0, 5])
+    .range([25, 555]);
+
+var xAxis = d3.axisBottom(xScale);
+</pre>
+
+
+<p><a class="p_ident" id="p_2OkfLj2Auf" href="#p_2OkfLj2Auf" tabindex="-1" role="presentation"></a>We then append a group element (“g”) to the svg element, translate (i.e. move) the g element 75 pixels down, and invoke the <code>xAxis</code> function by passing it to the <code>call</code> method.</p><pre>
+var svg = d3.select("#axisDemo1");
+
+svg.append("g")
+    .attr("transform", "translate(0,60)")
+    .call(xAxis);
+</pre>
+
+
+<p><a class="p_ident" id="p_W2T3AOmgw1" href="#p_W2T3AOmgw1" tabindex="-1" role="presentation"></a>Last, we create a title for the axis.</p><pre>
+svg.append("text")
+    .attr("transform", "translate(300,95)")
+    .style("text-anchor", "middle")
+    .attr("fill", "black")
+    .text("Title");
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_XwHcYP3Qp3" href="#c_XwHcYP3Qp3" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+        .<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">5</span>])
+        .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">555</span>]);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#axisDemo1&quot;</span>);
+
+  <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,60)&quot;</span>)
+      .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+
+  <span class="cm-variable">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;text&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(300,95)&quot;</span>)
+      .<span class="cm-property">style</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+      .<span class="cm-property">text</span>(<span class="cm-string">&quot;Title&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;axisDemo1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_XTafl0PaIg" href="#p_XTafl0PaIg" tabindex="-1" role="presentation"></a>By inspecting the HTML, you can see that the axis consists of a path element for the horizontal line and a group of line and text elements for each tick.  The horizontal line is made a member of the “domain” class and each tick is made a member of the “tick” class.</p><div>
+  <img class="alignnone wp-image-3685 size-full" src="http://www.n0code.net/wp/csci240/wp-content/uploads/sites/2/2018/03/Screen-Shot-2018-03-21-at-1.07.46-PM.png" alt="" width="500" height="297" />
+</div>
+
+
+<h2><a class="h_ident" id="h_hjubLajfHk" href="#h_hjubLajfHk" tabindex="-1" role="presentation"></a>Tick Spacing</h2>
+
+<p><a class="p_ident" id="p_tey0OdISPH" href="#p_tey0OdISPH" tabindex="-1" role="presentation"></a>We can control various properties of the ticks like the line style, the number of ticks, and the location of ticks.</p>
+
+<p><a class="p_ident" id="p_8AhTUH9+2F" href="#p_8AhTUH9+2F" tabindex="-1" role="presentation"></a>To <em>suggest</em> the number of ticks to display, we can call the ticks(count) method on the axis function object.  Note that if we pass a single number to the ticks method, that number is only a suggestion.  D3 will decide how many ticks to display and their spacing.  For example, when I pass 4, 5, 6, or 7 to the ticks method shown below, 6 ticks are always drawn.</p><pre>
+xAxis = d3.axisBottom(xScale)
+   .ticks(6);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_uXn/0Dzakf" href="#c_uXn/0Dzakf" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+        .<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">5</span>])
+        .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">555</span>]);
+
+
+  <span class="cm-variable">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>)
+      .<span class="cm-property">ticks</span>(<span class="cm-number">7</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#axisDemo2&quot;</span>)
+      .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,75)&quot;</span>)
+      .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;axisDemo2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_2OQBEit6pi" href="#p_2OQBEit6pi" tabindex="-1" role="presentation"></a>To display ticks at certain points we can use the tickValues method.  For example, if I want to display ticks at 1, 3, and 4, I can do the following.</p><pre>
+xAxis = d3.axisBottom(xScale)
+    .tickValues([1,3,4]);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_C7LMJwtHZc" href="#c_C7LMJwtHZc" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+        .<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">5</span>])
+        .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">555</span>]);
+
+  <span class="cm-variable">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>)
+      .<span class="cm-property">tickValues</span>([<span class="cm-number">1</span>,<span class="cm-number">3</span>,<span class="cm-number">4</span>]);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#axisDemo3&quot;</span>)
+      .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,75)&quot;</span>)
+      .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;axisDemo3&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_ebja2QGJi9" href="#p_ebja2QGJi9" tabindex="-1" role="presentation"></a>We can use various methods in D3’s array library to create an array which we can pass to tickValues.  One such method is <a href="https://github.com/d3/d3-array#range">d3.range([start, ]stop[, step])</a> which returns an array containing an arithmetic progression.   For example to generate ticks at the  1, 1.25, 1.5, and 1.75  we can use range to generate</p><pre>
+var array = d3.range(1,2,0.25);
+
+xAxis = d3.axisBottom(xScale)
+      .tickValues(array)
+      .tickFormat(d3.format(".2f"));
+ </pre>
+
+
+<p><a class="p_ident" id="p_Hwi3S1Gfk+" href="#p_Hwi3S1Gfk+" tabindex="-1" role="presentation"></a>In the code shown above we use the <code>tickFormat</code> method to control how many digits are displayed under the tick.  If we hadn’t called <code>tickFormat</code>, the tick labels would have been rounded to up to the nearest tenths place and displayed as 1, 1.3, 1.5 and 1.8.  To control the format of the tick text we can set the <em>tick format function</em> which is called when the ticks are drawn by passing a <em>tick format function</em> to the axis’ <code>tickFormat</code> method. D3 provides both <a href="https://github.com/d3/d3-format">d3.format(specifier)</a> and <a href="https://github.com/d3/d3-time-format">d3.timeFormat(specifier)</a> to help create format functions.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_LaW/rZILCZ" href="#c_LaW/rZILCZ" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+        .<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">5</span>])
+        .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">555</span>]);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">array</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">range</span>(<span class="cm-number">1</span>,<span class="cm-number">2</span>,<span class="cm-number">0.25</span>);
+
+  <span class="cm-variable">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>)
+      .<span class="cm-property">tickValues</span>(<span class="cm-variable">array</span>)
+      .<span class="cm-property">tickFormat</span>(<span class="cm-variable">d3</span>.<span class="cm-property">format</span>(<span class="cm-string">&quot;.2f&quot;</span>));
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#axisDemo4&quot;</span>)
+      .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,75)&quot;</span>)
+      .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;axisDemo4&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_d/BrVrlje6" href="#h_d/BrVrlje6" tabindex="-1" role="presentation"></a>Tick Length</h2>
+
+<p><a class="p_ident" id="p_ryPyZFJAOQ" href="#p_ryPyZFJAOQ" tabindex="-1" role="presentation"></a>We can control the length of each tick as well. Below we call <code>tickSize</code> and pass in a value that specifies the length of each tick. Notice that we passed an array containing the value -50. This values specifies the length of the inner ticks as well as the two outer ticks. By specifying a negative number we direct the axis generator to draw tick in the opposite direction that they would normally be drawn.</p><pre>
+xAxis = d3.axisBottom(xScale)
+    .tickValues([1,3,4])
+    .tickSize([-50])
+    .tickFormat(d3.format(".0f"));
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_fsahA8GTbX" href="#c_fsahA8GTbX" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+        .<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">5</span>])
+        .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">555</span>]);
+
+  <span class="cm-variable">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>)
+      .<span class="cm-property">tickValues</span>([<span class="cm-number">1</span>,<span class="cm-number">3</span>,<span class="cm-number">4</span>])
+      .<span class="cm-property">tickSize</span>([<span class="cm-operator">-</span><span class="cm-number">50</span>])
+      .<span class="cm-property">tickFormat</span>(<span class="cm-variable">d3</span>.<span class="cm-property">format</span>(<span class="cm-string">&quot;.0f&quot;</span>));
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#axisDemo5&quot;</span>)
+      .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,75)&quot;</span>)
+      .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;axisDemo5&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_7fqIM02X3c" href="#p_7fqIM02X3c" tabindex="-1" role="presentation"></a>Alternatively, we can set just the length of the inner ticks by calling <code>tickSizeInner</code> or set the length of the outer ticks by calling <code>tickSizeOuter</code>.</p><pre>
+xAxis = d3.axisBottom(xScale)
+    .tickValues([1,3,4])
+    .tickSizeInner([-50])
+    .tickFormat(d3.format(".0f"));
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_VrMZc5FeL3" href="#c_VrMZc5FeL3" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+        .<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">5</span>])
+        .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">555</span>]);
+
+  <span class="cm-variable">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>)
+      .<span class="cm-property">tickValues</span>([<span class="cm-number">1</span>,<span class="cm-number">3</span>,<span class="cm-number">4</span>])
+      .<span class="cm-property">tickSizeInner</span>([<span class="cm-operator">-</span><span class="cm-number">50</span>])
+      .<span class="cm-property">tickFormat</span>(<span class="cm-variable">d3</span>.<span class="cm-property">format</span>(<span class="cm-string">&quot;.0f&quot;</span>));
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#axisDemo6&quot;</span>)
+      .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,75)&quot;</span>)
+      .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;axisDemo6&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_0Djik0CCJ6" href="#p_0Djik0CCJ6" tabindex="-1" role="presentation"></a>We can also control the space between axis and the tick labels by calling <code>tickPadding</code>.</p><pre>
+xAxis = d3.axisBottom(xScale)
+    .tickValues([1,3,4])
+    .tickPadding([10])
+    .tickFormat(d3.format(".0f"));
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_RfyXz6AGx/" href="#c_RfyXz6AGx/" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+        .<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">5</span>])
+        .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">555</span>]);
+
+  <span class="cm-variable">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>)
+      .<span class="cm-property">tickValues</span>([<span class="cm-number">1</span>,<span class="cm-number">3</span>,<span class="cm-number">4</span>])
+      .<span class="cm-property">tickPadding</span>([<span class="cm-number">10</span>])
+      .<span class="cm-property">tickFormat</span>(<span class="cm-variable">d3</span>.<span class="cm-property">format</span>(<span class="cm-string">&quot;.0f&quot;</span>));
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#axisDemo7&quot;</span>)
+      .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,75)&quot;</span>)
+      .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;axisDemo7&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_1u3ulMx2fy" href="#h_1u3ulMx2fy" tabindex="-1" role="presentation"></a>Tick Line Style</h2>
+
+<p><a class="p_ident" id="p_gqYKfYynHB" href="#p_gqYKfYynHB" tabindex="-1" role="presentation"></a>We can also change the style of the line that is drawn for each tick. Below we draw each of the inner ticks as a dotted line.</p>
+
+<p><a class="p_ident" id="p_08lwRzKACP" href="#p_08lwRzKACP" tabindex="-1" role="presentation"></a>To do so, we create the set of ticks, each of length 50, as we did before. After the ticks have been added to the DOM, we select all of the line elements in the tick groups and set their stroke-dasharray attributes.</p><pre>
+>d3.select("#axisDemo8")
+    .selectAll(".tick line")
+    .attr("stroke-dasharray", "2,2");
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_yamLd/Z+fX" href="#c_yamLd/Z+fX" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+        .<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">5</span>])
+        .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">555</span>]);
+
+  <span class="cm-variable">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable">xScale</span>)
+      .<span class="cm-property">tickValues</span>([<span class="cm-number">1</span>,<span class="cm-number">3</span>,<span class="cm-number">4</span>])
+      .<span class="cm-property">tickSizeInner</span>([<span class="cm-operator">-</span><span class="cm-number">50</span>])
+      .<span class="cm-property">tickFormat</span>(<span class="cm-variable">d3</span>.<span class="cm-property">format</span>(<span class="cm-string">&quot;.0f&quot;</span>));
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#axisDemo8&quot;</span>)
+      .<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,75)&quot;</span>)
+      .<span class="cm-property">call</span>(<span class="cm-variable">xAxis</span>);
+
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#axisDemo8&quot;</span>)
+      .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;.tick line&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-dasharray&quot;</span>, <span class="cm-string">&quot;2,2&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;axisDemo8&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><nav><a href="04_02_continuous_scales.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_04_working_with_dates.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

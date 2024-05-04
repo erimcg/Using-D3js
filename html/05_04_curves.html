@@ -1,0 +1,526 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Curves</title>
+  <link rel="canonical" href="http://using-d3js.com/05_04_curves.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 05;</script></head>
+
+<article>
+<nav><a href="05_03_radial_lines.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_05_areas.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 05</span>Curves</h1><script src="https://d3js.org/d3.v5.min.js"></script>
+<script>
+function renderLine(id, line, color) {
+  color = (color === undefined) ? "black" : color;
+  
+  d3.select("#" + id)
+    .append("path")
+    .attr("d", line(data))
+    .attr("fill", "none")
+    .attr("stroke", color);
+        
+  d3.select("#" + id)
+    .selectAll("circle")
+    .data(data)
+    .join("circle")
+    .attr("cx", (d) => xScale(d.x))
+    .attr("cy", (d) => yScale(d.y))
+    .attr("r", 1.5);
+}
+</script>
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(1) {background-color: #f2f2f2;}
+
+tr:nth-child(3) {background-color: #f2f2f2;}
+
+
+tr:nth-child(4) {background-color: #f2f2f2;}
+tr:nth-child(8) {background-color: #f2f2f2;}
+tr:nth-child(9) {background-color: #f2f2f2;}
+</style>
+
+
+<p><a class="p_ident" id="p_6opOmJaarq" href="#p_6opOmJaarq" tabindex="-1" role="presentation"></a>In this section we discuss the point interpolators provided by D3.js.  These are used with various generators (<a href="./05_03_lines.md">lines</a> and <a href="./05_04_areas.html">areas</a>) to determine the points of the lines.  Depending on the type of curve, the points specified in the dataset passed to the generator will be used as either end points or control points.</p>
+
+<p><a class="p_ident" id="p_lDsY75G+zZ" href="#p_lDsY75G+zZ" tabindex="-1" role="presentation"></a>In the table below we group the interpolators by type using rows and colors.  For each row, the interpolators in the second and third columns are variants of the interpolator in the first column.  The fourth column identifies methods that can be called on the interpolators in the first three columns.</p><table style="font-size: small;">
+<tr>
+<td><a href="https://github.com/d3/d3-shape#curveLinear">curveLinear</a></td>
+<td><a href="https://github.com/d3/d3-shape#curveLinearClosed">curveLinearClosed</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/d3/d3-shape#curveStep">curveStep</a></td>
+<td><a href="https://github.com/d3/d3-shape#curveStepBefore">curveStepBefore</a></td>
+<td><a href="https://github.com/d3/d3-shape#curveStepAfter">curveStepAfter</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/d3/d3-shape#curveBasis">curveBasis</a></td>
+<td><a href="https://github.com/d3/d3-shape#curveBasisClosed">curveBasisClosed</a></td>
+<td><a href="https://github.com/d3/d3-shape#curveBasisOpen">curveBasisOpen</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/d3/d3-shape#curveBundle">curveBundle</a></td>
+<td></td>
+<td></td>
+<td><a href="https://github.com/d3/d3-shape#curveBundle_beta">curveBundle.beta</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/d3/d3-shape#curveNatural">curveNatural</a></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/d3/d3-shape#curveCardinal">curveCardinal</a></td>
+<td><a href="https://github.com/d3/d3-shape#curveCardinalClosed">curveCardinalClosed</a></td>
+<td><a href="https://github.com/d3/d3-shape#curveCardinalOpen">curveCardinalOpen</a></td>
+<td><a href="https://github.com/d3/d3-shape#curveCardinal_tension">cardinal.tension</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/d3/d3-shape#curveCatmullRom">curveCatmullRom</a></td>
+<td><a href="https://github.com/d3/d3-shape#curveCatmullRomClosed">curveCatmullRomClosed</a></td>
+<td><a href="https://github.com/d3/d3-shape#curveCatmullRomOpen">curveCatmullRomOpen</a></td>
+<td><a href="https://github.com/d3/d3-shape#curveCatmullRom_alpha">catmullRom.alpha</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/d3/d3-shape#curveMonotoneX">curveMonotoneX</a></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/d3/d3-shape#curveMonotoneY">curveMonotoneY</a></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+
+
+<p><a class="p_ident" id="p_E8UnOYuWLF" href="#p_E8UnOYuWLF" tabindex="-1" role="presentation"></a>Below we describe each of the interpolators and provide examples.  Each of the curves shown below are rendered as a <code>path</code> element in an <code>svg</code>.  The path description string (<code>d</code>) is computed using the line generator, <code>d3.line</code> and the interpolator is set using the line generator’s <code>line.curve</code> method.</p>
+
+<h2><a class="h_ident" id="h_Ld0i01AWAN" href="#h_Ld0i01AWAN" tabindex="-1" role="presentation"></a>Linear Curves</h2>
+
+<p><a class="p_ident" id="p_2WDH+lWvN1" href="#p_2WDH+lWvN1" tabindex="-1" role="presentation"></a>The linear curve interpolators create polylines by choosing points that create straight lines between each pair of adjacent points in the dataset. There is no open variant of the linear curve, but there is a closed variant which adds a straight line between the first and last point in the dataset.  The <code>d3.curveLinear</code> interpolator is the default interpolator used when <code>line.curve</code> is not called.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_E8sHy6DCj7" href="#p_E8sHy6DCj7" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveLinear">d3.curveLinear(context)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_vOd3G/1NwF" href="#p_vOd3G/1NwF" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveLinearClosed">d3.curveLinearClosed(context)</a></p></li></ul>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_hLFx67X7Fo" href="#c_hLFx67X7Fo" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">10</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">7</span>, <span class="cm-property">y</span>: <span class="cm-number">5</span>}];
+
+<span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">7</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+<span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+
+<span class="cm-keyword">var</span> <span class="cm-def">line</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">line</span>()
+  .<span class="cm-property">x</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+  .<span class="cm-property">y</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>));
+
+<span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo1a&quot;</span>, <span class="cm-variable">line</span>);
+<span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo1b&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveLinearClosed</span>));
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1a&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1b&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 1. Linear curve (left) and closed linear curve (right).</figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_/yxIUMMWFX" href="#h_/yxIUMMWFX" tabindex="-1" role="presentation"></a>Step Curves</h2>
+
+<p><a class="p_ident" id="p_hNn3aHMxUc" href="#p_hNn3aHMxUc" tabindex="-1" role="presentation"></a>The step curve interpolators create vertical and horizontal lines representing a <a href="https://en.wikipedia.org/wiki/Step_function">step function</a>.  A vertical line is created for each pair of points in the dataset.  Each of the three step curve interpolators position the vertical lines along the x-axis differently.  Horizontal lines are created from the points in the dataset to the vertical lines.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_gBQMAI8068" href="#p_gBQMAI8068" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveStep">d3.curveStep(context)</a> - for each pair of points, the vertical line is positioned at the midpoint between the <code>x</code> coordinates</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_d+pfNGqZXB" href="#p_d+pfNGqZXB" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveStepBefore">d3.curveStepBefore(context)</a> - for each pair of points, the vertical line is positioned at the <code>x</code> coordinate of the first point</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_vQXTYIyAon" href="#p_vQXTYIyAon" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveStepAfter">d3.curveStepAfter(context)</a> - for each pair of points, the vertical line is positioned at the <code>x</code> coordinate of the second point</p></li></ul>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_iVmDHIL5J2" href="#c_iVmDHIL5J2" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">10</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">7</span>, <span class="cm-property">y</span>: <span class="cm-number">5</span>}];
+
+<span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">7</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+<span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+  
+<span class="cm-keyword">var</span> <span class="cm-def">line</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">line</span>()
+  .<span class="cm-property">x</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+  .<span class="cm-property">y</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>));
+            
+<span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo2a&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveStep</span>));
+<span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo2b&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveStepBefore</span>)); 
+<span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo2c&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveStepAfter</span>)); 
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2a&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2b&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2c&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 2. Step (left), step before (center), step after (right).</figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_AljeVWyYm8" href="#h_AljeVWyYm8" tabindex="-1" role="presentation"></a>Basis Curves</h2>
+
+<p><a class="p_ident" id="p_wPFuIxf0fl" href="#p_wPFuIxf0fl" tabindex="-1" role="presentation"></a>The basis curve interpolators produce <a href="https://en.wikipedia.org/wiki/B-spline">cubic basis splines</a> where the points provided to the generators are used as control points.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_C46LQkBPFj" href="#p_C46LQkBPFj" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveBasis">d3.curveBasis(context)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_Ud3WDy2szB" href="#p_Ud3WDy2szB" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveBasisClosed">d3.curveBasisClosed(context)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_zDS9HA9TaJ" href="#p_zDS9HA9TaJ" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveBasisOpen">d3.curveBasisOpen(context)</a></p></li></ul>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_IQCt1eceV+" href="#c_IQCt1eceV+" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">10</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">7</span>, <span class="cm-property">y</span>: <span class="cm-number">5</span>}];
+
+<span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">7</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+<span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+  
+<span class="cm-keyword">var</span> <span class="cm-def">line</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">line</span>()
+  .<span class="cm-property">x</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+  .<span class="cm-property">y</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>));
+            
+<span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo3a&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveBasis</span>));
+<span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo3b&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveBasisClosed</span>)); 
+<span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo3c&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveBasisOpen</span>)); 
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo3a&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo3b&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo3c&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 3. Basis (left), basis closed (center), basis open (right).</figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_urYLO6ble9" href="#h_urYLO6ble9" tabindex="-1" role="presentation"></a>Bundle Curve</h2>
+
+<p><a class="p_ident" id="p_UrcehDuo6q" href="#p_UrcehDuo6q" tabindex="-1" role="presentation"></a>The bundle curve interpolators create straightened <a href="https://en.wikipedia.org/wiki/B-spline">cubic basis splines</a>.  The degree to which the spline is straightened is determined by the interpolator’s <code>beta</code> value.  Valid <code>beta</code> values range between 0 and 1. At the extremes, when <code>beta</code> is <code>1</code> the curve resembles the curve produced by <code>d3.curveBasis</code> and when <code>beta</code> is <code>0</code> the curve is a straight line between the first and last control points.  By default, the <code>beta</code> value is <code>0.85</code>.  This curve is not intended for use with <code>d3.area</code>, only <code>d3.line</code>.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_ruxowpEg62" href="#p_ruxowpEg62" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveBundle">d3.curveBundle(context)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_oL5xAi9lvK" href="#p_oL5xAi9lvK" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveBundle_beta">d3.curveBundle.beta(beta)</a> - returns a bundle curve interpolator with the specified <code>beta</code>.</p></li></ul>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_RZ4A/DgxYH" href="#c_RZ4A/DgxYH" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">10</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">7</span>, <span class="cm-property">y</span>: <span class="cm-number">5</span>}];
+
+<span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">7</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+<span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+  
+<span class="cm-keyword">var</span> <span class="cm-def">line</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">line</span>()
+  .<span class="cm-property">x</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+  .<span class="cm-property">y</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>));
+           
+<span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo4&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveBundle</span>), <span class="cm-string">&quot;black&quot;</span>);
+
+<span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo4&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveBundle</span>.<span class="cm-property">beta</span>(<span class="cm-number">0</span>)), <span class="cm-string">&quot;darkslategray&quot;</span>);
+<span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo4&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveBundle</span>.<span class="cm-property">beta</span>(<span class="cm-number">0.25</span>)), <span class="cm-string">&quot;dimgray&quot;</span>);
+<span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo4&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveBundle</span>.<span class="cm-property">beta</span>(<span class="cm-number">0.5</span>)), <span class="cm-string">&quot;gray&quot;</span>);
+<span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo4&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveBundle</span>.<span class="cm-property">beta</span>(<span class="cm-number">0.75</span>)), <span class="cm-string">&quot;darkgray&quot;</span>);
+<span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo4&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveBundle</span>.<span class="cm-property">beta</span>(<span class="cm-number">1</span>)), <span class="cm-string">&quot;lightgray&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo4&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 4. Bundle curve with beta values (from top to bottom): 1, 0.85, 0.75, 0.5, 0.25, 0. </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_6iaHbaqaCg" href="#h_6iaHbaqaCg" tabindex="-1" role="presentation"></a>Natural</h2>
+
+<p><a class="p_ident" id="p_OnfjR+jjJ7" href="#p_OnfjR+jjJ7" tabindex="-1" role="presentation"></a>The <code>d3.curveNatural</code> interpolator produces a <a href="https://en.wikipedia.org/wiki/Spline_interpolation">natural cubic spline</a>.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_k1e5dSBk7X" href="#p_k1e5dSBk7X" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveNatural">d3.curveNatural(context)</a></p></li></ul>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_CcSJ0ecnIB" href="#c_CcSJ0ecnIB" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">10</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">7</span>, <span class="cm-property">y</span>: <span class="cm-number">5</span>}];
+
+<span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">7</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+<span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+  
+<span class="cm-keyword">var</span> <span class="cm-def">line</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">line</span>()
+  .<span class="cm-property">x</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+  .<span class="cm-property">y</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>));
+            
+<span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo5&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveNatural</span>));
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo5&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 5. Natural cublic spline. </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_iXamHLk7dI" href="#h_iXamHLk7dI" tabindex="-1" role="presentation"></a>Cardinal Curves</h2>
+
+<p><a class="p_ident" id="p_SUhztVMr3m" href="#p_SUhztVMr3m" tabindex="-1" role="presentation"></a>The cardinal curve interpolators produce <a href="https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Cardinal_spline">cubic cardinal splines</a>. The spline’s tension can be altered using <code>cardinal.tension</code>.  Tension values range between 0 and 1 and by default, the tension is set to 0.  When the tension is set to 0, the curve resembles the natural curve and when the tension is set to 1, the curve resembles the linear curve.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_CNgKpeJeV5" href="#p_CNgKpeJeV5" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveCardinal">d3.curveCardinal(context)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_53oj1Shhxc" href="#p_53oj1Shhxc" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveCardinalClosed">d3.curveCardinalClosed(context)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_j+lCwkmSet" href="#p_j+lCwkmSet" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveCardinalOpen">d3.curveCardinalOpen(context)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_lVakU4ARI4" href="#p_lVakU4ARI4" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveCardinal_tension">cardinal.tension(tension)</a> - returns a cardinal curve interpolator with the specified <code>tension</code>.</p></li></ul>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_Af/8zA20ne" href="#c_Af/8zA20ne" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">10</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">7</span>, <span class="cm-property">y</span>: <span class="cm-number">5</span>}];
+
+<span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">7</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+<span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+  
+<span class="cm-keyword">var</span> <span class="cm-def">line</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">line</span>()
+  .<span class="cm-property">x</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+  .<span class="cm-property">y</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>));
+  
+<span class="cm-keyword">var</span> <span class="cm-def">variations</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">t</span>: <span class="cm-number">0</span>,    <span class="cm-property">c</span>: <span class="cm-string">&quot;black&quot;</span>},
+  {<span class="cm-property">t</span>: <span class="cm-number">0.5</span>,  <span class="cm-property">c</span>: <span class="cm-string">&quot;darkgray&quot;</span>},
+  {<span class="cm-property">t</span>: <span class="cm-number">1</span>,    <span class="cm-property">c</span>: <span class="cm-string">&quot;gray&quot;</span>}
+];
+
+<span class="cm-keyword">for</span>(<span class="cm-variable">o</span> <span class="cm-keyword">of</span> <span class="cm-variable">variations</span>) {
+  <span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo6a&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveCardinal</span>.<span class="cm-property">tension</span>(<span class="cm-variable">o</span>.<span class="cm-property">t</span>)), <span class="cm-variable">o</span>.<span class="cm-property">c</span>);
+  <span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo6b&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveCardinalClosed</span>.<span class="cm-property">tension</span>(<span class="cm-variable">o</span>.<span class="cm-property">t</span>)), <span class="cm-variable">o</span>.<span class="cm-property">c</span>);
+  <span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo6c&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveCardinalOpen</span>.<span class="cm-property">tension</span>(<span class="cm-variable">o</span>.<span class="cm-property">t</span>)), <span class="cm-variable">o</span>.<span class="cm-property">c</span>);
+}            
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo6a&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo6b&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo6c&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 6. Cardinal (left), closed cardinal (center), and open cardinal (right) curves. </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_zhQLPVtFje" href="#h_zhQLPVtFje" tabindex="-1" role="presentation"></a>Catmull-Rom Curves</h2>
+
+<p><a class="p_ident" id="p_1Ru9jyZ/Ae" href="#p_1Ru9jyZ/Ae" tabindex="-1" role="presentation"></a>The Catmull-Rom curve interpolators produce <a href="https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Cardinal_spline">cubic Catmull-Rom splines</a>. The spline’s alpha parameter can be set using <code>catmullRom.alpha</code>.  Alpha values range between 0 and 1 and by default, the value is set to 0.5.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_2iV4MaXOBG" href="#p_2iV4MaXOBG" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveCatmullRom">d3.curveCatmullRom(context)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_bWRirr6Rvv" href="#p_bWRirr6Rvv" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveCatmullRomClosed">d3.curveCatmullRomClosed(context)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_dAtnTcAvtp" href="#p_dAtnTcAvtp" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveCatmullRomOpen">d3.curveCatmullRomOpen(context)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_GfAG9PpZfN" href="#p_GfAG9PpZfN" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveCatmullRom_alpha">catmullRom.alpha(alpha)</a> - returns a Catmull-Rom curve interpolator with the specified <code>alpha</code>.</p></li></ul>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_CPr+VZsI5T" href="#c_CPr+VZsI5T" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">10</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">7</span>, <span class="cm-property">y</span>: <span class="cm-number">5</span>}];
+
+<span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">7</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+<span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+  
+<span class="cm-keyword">var</span> <span class="cm-def">line</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">line</span>()
+  .<span class="cm-property">x</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+  .<span class="cm-property">y</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>));
+  
+<span class="cm-keyword">var</span> <span class="cm-def">variations</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">t</span>: <span class="cm-number">0</span>,    <span class="cm-property">c</span>: <span class="cm-string">&quot;black&quot;</span>},
+  {<span class="cm-property">t</span>: <span class="cm-number">0.5</span>,  <span class="cm-property">c</span>: <span class="cm-string">&quot;darkgray&quot;</span>},
+  {<span class="cm-property">t</span>: <span class="cm-number">1</span>,    <span class="cm-property">c</span>: <span class="cm-string">&quot;gray&quot;</span>}
+];
+
+<span class="cm-keyword">for</span>(<span class="cm-variable">o</span> <span class="cm-keyword">of</span> <span class="cm-variable">variations</span>) {
+  <span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo7a&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveCatmullRom</span>.<span class="cm-property">alpha</span>(<span class="cm-variable">o</span>.<span class="cm-property">t</span>)), <span class="cm-variable">o</span>.<span class="cm-property">c</span>);
+  <span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo7b&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveCatmullRomClosed</span>.<span class="cm-property">alpha</span>(<span class="cm-variable">o</span>.<span class="cm-property">t</span>)), <span class="cm-variable">o</span>.<span class="cm-property">c</span>);
+  <span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo7c&quot;</span>, <span class="cm-variable">line</span>.<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveCatmullRomOpen</span>.<span class="cm-property">alpha</span>(<span class="cm-variable">o</span>.<span class="cm-property">t</span>)), <span class="cm-variable">o</span>.<span class="cm-property">c</span>);
+}            
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo7a&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo7b&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo7c&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 7. Catmull-Rom (left), closed Catmull-Rom (center), and open Catmull-Rom (right) curves. </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_rvSQzyUNHy" href="#h_rvSQzyUNHy" tabindex="-1" role="presentation"></a>Monotone Curves</h2>
+
+<p><a class="p_ident" id="p_JckA551GCM" href="#p_JckA551GCM" tabindex="-1" role="presentation"></a>The monotone curves assume that the data is sorted according to either the x coordinates (<code>d3.<wbr>curveMonotoneX</code>) or the y coordinates (<code>d3.<wbr>curveMonotoneY</code>).  In the examples below we use the same data, but sort them differently.  In the first example, the data is sorted according to the x coordinates and in the second example, the data is sorted according to the y coordinates.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_roYy6FS2nw" href="#p_roYy6FS2nw" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveMonotoneX">d3.curveMonotoneX(context)</a> - produces a cubic spline that preserves monotonicity in y, assuming monotonicity in x.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_3w97UFWh4M" href="#p_3w97UFWh4M" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#curveMonotoneY">d3.curveMonotoneY(context)</a> - produces a cubic spline that preserves monotonicity in x, assuming monotonicity in y.</p></li></ul>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_gbqTnwcAMz" href="#c_gbqTnwcAMz" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">10</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">7</span>, <span class="cm-property">y</span>: <span class="cm-number">5</span>}];
+
+<span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">7</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+<span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+
+<span class="cm-keyword">var</span> <span class="cm-def">line</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">line</span>()
+  .<span class="cm-property">x</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+  .<span class="cm-property">y</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>))
+  .<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveMonotoneX</span>);
+        
+<span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo8a&quot;</span>, <span class="cm-variable">line</span>);        
+
+<span class="cm-comment">//Monotone Y</span>
+<span class="cm-variable">data</span>.<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">a</span>.<span class="cm-property">y</span> <span class="cm-operator">-</span> <span class="cm-variable-2">b</span>.<span class="cm-property">y</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">line</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">line</span>()
+  .<span class="cm-property">x</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+  .<span class="cm-property">y</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>))
+  .<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveMonotoneY</span>);
+
+<span class="cm-variable">renderLine</span>(<span class="cm-string">&quot;demo8b&quot;</span>, <span class="cm-variable">line</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo8a&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo8b&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 8. Monotone X curve (left), monotone Y curve (right). </figcaption></figure>
+<aside>
+
+
+<h2><a class="h_ident" id="h_Ym1EQycNEW" href="#h_Ym1EQycNEW" tabindex="-1" role="presentation"></a>In Case You Were Wondering</h2>
+
+<p><a class="p_ident" id="p_XDcC61CZ17" href="#p_XDcC61CZ17" tabindex="-1" role="presentation"></a>In each of the examples shown above we rendered the lines and plot the points in the dataset using the following function.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_vtzd89q5bd" href="#c_vtzd89q5bd" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">function</span> <span class="cm-def">renderLine</span>(<span class="cm-def">id</span>, <span class="cm-def">line</span>, <span class="cm-def">color</span>) {
+  <span class="cm-variable-2">color</span> <span class="cm-operator">=</span> (<span class="cm-variable-2">color</span> <span class="cm-operator">===</span> <span class="cm-atom">undefined</span>) <span class="cm-operator">?</span> <span class="cm-string">&quot;black&quot;</span> : <span class="cm-variable-2">color</span>;
+  
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">id</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable-2">line</span>(<span class="cm-variable">data</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-variable-2">color</span>);
+        
+  <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">id</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable">data</span>)
+    .<span class="cm-property">join</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">1.5</span>);
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">code</span><span class="cm-tag cm-bracket">&gt;</span>renderLines(id, line, color)<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">code</span><span class="cm-tag cm-bracket">&gt;</span></pre></aside><nav><a href="05_03_radial_lines.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_05_areas.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

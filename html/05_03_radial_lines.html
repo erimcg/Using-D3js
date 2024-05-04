@@ -1,0 +1,331 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Radial Lines</title>
+  <link rel="canonical" href="http://using-d3js.com/05_03_radial_lines.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 05;</script></head>
+
+<article>
+<nav><a href="05_02_lines.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_04_curves.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 05</span>Radial Lines</h1><script src="https://d3js.org/d3.v5.min.js"></script>
+
+
+<p><a class="p_ident" id="p_yqJAkzOi9X" href="#p_yqJAkzOi9X" tabindex="-1" role="presentation"></a>D3.js defines a radial line as a line about an origin where each point <em>p</em> on the line is characterized by the distance from <em>p</em> to the origin (a radius) and the angle at the origin subtended by the arc between the positive y-axis and <em>p</em>.</p>
+
+<p><a class="p_ident" id="p_1qlj+mdL/X" href="#p_1qlj+mdL/X" tabindex="-1" role="presentation"></a>D3.js provides <a href="https://github.com/d3/d3-shape#lineRadial">d3.lineRadial()</a>, a radial line generator, much like <code>d3.line</code>, that can be used to produce a path descriptor for SVG <code>path</code> element and for rendering a path in a <code>canvas</code> element.</p>
+
+<p><a class="p_ident" id="p_1Z45/+9qAd" href="#p_1Z45/+9qAd" tabindex="-1" role="presentation"></a>By default, the line generator expects a dataset consisting of an array of arrays, where each inner array is an angle and radius pair.  For each angle/radius pair, t, in the dataset, a point is generated such that the angle at the origin subtended by the arc between the positive y-axis and the point is given by <em>t[0]</em> and the distance from the origin to the point is given by <em>t[1]</em>.</p>
+
+<p><a class="p_ident" id="p_yitvrEkoHo" href="#p_yitvrEkoHo" tabindex="-1" role="presentation"></a>In Figure 1 we render a radial line using the following dataset.</p><pre>
+var data = [
+  [0, 10],
+  [Math.PI * .25, 20],
+  [Math.PI * .5, 35],
+  [Math.PI * .75, 55],
+  [Math.PI, 60],
+  [Math.PI * 1.25, 65],
+  [Math.PI * 1.5, 70],
+  [Math.PI * 1.75, 75],
+  [Math.PI * 2, 80]];
+</pre>
+
+
+<p><a class="p_ident" id="p_+JPnXEVEiq" href="#p_+JPnXEVEiq" tabindex="-1" role="presentation"></a>After creating a radial line generator we append a <code>path</code> element to the <code>g</code> element in the <code>svg</code> and set its <code>d</code> attribute to the path description created by the radial line generator.</p><pre>
+ var lineRadial = d3.lineRadial();
+      
+ d3.select("#demo1")
+    .select("g")
+    .append("path")
+    .attr("d", lineRadial(data))
+    .attr("fill", "none")
+    .attr("stroke", "black");
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_JunG7d8Egq" href="#c_JunG7d8Egq" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+ <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+    [<span class="cm-number">0</span>, <span class="cm-number">10</span>],
+    [<span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.25</span>, <span class="cm-number">20</span>],
+    [<span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.5</span>, <span class="cm-number">35</span>],
+    [<span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.75</span>, <span class="cm-number">55</span>],
+    [<span class="cm-variable">Math</span>.<span class="cm-property">PI</span>, <span class="cm-number">60</span>],
+    [<span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.25</span>, <span class="cm-number">65</span>],
+    [<span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.5</span>, <span class="cm-number">70</span>],
+    [<span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.75</span>, <span class="cm-number">75</span>],
+    [<span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">2</span>, <span class="cm-number">80</span>]];
+  
+ <span class="cm-keyword">var</span> <span class="cm-def">lineRadial</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">lineRadial</span>();
+      
+ <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1&quot;</span>)
+    .<span class="cm-property">select</span>(<span class="cm-string">&quot;g&quot;</span>)
+    .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">lineRadial</span>(<span class="cm-variable">data</span>))
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(100,100)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre> <figure class="sandbox"><figcaption>Figure 1. Radial line created using the default angle and radius functions.</figcaption></figure>
+
+
+<p><a class="p_ident" id="p_pGAcZczQky" href="#p_pGAcZczQky" tabindex="-1" role="presentation"></a>Note that the origin is at <em>(0,0)</em> in the element in which the line is drawn.  In order to position the radial line in the middle of the screen, we add a <code>g</code> element to our <code>svg</code>, translate it into the middle, then draw the line inside the <code>g</code> element.</p>
+
+<h2><a class="h_ident" id="h_SEafCBa32L" href="#h_SEafCBa32L" tabindex="-1" role="presentation"></a>Accessor Methods</h2>
+
+<p><a class="p_ident" id="p_TCxZ94aK20" href="#p_TCxZ94aK20" tabindex="-1" role="presentation"></a>The radial line generator has two methods that can be called to assign custom angle and radius accessor methods to the radial line generator.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_wUf/M9t2ng" href="#p_wUf/M9t2ng" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#lineRadial_angle">lineRadial.angle([angle])</a> - sets or gets the angle accessor. If angle is provided, it must be a number or a function that returns a number representing an angle in radians. If angle is not provide, returns the current angle accessor function.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_Uq69zQ9oOB" href="#p_Uq69zQ9oOB" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#lineRadial_radius">lineRadial.radius([radius])</a> - sets or gets the radius accessor. If radius is provided, it must be a number or a function that returns a number. If radius is not provide, returns the current radius accessor function.</p></li></ul>
+
+<p><a class="p_ident" id="p_pWhBRJI7iZ" href="#p_pWhBRJI7iZ" tabindex="-1" role="presentation"></a>When <code>lineRadial.angle</code> and <code>lineRadial.<wbr>radius</code> are passed functions (or lambda expressions), the functions are called for each element in the dataset and when called, are passed the current data element d, the index of the current element i, and the array of data on which the generator is invoked, data.</p>
+
+<p><a class="p_ident" id="p_t/0NdGhhSI" href="#p_t/0NdGhhSI" tabindex="-1" role="presentation"></a>When <code>lineRadial.angle</code> and <code>lineRadial.<wbr>radius</code> are called without an argument, the methods return the radial line generator’s current accessor.</p>
+
+<p><a class="p_ident" id="p_GHwIUcYz65" href="#p_GHwIUcYz65" tabindex="-1" role="presentation"></a>In Figure 2 the dataset consists of an array of objects, each having an <code>angle</code> and <code>radius</code> property.  To use these properties when computing the <em>x</em> and <em>y</em> positions for the points, we provide the radial line generator with custom angle and radius accessor methods.</p><pre>
+var data = [
+  {angle: 0, radius: 10},
+  {angle: Math.PI * .25, radius: 20},
+  {angle: Math.PI * .5, radius: 35},
+  {angle: Math.PI * .75, radius: 55},
+  {angle: Math.PI, radius: 60},
+  {angle: Math.PI * 1.25, radius: 65},
+  {angle: Math.PI * 1.5, radius: 70},
+  {angle: Math.PI * 1.75, radius: 75},
+  {angle: Math.PI * 2, radius: 80}];
+  
+var lineRadial = d3.lineRadial()
+  .angle((d) => d.angle)
+  .radius((d) => d.radius);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_v93Vm+CBLL" href="#c_v93Vm+CBLL" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">angle</span>: <span class="cm-number">0</span>, <span class="cm-property">radius</span>: <span class="cm-number">10</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.25</span>, <span class="cm-property">radius</span>: <span class="cm-number">20</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.5</span>, <span class="cm-property">radius</span>: <span class="cm-number">35</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.75</span>, <span class="cm-property">radius</span>: <span class="cm-number">55</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>, <span class="cm-property">radius</span>: <span class="cm-number">60</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.25</span>, <span class="cm-property">radius</span>: <span class="cm-number">65</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.5</span>, <span class="cm-property">radius</span>: <span class="cm-number">70</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.75</span>, <span class="cm-property">radius</span>: <span class="cm-number">75</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">2</span>, <span class="cm-property">radius</span>: <span class="cm-number">80</span>}];
+  
+<span class="cm-keyword">var</span> <span class="cm-def">lineRadial</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">lineRadial</span>()
+  .<span class="cm-property">angle</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">angle</span>)
+  .<span class="cm-property">radius</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">radius</span>);
+            
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo2&quot;</span>)
+  .<span class="cm-property">select</span>(<span class="cm-string">&quot;g&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">lineRadial</span>(<span class="cm-variable">data</span>))
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(100,100)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre> <figure class="sandbox"><figcaption>Figure 2. Radial line created using custom accessor functions.</figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_y4MnN5PlkZ" href="#h_y4MnN5PlkZ" tabindex="-1" role="presentation"></a>Using Bound Data</h2>
+
+<p><a class="p_ident" id="p_f07JGKO7N0" href="#p_f07JGKO7N0" tabindex="-1" role="presentation"></a>We can also compute the <code>d</code> attribute of a <code>path</code> element, not by invoking the radial line generator directly, but rather, by joining the data to the <code>path</code> element and then passing the radial line generator as the second argument of <code>selection.attr</code> when setting the <code>d</code> attribute.</p><pre>
+d3.select("#demo3")
+  .select("g")
+  .append("path")
+  .data([data])
+  .attr("d", lineRadial)
+  .attr("fill", "none")
+  .attr("stroke", "black");
+</pre>
+
+
+<p><a class="p_ident" id="p_kMkTZ/kJ56" href="#p_kMkTZ/kJ56" tabindex="-1" role="presentation"></a>Note that the dataset is passed to <code>selection.data</code> inside an array and the <code>lineRadial</code> function, not the string returned by <code>lineRadial</code>, is passed to <code>selection.attr</code>.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_/LMM1N5tXS" href="#c_/LMM1N5tXS" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">angle</span>: <span class="cm-number">0</span>, <span class="cm-property">radius</span>: <span class="cm-number">10</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.25</span>, <span class="cm-property">radius</span>: <span class="cm-number">20</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.5</span>, <span class="cm-property">radius</span>: <span class="cm-number">35</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.75</span>, <span class="cm-property">radius</span>: <span class="cm-number">55</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>, <span class="cm-property">radius</span>: <span class="cm-number">60</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.25</span>, <span class="cm-property">radius</span>: <span class="cm-number">65</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.5</span>, <span class="cm-property">radius</span>: <span class="cm-number">70</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.75</span>, <span class="cm-property">radius</span>: <span class="cm-number">75</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">2</span>, <span class="cm-property">radius</span>: <span class="cm-number">80</span>}];
+  
+<span class="cm-keyword">var</span> <span class="cm-def">lineRadial</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">lineRadial</span>()
+  .<span class="cm-property">angle</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">angle</span>)
+  .<span class="cm-property">radius</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">radius</span>);
+            
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo3&quot;</span>)
+  .<span class="cm-property">select</span>(<span class="cm-string">&quot;g&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">data</span>([<span class="cm-variable">data</span>])
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">lineRadial</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo3&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(100,100)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre> <figure class="sandbox"><figcaption>Figure 3. Radial line created using bound data.</figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_G8vod4LBpa" href="#h_G8vod4LBpa" tabindex="-1" role="presentation"></a>Excluding Points</h2>
+
+<p><a class="p_ident" id="p_dcjFs3E5p2" href="#p_dcjFs3E5p2" tabindex="-1" role="presentation"></a>Sometimes we may want to exclude certain points on the line. To do this we can set the <em>defined</em> accessor function by calling <a href="https://github.com/d3/d3-shape#lineRadial_defined">lineRadial.defined([defined])</a> on our line generator.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_qahlqSNEt3" href="#p_qahlqSNEt3" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#lineRadial_defined">lineRadial.defined([defined])</a> - takes as an argument a boolean or a function that returns a boolean.</p></li></ul>
+
+<p><a class="p_ident" id="p_UWw9ChDeux" href="#p_UWw9ChDeux" tabindex="-1" role="presentation"></a>When the radial line generator computes points, it invokes the <em>defined</em> accessor for each element in the dataset, passing it the current data element <code>d</code>, the index of the current element <code>i</code>, and the array of data on which the generator is invoked, <code>data</code>.  If the <em>defined</em> accessor evaluates to true, a point is generated for the data element, otherwise the element is ignored.  By default, the <em>defined</em> accessor returns true for all elements in the dataset.</p>
+
+<p><a class="p_ident" id="p_EqqCBj3Am7" href="#p_EqqCBj3Am7" tabindex="-1" role="presentation"></a>In Figure 4 we exclude the points that have angles between 0 and PI by passing a lambda expression to <code>line.defined</code>.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_rJee9D9ul8" href="#c_rJee9D9ul8" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">angle</span>: <span class="cm-number">0</span>, <span class="cm-property">radius</span>: <span class="cm-number">10</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.25</span>, <span class="cm-property">radius</span>: <span class="cm-number">20</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.5</span>, <span class="cm-property">radius</span>: <span class="cm-number">35</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.75</span>, <span class="cm-property">radius</span>: <span class="cm-number">55</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>, <span class="cm-property">radius</span>: <span class="cm-number">60</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.25</span>, <span class="cm-property">radius</span>: <span class="cm-number">65</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.5</span>, <span class="cm-property">radius</span>: <span class="cm-number">70</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.75</span>, <span class="cm-property">radius</span>: <span class="cm-number">75</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">2</span>, <span class="cm-property">radius</span>: <span class="cm-number">80</span>}];
+  
+<span class="cm-keyword">var</span> <span class="cm-def">lineRadial</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">lineRadial</span>()
+  .<span class="cm-property">angle</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">angle</span>)
+  .<span class="cm-property">radius</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">radius</span>)
+  .<span class="cm-property">defined</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">angle</span> <span class="cm-operator">&gt;=</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>);
+            
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo4&quot;</span>)
+  .<span class="cm-property">select</span>(<span class="cm-string">&quot;g&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">lineRadial</span>(<span class="cm-variable">data</span>))
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo4&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(100,100)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre> <figure class="sandbox"><figcaption>Figure 4. Radial line with points omitted.</figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_9K8T4+AXbZ" href="#h_9K8T4+AXbZ" tabindex="-1" role="presentation"></a>Curving the Line</h2>
+
+<p><a class="p_ident" id="p_u3oqTE2n7j" href="#p_u3oqTE2n7j" tabindex="-1" role="presentation"></a>To create a curve we need to change the way that the points are interpolated.  For this we can call <a href="https://github.com/d3/d3-shape#lineRadial_curve">lineRadial.curve([curve])</a> passing it a predefined curve factory.  D3.js provides several curve factories which we discuss in the section on <a href="05_04_curves.html">curves</a>.</p>
+
+<p><a class="p_ident" id="p_YPByg+nVGo" href="#p_YPByg+nVGo" tabindex="-1" role="presentation"></a>If <code>lineRadial.curve</code> is called without an argument, the current curve factory is returned, which by default is the <a href="https://github.com/d3/d3-shape/blob/v1.3.4/README.md#curveLinear">d3.curveLinear</a> curve factory.</p>
+
+<p><a class="p_ident" id="p_RgA9MB4iLL" href="#p_RgA9MB4iLL" tabindex="-1" role="presentation"></a>Figure 5 sets the line generator’s curve factory to <code>d3.curveBasis</code> producing a cubic basis spline.</p><pre>
+var lineRadial = d3.lineRadial()
+  .angle((d) => d.angle)
+  .radius((d) => d.radius)
+  .curve(d3.curveBasis);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_OYwLKdAr/8" href="#c_OYwLKdAr/8" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">angle</span>: <span class="cm-number">0</span>, <span class="cm-property">radius</span>: <span class="cm-number">10</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.25</span>, <span class="cm-property">radius</span>: <span class="cm-number">20</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.5</span>, <span class="cm-property">radius</span>: <span class="cm-number">35</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.75</span>, <span class="cm-property">radius</span>: <span class="cm-number">55</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>, <span class="cm-property">radius</span>: <span class="cm-number">60</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.25</span>, <span class="cm-property">radius</span>: <span class="cm-number">65</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.5</span>, <span class="cm-property">radius</span>: <span class="cm-number">70</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.75</span>, <span class="cm-property">radius</span>: <span class="cm-number">75</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">2</span>, <span class="cm-property">radius</span>: <span class="cm-number">80</span>}];
+  
+<span class="cm-keyword">var</span> <span class="cm-def">lineRadial</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">lineRadial</span>()
+  .<span class="cm-property">angle</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">angle</span>)
+  .<span class="cm-property">radius</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">radius</span>)
+  .<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveBasis</span>);
+            
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo5&quot;</span>)
+  .<span class="cm-property">select</span>(<span class="cm-string">&quot;g&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">lineRadial</span>(<span class="cm-variable">data</span>))
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;black&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo5&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(100,100)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre> <figure class="sandbox"><figcaption>Figure 5. Curved radial line.</figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_q8VcC/fiH6" href="#h_q8VcC/fiH6" tabindex="-1" role="presentation"></a>Rendering Lines to a Context</h2>
+
+<p><a class="p_ident" id="p_fizgPtnbHa" href="#p_fizgPtnbHa" tabindex="-1" role="presentation"></a>We can render the line in a <code>canvas</code> element’s <code>context</code> by using <a href="https://github.com/d3/d3-shape/blob/v1.3.4/README.md#lineRadial_context">lineRadial.context([context])</a>.</p>
+
+<p><a class="p_ident" id="p_zTCdF572bj" href="#p_zTCdF572bj" tabindex="-1" role="presentation"></a>If no argument is passed to <code>lineRadial.<wbr>context</code>, the method returns the current context, which by default is null.  If, however, a context is passed to <code>lineRadial.<wbr>context</code>, the line will be rendered in the context when the line generator is invoked.</p>
+
+<p><a class="p_ident" id="p_bS4impxCa/" href="#p_bS4impxCa/" tabindex="-1" role="presentation"></a>In Figure 6, we retrieve the context of the canvas element, then create the line generator and call <code>line.context</code> to set the context.</p><pre>
+var context = d3.select("#demo6").node().getContext("2d");
+
+var lineRadial = d3.lineRadial()
+  .angle((d) => d.angle)
+  .radius((d) => d.radius)
+  .context(context);
+</pre>
+
+
+<p><a class="p_ident" id="p_isUeRxEG/7" href="#p_isUeRxEG/7" tabindex="-1" role="presentation"></a>We then render the line by invoking the line generator, setting the stroke color, and calling  <code>context.stroke</code>.</p><pre>
+context.translate(100,100);              
+lineRadial(data);
+context.stroke();
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_Xha/ZKWqjH" href="#c_Xha/ZKWqjH" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">angle</span>: <span class="cm-number">0</span>, <span class="cm-property">radius</span>: <span class="cm-number">10</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.25</span>, <span class="cm-property">radius</span>: <span class="cm-number">20</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.5</span>, <span class="cm-property">radius</span>: <span class="cm-number">35</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">.75</span>, <span class="cm-property">radius</span>: <span class="cm-number">55</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span>, <span class="cm-property">radius</span>: <span class="cm-number">60</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.25</span>, <span class="cm-property">radius</span>: <span class="cm-number">65</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.5</span>, <span class="cm-property">radius</span>: <span class="cm-number">70</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">1.75</span>, <span class="cm-property">radius</span>: <span class="cm-number">75</span>},
+  {<span class="cm-property">angle</span>: <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">*</span> <span class="cm-number">2</span>, <span class="cm-property">radius</span>: <span class="cm-number">80</span>}];
+  
+<span class="cm-keyword">var</span> <span class="cm-def">context</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo6&quot;</span>).<span class="cm-property">node</span>().<span class="cm-property">getContext</span>(<span class="cm-string">&quot;2d&quot;</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">lineRadial</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">lineRadial</span>()
+  .<span class="cm-property">angle</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">angle</span>)
+  .<span class="cm-property">radius</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">radius</span>)
+  .<span class="cm-property">context</span>(<span class="cm-variable">context</span>);
+         
+<span class="cm-variable">context</span>.<span class="cm-property">translate</span>(<span class="cm-number">100</span>,<span class="cm-number">100</span>);              
+<span class="cm-variable">lineRadial</span>(<span class="cm-variable">data</span>);
+<span class="cm-variable">context</span>.<span class="cm-property">stroke</span>();
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">canvas</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo6&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">canvas</span><span class="cm-tag cm-bracket">&gt;</span></pre> <figure class="sandbox"><figcaption>Figure 6. Radial line rendered to a context.</figcaption></figure><nav><a href="05_02_lines.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_04_curves.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

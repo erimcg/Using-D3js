@@ -1,0 +1,409 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Working With Dates</title>
+  <link rel="canonical" href="http://using-d3js.com/04_04_working_with_dates.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 04;</script></head>
+
+<article>
+<nav><a href="04_03_axis.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_05_sequential_scales.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 04</span>Working With Dates</h1><style>
+  svg {
+      background-color: lightblue;
+  }
+</style>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+
+<p><a class="p_ident" id="p_h/eZ0egIsZ" href="#p_h/eZ0egIsZ" tabindex="-1" role="presentation"></a>When displaying temporal data we often need to</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_KkL2ZQ3xvw" href="#p_KkL2ZQ3xvw" tabindex="-1" role="presentation"></a>Convert string representations of the temporal data to Date objects</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_GRVp7T0Le7" href="#p_GRVp7T0Le7" tabindex="-1" role="presentation"></a>Define a scale function that can map the Date objects to some range</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_Apyxb/CnyK" href="#p_Apyxb/CnyK" tabindex="-1" role="presentation"></a>Create an axis based on the scale function</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_QzebMZ+ROi" href="#p_QzebMZ+ROi" tabindex="-1" role="presentation"></a>Adjust the number of ticks and format the tick labels</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_L1hSLDzHve" href="#p_L1hSLDzHve" tabindex="-1" role="presentation"></a>Draw the axis and ticks</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_+XE7oeRWF2" href="#p_+XE7oeRWF2" tabindex="-1" role="presentation"></a>Draw visual elements for the data elements</p></li></ul>
+
+<h2><a class="h_ident" id="h_eU5C1qYTFw" href="#h_eU5C1qYTFw" tabindex="-1" role="presentation"></a>Converting Strings to Dates</h2>
+
+<p><a class="p_ident" id="p_H9XCYe9D73" href="#p_H9XCYe9D73" tabindex="-1" role="presentation"></a>When creating a scale for temporal data, we need to specify the domain of the scale with an array containing 2 Date objects.  These Date objects correspond to the beginning of the time scale and the end of the time scale.</p>
+
+<p><a class="p_ident" id="p_zpzgdT3Hzo" href="#p_zpzgdT3Hzo" tabindex="-1" role="presentation"></a>D3 provides a method named <a href="https://github.com/d3/d3-time-format">timeParse(specifier)</a> than can be used to convert string representations of temporal data to Date objects.  The method takes a string as an argument that specifies the format of the data.  The string contains directives that specify what types of temporal information is in the temporal data.  For example %Y is a directive that represents a 4-digit year.  As example, the specifier for a date of the form “April 1, 1970” is  &quot;%b %d, %Y”.  A complete list of directives can be found <a href="https://github.com/d3/d3-time-format#locale_format">here</a>.</p>
+
+<p><a class="p_ident" id="p_8VRzO0fSeG" href="#p_8VRzO0fSeG" tabindex="-1" role="presentation"></a>The <code>timeParse</code> method returns a function object that when passed a string representing temporal data of the form specified by the specifier, will return a Date object representing the data.</p>
+
+<p><a class="p_ident" id="p_dnWxZulf0P" href="#p_dnWxZulf0P" tabindex="-1" role="presentation"></a>In the example below, we create a time parsing function by calling timeParse with the specifier &quot;%b %d, %Y”.  We then iterate over the objects in data array and for each object, parse the date field to create a Date object, and push the date object in the dates array.</p><pre>
+var data = [
+  {"date": "Apr 1, 1970", "event": "A"},
+  {"date": "Jun 15, 1971", "event": "B"},
+  {"date": "Mar 30, 1972", "event": "C"},
+  {"date": "Jan 1, 1973", "event": "D"},
+  {"date": "Jun 15, 1973", "event": "E"}
+];
+
+var parseTime = d3.timeParse("%b %d, %Y");
+
+var dates = [];
+for (let obj of data) {
+  dates.push(parseTime(obj.date));
+}
+</pre>
+
+
+<h2><a class="h_ident" id="h_o+NmfdKR2L" href="#h_o+NmfdKR2L" tabindex="-1" role="presentation"></a>Getting the Minimum and Maximum Dates</h2>
+
+<p><a class="p_ident" id="p_FbiH1t4k6n" href="#p_FbiH1t4k6n" tabindex="-1" role="presentation"></a>When creating a scale we need to define the domain for the scale using a scale generator’s <code>domain</code> method.  The <code>domain</code> method takes an array containing the minimum and maximum dates for the scale as an argument.  An easy way to create an array for the <code>domain</code> method is to use the <code>extent</code> method.  The <code>extent</code> method takes an array as an argument and returns a new array containing only the minimum and maximum elements.</p><pre>
+var domain = d3.extent(dates);
+</pre>
+
+
+<h2><a class="h_ident" id="h_XGHTETwmwu" href="#h_XGHTETwmwu" tabindex="-1" role="presentation"></a>Creating a Time Scaled Axis</h2>
+
+<p><a class="p_ident" id="p_W91EM4jk3v" href="#p_W91EM4jk3v" tabindex="-1" role="presentation"></a>Next, we create a temporal scaling function using <a href="https://github.com/d3/d3-scale/blob/master/README.md#scaleTime">d3.scaleTime</a>,  We set the domain of the scale by passing the array containing the min and max dates to the <code>domain</code> method and set the range relative to the width of the svg element by calling the <code>range</code> method.  An axis function is created by calling <code>axisBottom</code>, passing it the scaling function.   Once we have the axis function, we call it to draw the axis.</p><pre>
+var xScale = d3.scaleTime()
+  .domain(domain)
+  .range([25, 555]);
+
+var xAxis = d3.axisBottom(xScale);
+
+var svg = d3.select("#dateDemo1");
+
+svg.append("g")
+  .attr("transform", "translate(0,60)")
+  .call(xAxis);
+</pre>
+
+
+<p><a class="p_ident" id="p_z1bKhVzwhR" href="#p_z1bKhVzwhR" tabindex="-1" role="presentation"></a>Putting this all together we get the following axis.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_i2uqsV6rC4" href="#c_i2uqsV6rC4" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">function</span> <span class="cm-def">drawDemo1</span>() {
+    <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Apr 1, 1970&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;A&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Jun 15, 1971&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;B&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Mar 30, 1972&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;C&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Jan 1, 1973&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;D&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Jun 15, 1973&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;E&quot;</span>}
+    ];
+
+    <span class="cm-keyword">var</span> <span class="cm-def">parseTime</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">timeParse</span>(<span class="cm-string">&quot;%b %d, %Y&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">dates</span> <span class="cm-operator">=</span> [];
+    <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">obj</span> <span class="cm-keyword">of</span> <span class="cm-variable-2">data</span>) {
+        <span class="cm-variable-2">dates</span>.<span class="cm-property">push</span>(<span class="cm-variable-2">parseTime</span>(<span class="cm-variable-2">obj</span>.<span class="cm-property">date</span>));
+    }
+
+    <span class="cm-keyword">var</span> <span class="cm-def">domain</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">extent</span>(<span class="cm-variable-2">dates</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleTime</span>()
+          .<span class="cm-property">domain</span>(<span class="cm-variable-2">domain</span>)
+          .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">555</span>]);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable-2">xScale</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#dateDemo1&quot;</span>);
+
+    <span class="cm-variable-2">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,60)&quot;</span>)
+        .<span class="cm-property">call</span>(<span class="cm-variable-2">xAxis</span>);
+  }
+
+  <span class="cm-variable">drawDemo1</span>();
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;dateDemo1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_f/Pjf3UFbr" href="#h_f/Pjf3UFbr" tabindex="-1" role="presentation"></a>Limiting Ticks to Year Marks</h2>
+
+<p><a class="p_ident" id="p_u91DJqwEmt" href="#p_u91DJqwEmt" tabindex="-1" role="presentation"></a>As you can see above, sometimes the number of ticks and their labels are not ideal.  We can configure d3’s axis function to draw ticks at a specific time intervals by calling <code>ticks</code> on the axis function and passing in one of the <a href="https://github.com/d3/d3/blob/master/API.md#time-intervals-d3-time">d3 time interval</a> objects.  Below we pass in <code>d3.timeYear</code> to <code>ticks</code> which causes the axis function to draw ticks at the beginning of each year.</p><pre>
+svg.append("g")
+   .attr("transform", "translate(0,60)")
+   .call(xAxis.ticks(d3.timeYear));
+ </pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_rtZVCmHK+c" href="#c_rtZVCmHK+c" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">function</span> <span class="cm-def">drawDemo2</span>() {
+    <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Apr 1, 1970&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;A&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Jun 15, 1971&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;B&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Mar 30, 1972&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;C&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Jan 1, 1973&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;D&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Jun 15, 1973&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;E&quot;</span>}
+    ];
+
+    <span class="cm-keyword">var</span> <span class="cm-def">parseTime</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">timeParse</span>(<span class="cm-string">&quot;%b %d, %Y&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">dates</span> <span class="cm-operator">=</span> [];
+    <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">obj</span> <span class="cm-keyword">of</span> <span class="cm-variable-2">data</span>) {
+        <span class="cm-variable-2">dates</span>.<span class="cm-property">push</span>(<span class="cm-variable-2">parseTime</span>(<span class="cm-variable-2">obj</span>.<span class="cm-property">date</span>));
+    }
+
+    <span class="cm-keyword">var</span> <span class="cm-def">domain</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">extent</span>(<span class="cm-variable-2">dates</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleTime</span>()
+          .<span class="cm-property">domain</span>(<span class="cm-variable-2">domain</span>)
+          .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">555</span>]);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable-2">xScale</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#dateDemo2&quot;</span>);
+
+    <span class="cm-variable-2">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,60)&quot;</span>)
+        .<span class="cm-property">call</span>(<span class="cm-variable-2">xAxis</span>.<span class="cm-property">ticks</span>(<span class="cm-variable">d3</span>.<span class="cm-property">timeYear</span>));
+  }
+
+  <span class="cm-variable">drawDemo2</span>();
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;dateDemo2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_bnOBv/EhdS" href="#h_bnOBv/EhdS" tabindex="-1" role="presentation"></a>Expanding the Domain</h2>
+
+<p><a class="p_ident" id="p_jpMi7zcgiz" href="#p_jpMi7zcgiz" tabindex="-1" role="presentation"></a>If you’d like the domain to begin at the start of one year and end at the start of another year, we can use the time interval <code>floor</code> and <code>ceil</code> methods on the <code>timeYear</code> interval.  The <code>floor</code> method takes a <code>Date</code> as an argument and returns a <code>Date</code> object holding the smallest date in the same year (midnight, Jan 1, same year).  Similarly, the <code>ceil</code> method takes a <code>Date</code> object as an argument and returns the smallest date in the next year’s interval (midnight, Jan 1, next year).</p><pre>
+domain = [d3.timeYear.floor(domain[0]), d3.timeYear.ceil(domain[1])];
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_Fc0QEtDaAY" href="#c_Fc0QEtDaAY" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">function</span> <span class="cm-def">drawDemo3</span>() {
+    <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Apr 1, 1970&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;A&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Jun 15, 1971&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;B&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Mar 30, 1972&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;C&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Jan 1, 1973&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;D&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Jun 15, 1973&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;E&quot;</span>}
+    ];
+
+    <span class="cm-keyword">var</span> <span class="cm-def">parseTime</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">timeParse</span>(<span class="cm-string">&quot;%b %d, %Y&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">dates</span> <span class="cm-operator">=</span> [];
+    <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">obj</span> <span class="cm-keyword">of</span> <span class="cm-variable-2">data</span>) {
+        <span class="cm-variable-2">dates</span>.<span class="cm-property">push</span>(<span class="cm-variable-2">parseTime</span>(<span class="cm-variable-2">obj</span>.<span class="cm-property">date</span>));
+    }
+
+    <span class="cm-keyword">var</span> <span class="cm-def">domain</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">extent</span>(<span class="cm-variable-2">dates</span>);
+    <span class="cm-variable-2">domain</span> <span class="cm-operator">=</span> [<span class="cm-variable">d3</span>.<span class="cm-property">timeYear</span>.<span class="cm-property">floor</span>(<span class="cm-variable-2">domain</span>[<span class="cm-number">0</span>]), <span class="cm-variable">d3</span>.<span class="cm-property">timeYear</span>.<span class="cm-property">ceil</span>(<span class="cm-variable-2">domain</span>[<span class="cm-number">1</span>])];
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleTime</span>()
+          .<span class="cm-property">domain</span>(<span class="cm-variable-2">domain</span>)
+          .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">555</span>]);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable-2">xScale</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#dateDemo3&quot;</span>);
+
+    <span class="cm-variable-2">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,60)&quot;</span>)
+        .<span class="cm-property">call</span>(<span class="cm-variable-2">xAxis</span>.<span class="cm-property">ticks</span>(<span class="cm-variable">d3</span>.<span class="cm-property">timeYear</span>));
+  }
+
+  <span class="cm-variable">drawDemo3</span>();
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;dateDemo3&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_YHwJi9aDDS" href="#h_YHwJi9aDDS" tabindex="-1" role="presentation"></a>Adding Month Ticks and an Axis Label</h2>
+
+<p><a class="p_ident" id="p_8Kmwwa5B2o" href="#p_8Kmwwa5B2o" tabindex="-1" role="presentation"></a>If you’d like to add a second set of tick marks you can do so with the original x-axis function.  Below we draw tick marks for each month.  We also remove the text for the monthly tick marks since they’re not necessary when analyzing the axis.  Note that if we draw yearly ticks as well, we’d want to draw the yearly ticks after drawing the monthly ticks so as to not remove the labels for the yearly ticks.</p><pre>
+svg.append("g")
+    .attr("transform", "translate(0,60)")
+    .call(xAxis.ticks(d3.timeMonth));
+
+svg.selectAll(".tick text").remove();
+</pre>
+
+
+<p><a class="p_ident" id="p_E7KvgwHcfs" href="#p_E7KvgwHcfs" tabindex="-1" role="presentation"></a>Below is code that draws a Label reading “Dates” for the axis.</p><pre>
+svg.append("text")
+    .attr("transform", "translate(300,95)")
+   .style("text-anchor", "middle")
+   .attr("fill", "black")
+   .text("Dates");
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_YzHSgh19y2" href="#c_YzHSgh19y2" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">function</span> <span class="cm-def">drawDemo4</span>() {
+    <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Apr 1, 1970&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;A&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Jun 15, 1971&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;B&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Mar 30, 1972&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;C&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Jan 1, 1973&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;D&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Jun 15, 1973&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;E&quot;</span>}
+    ];
+
+    <span class="cm-keyword">var</span> <span class="cm-def">parseTime</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">timeParse</span>(<span class="cm-string">&quot;%b %d, %Y&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">dates</span> <span class="cm-operator">=</span> [];
+    <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">obj</span> <span class="cm-keyword">of</span> <span class="cm-variable-2">data</span>) {
+        <span class="cm-variable-2">dates</span>.<span class="cm-property">push</span>(<span class="cm-variable-2">parseTime</span>(<span class="cm-variable-2">obj</span>.<span class="cm-property">date</span>));
+    }
+
+    <span class="cm-keyword">var</span> <span class="cm-def">domain</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">extent</span>(<span class="cm-variable-2">dates</span>);
+    <span class="cm-variable-2">domain</span> <span class="cm-operator">=</span> [<span class="cm-variable">d3</span>.<span class="cm-property">timeYear</span>.<span class="cm-property">floor</span>(<span class="cm-variable-2">domain</span>[<span class="cm-number">0</span>]), <span class="cm-variable">d3</span>.<span class="cm-property">timeYear</span>.<span class="cm-property">ceil</span>(<span class="cm-variable-2">domain</span>[<span class="cm-number">1</span>])];
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleTime</span>()
+          .<span class="cm-property">domain</span>(<span class="cm-variable-2">domain</span>)
+          .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">555</span>]);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable-2">xScale</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#dateDemo4&quot;</span>);
+
+    <span class="cm-variable-2">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,60)&quot;</span>)
+        .<span class="cm-property">call</span>(<span class="cm-variable-2">xAxis</span>.<span class="cm-property">ticks</span>(<span class="cm-variable">d3</span>.<span class="cm-property">timeMonth</span>));
+
+    <span class="cm-variable-2">svg</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;.tick text&quot;</span>).<span class="cm-property">remove</span>();
+
+    <span class="cm-variable-2">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,60)&quot;</span>)
+        .<span class="cm-property">call</span>(<span class="cm-variable-2">xAxis</span>.<span class="cm-property">ticks</span>(<span class="cm-variable">d3</span>.<span class="cm-property">timeYear</span>));
+
+    <span class="cm-variable-2">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;text&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(300,95)&quot;</span>)
+        .<span class="cm-property">style</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+        .<span class="cm-property">text</span>(<span class="cm-string">&quot;Dates&quot;</span>);
+  }
+
+  <span class="cm-variable">drawDemo4</span>();
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;dateDemo4&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_VeDTxW3AOe" href="#h_VeDTxW3AOe" tabindex="-1" role="presentation"></a>Adding Data Points</h2>
+
+<p><a class="p_ident" id="p_1SHuY+n99b" href="#p_1SHuY+n99b" tabindex="-1" role="presentation"></a>Recall from earlier that we have an array containing 5 objects, where each object has a date property and an event property.  Below, we join the data to new circle elements and set the circle’s radii, color, and position. Since the date property is a string, in order to find its position on the x-axis using the <code>xScale</code> scaling function, we need to convert the string to a <code>Date</code> object.  To do so, we can use the same parsing function that we created earlier (<code>parseTime</code>) and pass the result to the scaling function (<code>xScale</code>).</p><pre>
+svg.selectAll("circle")
+    .data(data)
+    .enter()
+    .append("circle")
+    .attr("r", 5)
+    .attr("fill", "black")
+    .attr("cx", (d) =&gt; xScale(parseTime(d.date)))
+    .attr("cy", 50);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_LAjOkbadsf" href="#c_LAjOkbadsf" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">style</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag">div</span><span class="cm-qualifier">.tooltip</span> {
+    <span class="cm-property">position</span>: <span class="cm-atom">absolute</span>;
+    <span class="cm-property">text-align</span>: <span class="cm-atom">center</span>;
+    <span class="cm-property">padding</span>: <span class="cm-number">2px</span>;
+    <span class="cm-property">font</span>: <span class="cm-number">12px</span> <span class="cm-atom">sans-serif</span>;
+    <span class="cm-property">background</span>: <span class="cm-keyword">lightsteelblue</span>;
+    <span class="cm-property">border</span>: <span class="cm-number">0px</span>;
+    <span class="cm-property">border-radius</span>: <span class="cm-number">8px</span>;
+    <span class="cm-property">pointer-events</span>: <span class="cm-atom">none</span>;
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">style</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">function</span> <span class="cm-def">drawDemo5</span>() {
+
+    <span class="cm-keyword">var</span> <span class="cm-def">tooltip</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;body&quot;</span>).<span class="cm-property">append</span>(<span class="cm-string">&quot;div&quot;</span>)
+                  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;class&quot;</span>, <span class="cm-string">&quot;tooltip&quot;</span>)
+                  .<span class="cm-property">style</span>(<span class="cm-string">&quot;opacity&quot;</span>, <span class="cm-number">0</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Apr 1, 1970&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;A&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Jun 15, 1971&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;B&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Mar 30, 1972&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;C&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Jan 1, 1973&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;D&quot;</span>},
+      {<span class="cm-string cm-property">&quot;date&quot;</span>: <span class="cm-string">&quot;Jun 15, 1973&quot;</span>, <span class="cm-string cm-property">&quot;event&quot;</span>: <span class="cm-string">&quot;E&quot;</span>}
+    ];
+
+    <span class="cm-keyword">var</span> <span class="cm-def">parseTime</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">timeParse</span>(<span class="cm-string">&quot;%b %d, %Y&quot;</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">dates</span> <span class="cm-operator">=</span> [];
+    <span class="cm-keyword">for</span> (<span class="cm-keyword">let</span> <span class="cm-def">obj</span> <span class="cm-keyword">of</span> <span class="cm-variable-2">data</span>) {
+        <span class="cm-variable-2">dates</span>.<span class="cm-property">push</span>(<span class="cm-variable-2">parseTime</span>(<span class="cm-variable-2">obj</span>.<span class="cm-property">date</span>));
+    }
+
+    <span class="cm-keyword">var</span> <span class="cm-def">domain</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">extent</span>(<span class="cm-variable-2">dates</span>);
+    <span class="cm-variable-2">domain</span> <span class="cm-operator">=</span> [<span class="cm-variable">d3</span>.<span class="cm-property">timeYear</span>.<span class="cm-property">floor</span>(<span class="cm-variable-2">domain</span>[<span class="cm-number">0</span>]), <span class="cm-variable">d3</span>.<span class="cm-property">timeYear</span>.<span class="cm-property">ceil</span>(<span class="cm-variable-2">domain</span>[<span class="cm-number">1</span>])];
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleTime</span>()
+          .<span class="cm-property">domain</span>(<span class="cm-variable-2">domain</span>)
+          .<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">555</span>]);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xAxis</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">axisBottom</span>(<span class="cm-variable-2">xScale</span>);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#dateDemo5&quot;</span>);
+
+    <span class="cm-variable-2">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,60)&quot;</span>)
+        .<span class="cm-property">call</span>(<span class="cm-variable-2">xAxis</span>.<span class="cm-property">ticks</span>(<span class="cm-variable">d3</span>.<span class="cm-property">timeMonth</span>));
+
+    <span class="cm-variable-2">svg</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;.tick text&quot;</span>).<span class="cm-property">remove</span>();
+
+    <span class="cm-variable-2">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;g&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(0,60)&quot;</span>)
+        .<span class="cm-property">call</span>(<span class="cm-variable-2">xAxis</span>.<span class="cm-property">ticks</span>(<span class="cm-variable">d3</span>.<span class="cm-property">timeYear</span>));
+
+    <span class="cm-variable-2">svg</span>.<span class="cm-property">append</span>(<span class="cm-string">&quot;text&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-string">&quot;translate(300,95)&quot;</span>)
+        .<span class="cm-property">style</span>(<span class="cm-string">&quot;text-anchor&quot;</span>, <span class="cm-string">&quot;middle&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+        .<span class="cm-property">text</span>(<span class="cm-string">&quot;Dates&quot;</span>);
+
+    <span class="cm-variable-2">svg</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+      .<span class="cm-property">data</span>(<span class="cm-variable-2">data</span>)
+      .<span class="cm-property">enter</span>()
+      .<span class="cm-property">append</span>(<span class="cm-string">&quot;circle&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;r&quot;</span>, <span class="cm-number">7</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;black&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cx&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">xScale</span>(<span class="cm-variable-2">parseTime</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">date</span>)))
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;cy&quot;</span>, <span class="cm-number">50</span>)
+      .<span class="cm-property">on</span>(<span class="cm-string">&quot;mouseover&quot;</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {
+                          <span class="cm-variable-2">tooltip</span>.<span class="cm-property">transition</span>()
+                              .<span class="cm-property">duration</span>(<span class="cm-number">200</span>)
+                              .<span class="cm-property">style</span>(<span class="cm-string">&quot;opacity&quot;</span>, <span class="cm-number">.9</span>);
+                          <span class="cm-variable-2">tooltip</span>.<span class="cm-property">html</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">date</span>)
+                              .<span class="cm-property">style</span>(<span class="cm-string">&quot;left&quot;</span>, (<span class="cm-variable">d3</span>.<span class="cm-property">event</span>.<span class="cm-property">pageX</span>) <span class="cm-operator">+</span> <span class="cm-string">&quot;px&quot;</span>)
+                              .<span class="cm-property">style</span>(<span class="cm-string">&quot;top&quot;</span>, (<span class="cm-variable">d3</span>.<span class="cm-property">event</span>.<span class="cm-property">pageY</span> <span class="cm-operator">-</span> <span class="cm-number">28</span>) <span class="cm-operator">+</span> <span class="cm-string">&quot;px&quot;</span>);
+                      })
+      .<span class="cm-property">on</span>(<span class="cm-string">&quot;mouseout&quot;</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {
+                          <span class="cm-variable-2">tooltip</span>.<span class="cm-property">transition</span>()
+                              .<span class="cm-property">duration</span>(<span class="cm-number">500</span>)
+                              .<span class="cm-property">style</span>(<span class="cm-string">&quot;opacity&quot;</span>, <span class="cm-number">0</span>);
+      });
+  }
+
+  <span class="cm-variable">drawDemo5</span>();
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;dateDemo5&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><nav><a href="04_03_axis.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_05_sequential_scales.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

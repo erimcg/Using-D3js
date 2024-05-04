@@ -1,0 +1,123 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Transitions</title>
+  <link rel="canonical" href="http://using-d3js.com/09_01_transitions.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 09;</script></head>
+
+<article>
+<nav><a href="08_04_timers.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="09_02_easings.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 09</span>Transitions</h1><style>
+
+</style>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+
+
+<h2><a class="h_ident" id="h_e9gc+EMbuy" href="#h_e9gc+EMbuy" tabindex="-1" role="presentation"></a>Selecting Elements</h2>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_qS8rXhYQxR" href="#p_qS8rXhYQxR" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#selection_transition">selection.transition([name])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_QlVh97K/Ii" href="#p_QlVh97K/Ii" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#selection_interrupt">selection.interrupt([name])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_sVcUZtp8hA" href="#p_sVcUZtp8hA" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#interrupt">d3.interrupt(node[, name])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_wdE0IdboIO" href="#p_wdE0IdboIO" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#transition">d3.transition([name])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_ryOxlThEvy" href="#p_ryOxlThEvy" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#transition_select">transition.select(selector)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_VzMzbC1KyN" href="#p_VzMzbC1KyN" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#transition_selectAll">transition.selectAll(selector)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_bs/yC8sL42" href="#p_bs/yC8sL42" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#transition_filter">transition.filter(filter)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_n1et9VUCsK" href="#p_n1et9VUCsK" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#transition_merge">transition.merge(other)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_QoVuQ5bs2c" href="#p_QoVuQ5bs2c" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#transition_transition">transition.transition()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_wUIIRG6mp3" href="#p_wUIIRG6mp3" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#transition_selection">transition.selection()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_Ad0ExfKlqJ" href="#p_Ad0ExfKlqJ" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#active">d3.active(node[, name])</a></p></li></ul>
+
+<h2><a class="h_ident" id="h_GEoOuQBu3Z" href="#h_GEoOuQBu3Z" tabindex="-1" role="presentation"></a>Modifying Elements</h2>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_Rm3oKmKO+N" href="#p_Rm3oKmKO+N" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#transition_attr">transition.attr(name, value)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_bx9rW3iwWf" href="#p_bx9rW3iwWf" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#transition_attrTween">transition.attrTween(name[, factory])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_GD6+s86rIO" href="#p_GD6+s86rIO" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#transition_style">transition.style(name, value[, priority])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_tPi139+Lka" href="#p_tPi139+Lka" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#transition_styleTween">transition.styleTween(name[, factory[, priority]]))</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_o0kh4iPNYC" href="#p_o0kh4iPNYC" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#transition_text">transition.text(value)</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_+DoariOdlh" href="#p_+DoariOdlh" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#transition_remove">transition.remove()</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_Pbp4wUIGqy" href="#p_Pbp4wUIGqy" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition#transition_tween">transition.tween(name[, value])</a></p></li></ul>
+
+<h2><a class="h_ident" id="h_CYAk3FU3yj" href="#h_CYAk3FU3yj" tabindex="-1" role="presentation"></a>Timing</h2>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_WNCO2+3xC8" href="#p_WNCO2+3xC8" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition/tree/v1.2.0#transition_delay">transition.delay([value])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_k5lY/cll7F" href="#p_k5lY/cll7F" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition/tree/v1.2.0#transition_duration">transition.duration([value])</a></p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_FBo93bzPUJ" href="#p_FBo93bzPUJ" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-transition/tree/v1.2.0#transition_ease">transition.ease([value])</a></p></li></ul>
+
+<h2><a class="h_ident" id="h_RyLF6mT1v2" href="#h_RyLF6mT1v2" tabindex="-1" role="presentation"></a>Control Flow</h2>
+
+<p><a class="p_ident" id="p_cc/19qoqKk" href="#p_cc/19qoqKk" tabindex="-1" role="presentation"></a>+<a href="https://github.com/d3/d3-transition/tree/v1.2.0#transition_on">transition.on(typenames[, listener])</a> +<a href="https://github.com/d3/d3-transition/tree/v1.2.0#transition_each">transition.each(function)</a> +<a href="https://github.com/d3/d3-transition/tree/v1.2.0#transition_call">transition.call(function[, arguments…])</a> +<a href="https://github.com/d3/d3-transition/tree/v1.2.0#transition_empty">transition.empty()</a> +<a href="https://github.com/d3/d3-transition/tree/v1.2.0#transition_nodes">transition.nodes()</a> +<a href="https://github.com/d3/d3-transition/tree/v1.2.0#transition_node">transition.node()</a> +<a href="https://github.com/d3/d3-transition/tree/v1.2.0#transition_size">transition.size()</a></p><nav><a href="08_04_timers.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="09_02_easings.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

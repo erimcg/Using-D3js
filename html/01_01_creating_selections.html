@@ -1,0 +1,258 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Creating Selection</title>
+  <link rel="canonical" href="http://using-d3js.com/01_01_creating_selections.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 01;</script></head>
+
+<article>
+<nav><a href="00_01_introduction.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="01_02_selection_node_properties.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 01</span>Creating Selection</h1><style>
+  svg {
+      display: inline-block;
+      vertical-align: middle;
+  }
+  button{
+      display: inline;
+      vertical-align: middle;
+  }
+  .lightblue {
+      fill: lightblue;
+  }
+  .pink {
+    fill: pink;
+  }
+</style>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+
+<p><a class="p_ident" id="p_Pb8Awq55sR" href="#p_Pb8Awq55sR" tabindex="-1" role="presentation"></a>When creating data visualizations we often need to apply a set of visual changes to a set of elements in the DOM.  Sometimes we can retrieve the set we need by calling <code>getElementsByClassName</code>, <code>getElementsByTagName</code>, and <code>getElementById</code>. But often times, these are insufficient.   D3.js has an incredibly useful and versatile module named <a href="https://github.com/d3/d3-selection/blob/master/README.md#selection">Selections</a> that allow us to select sets of elements from the DOM using CSS selectors and user-defined functions.</p>
+
+<p><a class="p_ident" id="p_Z1DpcXtdS7" href="#p_Z1DpcXtdS7" tabindex="-1" role="presentation"></a>The D3 API has 3 initial methods that can be used to select sets of elements from the DOM.  These are:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_XEzK7sYP5+" href="#p_XEzK7sYP5+" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#select">d3.select(selector)</a> - select a single element from the document</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_U/L+4NnW6z" href="#p_U/L+4NnW6z" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selectAll">d3.selectAll(selector)</a> - select multiple elements from the document</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_TitQa6s9q+" href="#p_TitQa6s9q+" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection">d3.selection()</a> - select the root element in the document</p></li></ul>
+
+<p><a class="p_ident" id="p_ev/4wqWCIk" href="#p_ev/4wqWCIk" tabindex="-1" role="presentation"></a>Each one of the methods above return a <a href="https://github.com/d3/d3-selection/blob/master/README.md#selection">d3.selection</a> object containing zero or more element nodes from the DOM.  Once we have a selection object we can call the various selection methods to manipulate the DOM as we’ll see in the next section.</p>
+
+<p><a class="p_ident" id="p_GirxL4OVus" href="#p_GirxL4OVus" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#select">d3.select(selector)</a> returns a selection containing zero or one element or node. The <code>selector</code> argument can be either an string that holds any valid CSS selector or a reference to a node.  If the selector is a string, it returns a selection containing the <em>first</em> element found in the DOM that meets the CSS selector criteria.  If no element is found then it returns an empty selection.  If the selector is a reference to a node (e.g. this) then it returns a section object containing that node.</p>
+
+<p><a class="p_ident" id="p_n3FEUjmdba" href="#p_n3FEUjmdba" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selectAll">d3.selectAll(selector)</a> returns a selection of zero or more elements or nodes. The method takes as an argument a string that holds a CSS selector, an array of nodes, or a pseudo-array like a <code>NodeList</code>.  If the argument is a string, the method returns a selection containing all of the elements that match the CSS selector defined by the string.  If no elements match, the selection object that is returned is empty.  If the selector contains references to nodes then the method returns a selection that contains the nodes.</p>
+
+<p><a class="p_ident" id="p_H/MtnJuBh2" href="#p_H/MtnJuBh2" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection">d3.selection()</a> is used to retrieve a selection object that only contains the root document element (i.e. <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document/documentElement">document.documentElement</a>) of the web page.  This method can can also be used to test for the <code>selection</code> type using <code>instanceof d3.<wbr>selection</code>.</p>
+
+<p><a class="p_ident" id="p_LdA5uzkL/e" href="#p_LdA5uzkL/e" tabindex="-1" role="presentation"></a>To illustrate various ways that we can use these methods, let’s suppose we have 5 circles rendered in an SVG as shown below.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_zwir6h8clf" href="#c_zwir6h8clf" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;425&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span> <span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;125&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;secondPink&quot;</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;275&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span><span class="cm-string">&quot; /&gt;</span>
+  <span class="cm-string">&lt;circle cx=&quot;</span><span class="cm-attribute">350</span><span class="cm-string cm-error">&quot; cy=&quot;</span><span class="cm-attribute">50</span><span class="cm-string cm-error">&quot; r=&quot;</span><span class="cm-attribute">25</span><span class="cm-string cm-error">&quot; fill=&quot;</span><span class="cm-attribute">aquamarine</span><span class="cm-string cm-error">&quot; /&gt;</span>
+<span class="cm-string cm-error">&lt;/svg&gt;</span></pre>
+
+<p><a class="p_ident" id="p_LzWlKK1UJp" href="#p_LzWlKK1UJp" tabindex="-1" role="presentation"></a>In the script below we select different subsets of the 5 circles using the selection methods.  Note that we don’t do anything with the selections just yet; we’re just demonstrating how to select sets of elements.</p><pre>
+let firstBlueCircle = d3.select(".lightblue");
+let allBlueCircles = d3.selectAll(".lightblue");
+let secondPinkCircle = d3.select("#secondPink");
+let allCircles = d3.selectAll("circle");
+</pre>
+
+
+<p><a class="p_ident" id="p_ztLW2/Z73a" href="#p_ztLW2/Z73a" tabindex="-1" role="presentation"></a>In the first statement we set <code>firstBlueCircle</code> equal to the selection object that contains a single element, the <em>first</em> element having the class name <code>lightblue</code>.  The second statement uses the same CSS selector, but calls <code>selectAll</code> to return a selection containing <em>all</em> of the elements having a class name <code>lightblue</code>.  The third statement sets the variable <code>secondPinkCircle</code> to the selection object containing a single element, namely the element whose id attribute is set to <code>secondPink</code>.  The fourth statement retrieves a selection containing all of the <code>circle</code> elements in the web page’s DOM.</p>
+
+<p><a class="p_ident" id="p_CX1FaBet9Z" href="#p_CX1FaBet9Z" tabindex="-1" role="presentation"></a>Remember that each of the select methods discussed above return a selection object, not a Node object or a set of Node objects.  Also, <em>any</em> valid CSS selector can be passed to <code>select</code> and <code>selectAll</code>.</p>
+
+<h2><a class="h_ident" id="h_0S6/lLBO4p" href="#h_0S6/lLBO4p" tabindex="-1" role="presentation"></a>Chaining Method Calls</h2>
+
+<p><a class="p_ident" id="p_c6NWE9ZPQ+" href="#p_c6NWE9ZPQ+" tabindex="-1" role="presentation"></a>The <code>d3.selection</code> type has many methods that return a new selection object.  As such, we can <em>chain</em> multiple <code>selection</code> method calls together in a single statement.</p>
+
+<p><a class="p_ident" id="p_q+oukDmNBl" href="#p_q+oukDmNBl" tabindex="-1" role="presentation"></a>In the example below, <code>selectAll</code> and <code>attr</code> return selection objects, so rather than writing code to set the <code>r</code> and <code>fill</code> properties of a set of circle elements like this:</p><pre>
+let sel = d3.selectAll("circle");
+sel.attr("r", "30");
+sel.attr("fill", "pink");
+</pre>
+
+
+<p><a class="p_ident" id="p_iRI8Tr3qVR" href="#p_iRI8Tr3qVR" tabindex="-1" role="presentation"></a>We can, instead, chain the method calls together and write an equivalent statement like the one below.</p><pre>
+  d3.selectAll("circle")
+    .attr("r", "30")
+    .attr("fill", "pink");
+</pre>
+
+
+<h2><a class="h_ident" id="h_UN75t2UEf7" href="#h_UN75t2UEf7" tabindex="-1" role="presentation"></a>Selecting Descendant Elements</h2>
+
+<p><a class="p_ident" id="p_lRtMgOP5+Y" href="#p_lRtMgOP5+Y" tabindex="-1" role="presentation"></a>The <code>d3.selection</code> type has two methods that allow you to select zero or more descendant elements based on the elements in the current selection.  Per the API, these methods are:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_4e/8RdsJeP" href="#p_4e/8RdsJeP" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_select">selection.select(selector)</a> - select zero or one descendant for each item in the selection</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_FQ8TQcHJCt" href="#p_FQ8TQcHJCt" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_selectAll">selection.selectAll(selector)</a> - select zero or more descendants for each item in the selection</p></li></ul>
+
+<p><a class="p_ident" id="p_nIGXZF+j0Q" href="#p_nIGXZF+j0Q" tabindex="-1" role="presentation"></a>Both <code>selection.select</code> and <code>selection.<wbr>selectAll</code> have one argument, a selector.  The value passed in can be either a string or a selector function.  If the argument is a string, it is interpreted as a CSS selector.  If the argument is a function then the function is called for each element of the selection.  When the selector function is called for an element of the selection, the function is passed 3 values: (<code>d</code>,<code>i</code>,<code>nodes</code>) where <code>d</code> holds data that might have been joined to the element, <code>i</code> holds the index of the element, and <code>node</code>s is a reference to a NodeList holding the element.  With this data we can retrieve the element for which the function is called using <code>nodes[i]</code>.</p>
+
+<p><a class="p_ident" id="p_viYmY3yGkn" href="#p_viYmY3yGkn" tabindex="-1" role="presentation"></a>If a selector function is passed to <code>selection.select</code>, the selector function must return a single element of null.  If a selector function is passed to <code>selection.<wbr>selectAll</code>, the selector function must return an array or pseudo-array, like a NodeList.</p>
+
+<p><a class="p_ident" id="p_NV1z7C5Bbs" href="#p_NV1z7C5Bbs" tabindex="-1" role="presentation"></a>Consider the SVG in the example below. The SVG element uses <code>&amp;lt;g&amp;gt;</code> tags to group circle elements into rows.  In order to get all of the circles that are descendants of the first <code>g</code> element we call <code>selection.select</code> to get the first <code>g</code> element and then chain a call to <code>selection.<wbr>selectAll</code> to get all of the <code>circle</code> elements that are children of the selected <code>g</code> element.  Once we have a selection containing the elements we want to modify, we can modify the attributes of the elements in the selection using the <code>attr</code> method.  Note: we discuss the <code>attr</code> method in the next section.</p><pre>
+d3.select("g")
+  .selectAll("circle")
+  .attr("stroke", "gray")
+  .attr("stroke-width", "3");
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_RfqmILp+k9" href="#c_RfqmILp+k9" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">function</span> <span class="cm-def">nestedSelect</span>() {
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;g&quot;</span>)
+      .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-string">&quot;3&quot;</span>);
+  }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;160&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;110&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;130&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;130&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;nestedSelectButton&quot;</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;nestedSelect()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Add Stroke<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_rpYp9Ou4LG" href="#h_rpYp9Ou4LG" tabindex="-1" role="presentation"></a>Groups</h2>
+
+<p><a class="p_ident" id="p_7J4iYJQSO/" href="#p_7J4iYJQSO/" tabindex="-1" role="presentation"></a>In this section we discuss how D3.js stores elements in a selection object.  When doing so, we’ll refer to the following example which calls <code>d3.select</code> and <code>d3.selectAll</code> in order to select all of the circle elements in the SVG.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_QJE+8MQMSX" href="#c_QJE+8MQMSX" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">a</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#groupSVG&quot;</span>)
+  <span class="cm-keyword">var</span> <span class="cm-def">b</span> <span class="cm-operator">=</span> <span class="cm-variable">a</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;g&quot;</span>);
+  <span class="cm-keyword">var</span> <span class="cm-def">c</span> <span class="cm-operator">=</span> <span class="cm-variable">b</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;circle&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;gray&quot;</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke-width&quot;</span>, <span class="cm-string">&quot;3&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;groupSVG&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;160&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;110&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;130&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;30&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;130&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_2KYsPZb9RQ" href="#p_2KYsPZb9RQ" tabindex="-1" role="presentation"></a>If you inspect a selection object in the browser’s console you’ll notice that a selection object contains a <code>_parents</code> property and a <code>_groups</code> property.  The <code>_parents</code> property contains an array of Nodes, which coorespond to the elements from which the search for selected elements takes place.  When we use <code>d3.select</code> or <code>d3.selectAll</code> we are searching from the document’s <code>html</code> element, thus we see that the <code>_parents</code> property holds an array containing a single element, the <code>html</code> node.</p>
+
+<p><a class="p_ident" id="p_Xf67aDkHBA" href="#p_Xf67aDkHBA" tabindex="-1" role="presentation"></a>In our example, the variable <code>a</code> holds a selection that was returned by <code>d3.<wbr>select(&quot;#groupSVG&quot;)</code>.  Since we use <code>d3.select</code> we search the entire document starting at the <code>html</code> element. Thus, as stated above, the selection’s <code>_parents</code> property contains an array holding the document’s <code>html</code> node.</p><img src="img/screenshots/selection_grp_a.png" alt="" height="120" />
+
+
+<p><a class="p_ident" id="p_S5JKdmXMex" href="#p_S5JKdmXMex" tabindex="-1" role="presentation"></a>The <code>_groups</code> property contains an array of <code>NodeList</code> objects, each holding a <em>group</em> of element nodes that are descendants of a parent node.  The number of NodeLists will always be equal to the number of parents and <code>_groups[i]</code> will be the NodeList holding the descendants of <code>_parents[i]</code>.</p>
+
+<p><a class="p_ident" id="p_pPdNcx/bkB" href="#p_pPdNcx/bkB" tabindex="-1" role="presentation"></a>When we call <code>d3.select</code> or <code>d3.selectAll</code>, since there is only one parent node, the document’s <code>html</code> node, we’ll find there is ever only one NodeList element in the <code>_groups</code> array.</p>
+
+<p><a class="p_ident" id="p_kXpJI9e8bC" href="#p_kXpJI9e8bC" tabindex="-1" role="presentation"></a>In our example, selection <code>a</code> has one parent (the document’s <code>html</code> element), thus it also has only one NodeList in <code>_groups</code> and that NodeList contains the SVG element that was selected.</p>
+
+<p><a class="p_ident" id="p_cOC4c48nry" href="#p_cOC4c48nry" tabindex="-1" role="presentation"></a>Now, when we call <code>select</code> or <code>selectAll</code> on a selection, all of the elements in the selection’s NodeLists become parents in the new selection and as before, there will be one NodeList in the selection’s <code>_groups</code> array for each parent.</p>
+
+<p><a class="p_ident" id="p_QM0ytVxWmS" href="#p_QM0ytVxWmS" tabindex="-1" role="presentation"></a>So, for example, when we select the g elements that are descendants of the SVG by calling <code>b = a.<wbr>selectAll(&quot;g&quot;)</code> the elements in <code>a's</code> NodeLists become the parents in <code>b</code>.  Since the total number of elements the <code>a's</code> NodeLists is 1, then there is only one parent in <code>b's</code> <code>_parents</code> array (the SVG element) and one NodeList containing the two g elements that are descendants of the SVG element.</p><img src="img/screenshots/selection_grp_b.png" alt="" height="120" />
+
+
+<p><a class="p_ident" id="p_XfSyGc8wW3" href="#p_XfSyGc8wW3" tabindex="-1" role="presentation"></a>The second call to <code>selectAll</code> selects all of the circle elements that are descendants of the g elements in <code>b</code>.  Since there are two g elements in <code>b</code>  there are two parents in <code>c</code> with each parent being assigned a <code>NodeList</code> containing the <code>circle</code> elements that are descendants of their parent <code>g</code> elements.</p><img src="img/screenshots/selection_grp_c.png" alt="" height="120" />
+
+
+<p><a class="p_ident" id="p_CFznl3/HL1" href="#p_CFznl3/HL1" tabindex="-1" role="presentation"></a>For more information on groups and how selections are created we recommend you read Bostock’s article titled <a href="https://bost.ocks.org/mike/selection/">How Selections Work</a>.</p>
+
+<h2><a class="h_ident" id="h_k9tQmE62nZ" href="#h_k9tQmE62nZ" tabindex="-1" role="presentation"></a>Filtering Selections</h2>
+
+<p><a class="p_ident" id="p_xY3mPwuhxs" href="#p_xY3mPwuhxs" tabindex="-1" role="presentation"></a>The <a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_filter">selection.filter(filter)</a> method takes a filter as an argument and returns a selection containing a subset of the objects in the selection on which it is called.  The <code>filter</code> argument can be either a selection string as discussed above or a function.  If the filter is a selection string, the method returns the elements in the selection that match the selection string.</p>
+
+<p><a class="p_ident" id="p_hb1n9UWOkv" href="#p_hb1n9UWOkv" tabindex="-1" role="presentation"></a>If the filter is a function, the function is called for each element in the selection, in order.  The elements for which the function returns true are retained in the selection and the others are removed.  When the function is called for an element, the function is passed three arguments (d, i, nodes):  the datum joined to the element (discussed in the next chapter), an integer specifying the group index of the element, and the group itself.  As you can see in the example code, the filter method uses <code>nodes[i]</code> to access the element in the selection that is being processed.</p>
+
+<p><a class="p_ident" id="p_Guot4XeQxR" href="#p_Guot4XeQxR" tabindex="-1" role="presentation"></a>In the example below, the 5 circle elements have radii between 5 and 25.  We select all of the circle elements, filter the selection down to only those with radii greater than or equal to 20, then remove the elements left in the selection.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_urd2QNuEaI" href="#c_urd2QNuEaI" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">function</span> <span class="cm-def">filterOnRadius</span>() {
+    <span class="cm-variable">d3</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;#filterOnRadius circle&quot;</span>)
+        .<span class="cm-property">filter</span>((<span class="cm-def">d</span>,<span class="cm-def">i</span>,<span class="cm-def">nodes</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">nodes</span>[<span class="cm-variable-2">i</span>].<span class="cm-property">getAttribute</span>(<span class="cm-string">&quot;r&quot;</span>) <span class="cm-operator">&gt;=</span> <span class="cm-number">20</span>)
+        .<span class="cm-property">remove</span>();
+  }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;filterOnRadius()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Filter<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;filterOnRadius&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;400&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;5&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;125&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;10&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;15&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;275&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">circle</span> <span class="cm-attribute">cx</span>=<span class="cm-string">&quot;350&quot;</span> <span class="cm-attribute">cy</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">r</span>=<span class="cm-string">&quot;25&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;pink&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_ElNERWe6Qu" href="#p_ElNERWe6Qu" tabindex="-1" role="presentation"></a>Note that <code>selection.filter</code> preserves the parents of the <code>selection</code> on which it is called, but does not preserve the indexes of the remaining elements in groups <code>NodeLists</code>.</p>
+
+<h2><a class="h_ident" id="h_ZXUcRIX14r" href="#h_ZXUcRIX14r" tabindex="-1" role="presentation"></a>Auxiliary Functions</h2>
+
+<p><a class="p_ident" id="p_BBRtdsqf1h" href="#p_BBRtdsqf1h" tabindex="-1" role="presentation"></a>D3.js contains three generator functions that are used by <code>selection.filter</code>, <code>selection.select</code>, and <code>selection.<wbr>selectAll</code>.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_6Ph1iWajfk" href="#p_6Ph1iWajfk" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/v1.4.0/README.md#matcher">d3.matcher(selector)</a> - returns a function that when run returns true if <em>this</em> matches the selector passed in as an argument.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_Mt/7CTYs4D" href="#p_Mt/7CTYs4D" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selector">d3.selector(selector)</a> - returns a function that when run returns the first descendant of <em>this</em> that matches the selector passed in as an argument.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_0f2ONxtQXD" href="#p_0f2ONxtQXD" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selectorAll">d3.selectorAll(selector)</a> - returns a function that when run returns a <code>NodeList</code> containing the descendant of <em>this</em> that matches the selector passed in as an argument.</p></li></ul>
+
+<p><a class="p_ident" id="p_jmP9s8IEyr" href="#p_jmP9s8IEyr" tabindex="-1" role="presentation"></a>Below we show examples of how <code>d3.matcher</code> and <code>d3.selector</code> can be used.  By calling <code>call</code> on each of the functions that are generated (<code>matcher</code> and <code>selector</code>) we change the execution context of the functions thus changing the value of <code>this</code> in each.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_x9Ud76Pdz9" href="#c_x9Ud76Pdz9" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">div</span> <span class="cm-operator">=</span> <span class="cm-variable">document</span>.<span class="cm-property">createElement</span>(<span class="cm-string">'div'</span>);
+  <span class="cm-variable">div</span>.<span class="cm-property">id</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;auxDiv&quot;</span>;
+  <span class="cm-variable">document</span>.<span class="cm-property">body</span>.<span class="cm-property">appendChild</span>(<span class="cm-variable">div</span>);
+  
+  <span class="cm-keyword">var</span> <span class="cm-def">matcher</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">matcher</span>(<span class="cm-string">'div'</span>);
+  <span class="cm-keyword">var</span> <span class="cm-def">selector</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">selector</span>(<span class="cm-string">'#auxDiv'</span>);
+  
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">matcher</span>.<span class="cm-property">call</span>(<span class="cm-variable">div</span>));
+  <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">selector</span>.<span class="cm-property">call</span>(<span class="cm-variable">document</span>.<span class="cm-property">body</span>).<span class="cm-property">id</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre><nav><a href="00_01_introduction.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="01_02_selection_node_properties.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

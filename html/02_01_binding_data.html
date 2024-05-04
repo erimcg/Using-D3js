@@ -1,0 +1,430 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Binding Data to Elements</title>
+  <link rel="canonical" href="http://using-d3js.com/02_01_binding_data.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 02;</script></head>
+
+<article>
+<nav><a href="01_05_selection_call.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="02_02_binding_object_data.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 02</span>Binding Data to Elements</h1><style>
+  button{
+      display: inline;
+      vertical-align: middle;
+  }
+  svg {
+      display: inline-block;
+      vertical-align: middle;
+  }
+</style>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+var arr = [13, 8, 3, 2, 2];
+</script>
+
+
+<p><a class="p_ident" id="p_Vk9cG+tVY+" href="#p_Vk9cG+tVY+" tabindex="-1" role="presentation"></a>In the previous chapter we looked at the selection methods provided by D3.js that allow us to select sets of elements from the DOM, modify the elements in the selection, and modify the DOM.  In this chapter we’ll look at an even more powerful feature: data binding.</p>
+
+<p><a class="p_ident" id="p_z2485McCny" href="#p_z2485McCny" tabindex="-1" role="presentation"></a>As you are probably aware, D3 is short for Data Driven Documents.  One of the objective of D3.js is to provide mechanisms that make creating visualizations of data easier.  Toward that goal, D3.js provides a set of selection methods that allow us to pair up the values in a set of data points with distinct visual elements, adding and removing visual elements when necessary.  Once this pairing (binding) is complete, we can modify the visual elements according to their bound data.</p>
+
+<p><a class="p_ident" id="p_J4GYgKI8TQ" href="#p_J4GYgKI8TQ" tabindex="-1" role="presentation"></a>The process we use to create this pairing is as follows:</p>
+
+<ol>
+
+<li>
+
+<p><a class="p_ident" id="p_UebnQtY8Mj" href="#p_UebnQtY8Mj" tabindex="-1" role="presentation"></a>Bind a set of data to a set of existing visual elements</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_nGdbxTCCM4" href="#p_nGdbxTCCM4" tabindex="-1" role="presentation"></a>Determine the subset of data that isn’t paired to a visual element and create visual elements for them</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_XKCCGc9QWq" href="#p_XKCCGc9QWq" tabindex="-1" role="presentation"></a>Determine the subset of the visual elements that don’t have data bound to them and remove them</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_N8I0y9wQGA" href="#p_N8I0y9wQGA" tabindex="-1" role="presentation"></a>Modify the visual elements to represent the data that is bound to them</p></li>
+
+</ol>
+
+<p><a class="p_ident" id="p_85uIwkZiek" href="#p_85uIwkZiek" tabindex="-1" role="presentation"></a>The <code>d3.selection</code> methods used to bind data to elements and retrieve data bound to elements are as follows:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_Sn8ieiYQdA" href="#p_Sn8ieiYQdA" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#joining-data">selection.data([data[, key]])</a> - bind data to elements</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_ZE6kZYDcyb" href="#p_ZE6kZYDcyb" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_datum">selection.datum([value])</a> - get or set the data bound to the elements in the selection</p></li></ul>
+
+<p><a class="p_ident" id="p_AGEMuEsGap" href="#p_AGEMuEsGap" tabindex="-1" role="presentation"></a>The methods that allow us to match up the data to a set of visual elements are:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_PHOVNYPi3S" href="#p_PHOVNYPi3S" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_enter">selection.enter()</a> - get the temporary elements for the data not bound to elements</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_F99J097f/A" href="#p_F99J097f/A" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_merge">selection.merge(selection)</a> - merge this selection with another selection</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_Brko5LH7lb" href="#p_Brko5LH7lb" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/master/README.md#selection_exit">selection.exit()</a> - get the elements that are missing data</p></li></ul>
+
+<p><a class="p_ident" id="p_2A+n7wje/1" href="#p_2A+n7wje/1" tabindex="-1" role="presentation"></a>D3.js also provides a convenience method that allows us to match up the data to a set of visual elements with a single method call:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_woT6cOPam/" href="#p_woT6cOPam/" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_join">selection.join(enter,[,update][,exit])</a> - a convenience method which can be used as an alternative to <code>enter</code>, <code>merge</code>, and <code>exit</code>.</p></li></ul>
+
+<h2><a class="h_ident" id="h_W5Blcjb6OF" href="#h_W5Blcjb6OF" tabindex="-1" role="presentation"></a>Selection.data</h2>
+
+<p><a class="p_ident" id="p_mOx8bfRbRr" href="#p_mOx8bfRbRr" tabindex="-1" role="presentation"></a>When using D3.js, we often <em>bind</em> individual data values to the visual elements in a selection and then modify the appearance of the visual elements to reflect the data.   To bind data to the elements in a selection we call <a href="https://github.com/d3/d3-selection/blob/master/README.md#joining-data">selection.data([data[, key]])</a> on the selection.  The <code>data</code> method takes as an argument either an array of any type of data or a function.</p>
+
+<p><a class="p_ident" id="p_MwEaLWX+BH" href="#p_MwEaLWX+BH" tabindex="-1" role="presentation"></a>Here we demonstrate passing an array to <code>data</code> and discuss passing functions at the end of this section.  The data used in the following example is simply an array of integers.</p><pre>
+var arr = [13, 8, 3, 2, 2];
+</pre>
+
+
+<p><a class="p_ident" id="p_bh2hcgd79S" href="#p_bh2hcgd79S" tabindex="-1" role="presentation"></a>When the <code>data</code> method is executed, it iterates over the elements in the array and for each data value adds a <code>__data__</code> property holding the data value to one of the visual elements in the selection.</p>
+
+<p><a class="p_ident" id="p_Dt/rnIhVpp" href="#p_Dt/rnIhVpp" tabindex="-1" role="presentation"></a>In the example below, we have a <code>svg</code> element that contains 5 <code>rect</code> elements.  We’ve positioned each <code>rect</code> element by setting their <code>x</code> and <code>y</code> properties, but have omitted the <code>width</code> attribute for each rectangle (for now), because we’d like the width of each rectangle to be dependent on the data that is bound to the element.</p><pre>
+&lt;svg id="bargraph1" width="400" height="90" &gt;
+    &lt;rect x="0" y="0" height="10" fill="lightblue" /&gt;
+    &lt;rect x="0" y="20" height="10" fill="lightblue" /&gt;
+    &lt;rect x="0" y="40" height="10" fill="lightblue" /&gt;
+    &lt;rect x="0" y="60" height="10" fill="lightblue" /&gt;
+    &lt;rect x="0" y="80" height="10" fill="lightblue" /&gt;
+&lt;/svg&gt;
+</pre>
+
+
+<p><a class="p_ident" id="p_Wez7W+bl9H" href="#p_Wez7W+bl9H" tabindex="-1" role="presentation"></a>When the button is pressed, we select the <code>svg</code> element with <code>select</code>, select all of the <code>rect</code> elements with <code>selectAll</code> and then call <code>data</code>, passing to the <code>data</code> method the array named <code>arr</code>.</p><pre>
+d3.select("#bargraph1")
+  .selectAll("rect")
+  .data(arr)                // returns the update selection
+  .attr("width", (d) => d * (400/13));
+</pre>  
+
+
+<p><a class="p_ident" id="p_VVqluQTPNt" href="#p_VVqluQTPNt" tabindex="-1" role="presentation"></a>The <code>data</code> method returns a new selection, called an <em>update selection</em>, that contains all of the elements for which data has been joined (all 5 rect elements, in this case).  We then call the <code>attr</code> method on the <em>update selection</em> to modify the width of each bar based on the data that is bound to them.</p>
+
+<p><a class="p_ident" id="p_PcVJXWHOqS" href="#p_PcVJXWHOqS" tabindex="-1" role="presentation"></a>As mentioned in the previous chapter <code>attr</code> may take a function as a second argument.  If passed a function, the function is executed for each element in the selection and the function is passed the data that is bound to the element (d) as its first argument.</p>
+
+<p><a class="p_ident" id="p_Q8ZdBW7AIy" href="#p_Q8ZdBW7AIy" tabindex="-1" role="presentation"></a>The function we pass to <code>attr</code> uses the value stored in <code>d</code> to computes and returns the value of the element’s <code>width</code> attribute.  In the example above we normalize the data so that the bars fits within the <code>svg</code> element.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_hNRdI0UMV/" href="#c_hNRdI0UMV/" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">arr</span> <span class="cm-operator">=</span> [<span class="cm-number">13</span>, <span class="cm-number">8</span>, <span class="cm-number">3</span>, <span class="cm-number">2</span>, <span class="cm-number">2</span>];
+
+<span class="cm-keyword">function</span> <span class="cm-def">createBarGraph1</span>() {
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#bargraph1&quot;</span>)
+      .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;rect&quot;</span>)
+      .<span class="cm-property">data</span>(<span class="cm-variable">arr</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;width&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span> <span class="cm-operator">*</span> (<span class="cm-number">400</span><span class="cm-operator">/</span><span class="cm-number">13</span>));
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;createBarGraph1()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Bind Data<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;bargraph1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;400&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;90&quot;</span> <span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">rect</span> <span class="cm-attribute">x</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">y</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;10&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">rect</span> <span class="cm-attribute">x</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">y</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;10&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">rect</span> <span class="cm-attribute">x</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">y</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;10&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">rect</span> <span class="cm-attribute">x</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">y</span>=<span class="cm-string">&quot;60&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;10&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">rect</span> <span class="cm-attribute">x</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">y</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;10&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_inzMid6Mr3" href="#h_inzMid6Mr3" tabindex="-1" role="presentation"></a>Enter and Exit Selections</h2>
+
+<p><a class="p_ident" id="p_b4c9SUZG7s" href="#p_b4c9SUZG7s" tabindex="-1" role="presentation"></a>In the example above, the number of elements in the data array was equal to the number of <code>rect</code> elements in the <code>svg</code>.  It is often the case that the number of elements in the data array is different than the number of visual elements in the selection.  There are 3 different scenarios:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_tpZHzA/iaH" href="#p_tpZHzA/iaH" tabindex="-1" role="presentation"></a>There are no visual elements in the selection.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_qMXUNmhieR" href="#p_qMXUNmhieR" tabindex="-1" role="presentation"></a>There are not enough visual elements in the selection.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_1lEU7YFUaq" href="#p_1lEU7YFUaq" tabindex="-1" role="presentation"></a>There are too many visual elements in the selection.</p></li></ul>
+
+<p><a class="p_ident" id="p_DQx8DlpwSd" href="#p_DQx8DlpwSd" tabindex="-1" role="presentation"></a>D3.js provides two selection methods named <code>enter</code> and <code>exit</code> that can be called on an <em>update selection</em> to help deal with these situations.</p>
+
+<p><a class="p_ident" id="p_lICCqiL2Vc" href="#p_lICCqiL2Vc" tabindex="-1" role="presentation"></a>The <code>enter</code> method is called on an <em>update selection</em> and returns an <em>enter selection</em> that contains one <em>pseudo-element</em> for each data element that was <strong>not bound</strong> to a visual element by the <code>data</code> method.  Each <em>pseudo-element</em> holds the data that was not bound.</p>
+
+<p><a class="p_ident" id="p_3Eljh7migH" href="#p_3Eljh7migH" tabindex="-1" role="presentation"></a>To create visual elements for each pseudo-element we call <code>append</code> on the enter selection.  In addition to creating a new visual element, <code>append</code> binds the data that is stored in the pseudo-elements to the newly created visual elements.</p>
+
+<p><a class="p_ident" id="p_CirJ9i5GAD" href="#p_CirJ9i5GAD" tabindex="-1" role="presentation"></a>The <code>exit</code> method is also called on an <em>update selection</em> but returns a selection called the <em>exit selection</em> that contains all of the visual elements in the original selection that did not have data bound to them.  We often call <code>remove</code> on the exit selection to remove the unnecessary visual elements.</p>
+
+<h2><a class="h_ident" id="h_G2V1Y4a/6D" href="#h_G2V1Y4a/6D" tabindex="-1" role="presentation"></a>Dealing With No Visual Elements in an Update Selection</h2>
+
+<p><a class="p_ident" id="p_+U3I0YUzjS" href="#p_+U3I0YUzjS" tabindex="-1" role="presentation"></a>Below we start with a <code>svg</code> element that has no <code>rect</code> elements within it.</p><pre>
+&lt;svg id="bargraph2" width="400" height="90" &gt;&lt;/svg&gt;
+</pre>
+
+
+<p><a class="p_ident" id="p_aInpmGNacp" href="#p_aInpmGNacp" tabindex="-1" role="presentation"></a>When the button is pressed, the button handler selects the <code>svg</code> element using <code>select</code> and then calls <code>selectAll</code> to select all of the <code>rect</code> elements within the <code>svg</code> element (for which there are none).  <code>SelectAll</code> returns empty selection whose elements (though there are none) have the <code>svg</code> element as their parent. This chaining of <code>select</code> and <code>selectAll</code> is important because when we append new elements later, their parent element will be the svg element.</p>
+
+<p><a class="p_ident" id="p_I9J2wq7+G0" href="#p_I9J2wq7+G0" tabindex="-1" role="presentation"></a>We then call the <code>data</code> method on the empty selection returned by <code>selectAll</code>.  The data method returns a <em>update selection</em> that contains the visual elements that were bound to data (again none) on which we can call the <code>enter</code> method.  The <code>enter</code> method returns an <em>enter selection</em> that contains a set of pseudo-elements, one for each data element that wasn’t joined to a visual element.  Since no data point was joined to a visual element by the <code>data</code> method, the <em>enter selection</em> contains 5 pseudo-elements.  We then call <code>append</code> on the <em>enter selection</em> which appends 5 new <code>rect</code> elements to the parent element (the <code>svg</code>) and set their properties using multiple <code>attr</code> calls.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_FwTMWMaZb9" href="#c_FwTMWMaZb9" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span> 
+<span class="cm-keyword">function</span> <span class="cm-def">createBarGraph2</span>() {
+    <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#bargraph2&quot;</span>)
+      .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;rect&quot;</span>)
+      .<span class="cm-property">data</span>(<span class="cm-variable">arr</span>)
+      .<span class="cm-property">enter</span>()
+      .<span class="cm-property">append</span>(<span class="cm-string">&quot;rect&quot;</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;height&quot;</span>, <span class="cm-number">10</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;width&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span> <span class="cm-operator">*</span> (<span class="cm-number">400</span><span class="cm-operator">/</span><span class="cm-number">13</span>))
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-number">0</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">20</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>);
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;createBarGraph2()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Bind Data<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;bargraph2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;400&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;90&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_lujrhScH7t" href="#p_lujrhScH7t" tabindex="-1" role="presentation"></a>To summarize, we started with an empty <code>svg</code> element, selected the children of the svg (of which there were none), bound data to that empty set, then appended <code>rect</code> elements to the svg for each data point that was not bound (all 5) when <code>data</code> was executed.   This is a technique that is typically used when dynamically creating data visualizations.</p>
+
+<h2><a class="h_ident" id="h_HWPMH0jMyz" href="#h_HWPMH0jMyz" tabindex="-1" role="presentation"></a>Dealing With Too Few Visual Elements in an Update Selection</h2>
+
+<p><a class="p_ident" id="p_BmgNcnLFr/" href="#p_BmgNcnLFr/" tabindex="-1" role="presentation"></a>In the example above, we were able to modify the attributes of all of the visual elements by chaining <code>attr</code> method calls after calling <code>append</code>, since <code>append</code> returned a selection containing <em>all</em> 5 of the newly created visual elements.</p>
+
+<p><a class="p_ident" id="p_vei9dIo/fI" href="#p_vei9dIo/fI" tabindex="-1" role="presentation"></a>Below we have a <code>svg</code> element that contains 3 ‘rect’ elements within it and a data array with 5 elements.</p>
+
+<p><a class="p_ident" id="p_/ole1+BJgz" href="#p_/ole1+BJgz" tabindex="-1" role="presentation"></a>When the button is pressed, the handler selects all of the <code>rect</code> elements and calls <code>data</code> to bind data to them.   This creates 3 elements in the <em>update selection</em> (the selection returned by <code>data</code>).  To make our code as efficient as possible we’ll save a reference to this selection (<code>update</code>) for later use.</p><pre>
+var update = d3.select("#bargraph3")
+ .selectAll("rect")
+ .data(arr);
+</pre>
+
+
+<p><a class="p_ident" id="p_aFPcxGlSfK" href="#p_aFPcxGlSfK" tabindex="-1" role="presentation"></a>We then call <code>enter</code> on the <em>update selection</em> to retrieve a selection containing 2 pseudo-elements that have data bound to them and call <code>append</code> to replace the pseudo-elements with <code>rect</code> elements.</p>
+
+<p><a class="p_ident" id="p_JJUDBATTDW" href="#p_JJUDBATTDW" tabindex="-1" role="presentation"></a>Now, if we were to simply call <code>attr</code> on the selection returned by <code>append</code> we’d only be modifying the attributes of the 2 newly created elements.  Instead, we’ll merge the elements in the update selection with those in the selection returned by <code>append</code> by calling <code>merge</code> on the selection returned by <code>append</code>, passing to it the reference to the update selection (<code>update</code>).  The <code>merge</code> method will return a selection containing all 5 elements that we can then call <code>attr</code> on in order to modify their attributes.</p><pre>
+update.enter()
+ .append("rect")
+ .merge(update)
+ .attr("height", 10)
+ .attr("width", (d) => d * (400/13))
+ .attr("x", 0)
+ .attr("y", (d, i) => i * 20)
+ .attr("fill", "pink");
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_v+xb0YiOUi" href="#c_v+xb0YiOUi" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">function</span> <span class="cm-def">createBarGraph3</span>() {
+    <span class="cm-keyword">var</span> <span class="cm-def">update</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#bargraph3&quot;</span>)
+              .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;rect&quot;</span>)
+              .<span class="cm-property">data</span>(<span class="cm-variable">arr</span>);
+
+    <span class="cm-variable-2">update</span>.<span class="cm-property">enter</span>()
+     .<span class="cm-property">append</span>(<span class="cm-string">&quot;rect&quot;</span>)
+     .<span class="cm-property">merge</span>(<span class="cm-variable-2">update</span>)
+     .<span class="cm-property">attr</span>(<span class="cm-string">&quot;height&quot;</span>, <span class="cm-number">10</span>)
+     .<span class="cm-property">attr</span>(<span class="cm-string">&quot;width&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span> <span class="cm-operator">*</span> (<span class="cm-number">400</span><span class="cm-operator">/</span><span class="cm-number">13</span>))
+     .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-number">0</span>)
+     .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">20</span>)
+     .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;aquamarine&quot;</span>);
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;createBarGraph3()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Bind Data<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;bargraph3&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;400&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;90&quot;</span> <span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">rect</span> <span class="cm-attribute">x</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">y</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;10&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;aquamarine&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">rect</span> <span class="cm-attribute">x</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">y</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;10&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;aquamarine&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">rect</span> <span class="cm-attribute">x</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">y</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;10&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;aquamarine&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_3A1kKG6MxK" href="#h_3A1kKG6MxK" tabindex="-1" role="presentation"></a>Dealing With Too Many Visual Elements</h2>
+
+<p><a class="p_ident" id="p_nIAY0Z2Uab" href="#p_nIAY0Z2Uab" tabindex="-1" role="presentation"></a>When joining data, if there are more visual elements in the selection than there are data points we often need to delete the extra visual elements. To do so, we call the <code>exit</code> method on the <em>update selection</em>.  The <code>exit</code> method will return an <em>exit selection</em> containing all of the visual elements that do not have data bound to them.  We can then call <code>remove</code> on the <em>exit selection</em> to remove them from the DOM.</p>
+
+<p><a class="p_ident" id="p_qcf7VnOf00" href="#p_qcf7VnOf00" tabindex="-1" role="presentation"></a>For example, suppose we have a svg element that contains 7 rect elements.  As before, we first save a reference to the <em>update selection</em> that is returned by the <code>data</code> method.  We then call <code>exit</code> on the <em>update selection</em> and call <code>remove</code> on the <em>exit selection</em> returned by <code>exit</code> to remove any unnecessary visual elements.</p><pre>
+var update = d3.select("#bargraph4")
+          .selectAll("rect")
+          .data(arr);
+
+update.exit().remove();
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_6vHej7OpC7" href="#c_6vHej7OpC7" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">function</span> <span class="cm-def">createBarGraph4</span>() {
+    <span class="cm-keyword">var</span> <span class="cm-def">update</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#bargraph4&quot;</span>)
+      .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;rect&quot;</span>)
+      .<span class="cm-property">data</span>(<span class="cm-variable">arr</span>);
+
+    <span class="cm-variable-2">update</span>.<span class="cm-property">enter</span>()
+      .<span class="cm-property">append</span>(<span class="cm-string">&quot;rect&quot;</span>)
+      .<span class="cm-property">merge</span>(<span class="cm-variable-2">update</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;height&quot;</span>, <span class="cm-number">10</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;width&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span> <span class="cm-operator">*</span> (<span class="cm-number">400</span><span class="cm-operator">/</span><span class="cm-number">13</span>))
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-number">0</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">20</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;lightblue&quot;</span>);
+
+    <span class="cm-variable-2">update</span>.<span class="cm-property">exit</span>().<span class="cm-property">remove</span>();
+}
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;createBarGraph4()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Bind Data<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;bargraph4&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;400&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;130&quot;</span> <span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">rect</span> <span class="cm-attribute">x</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">y</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;10&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">rect</span> <span class="cm-attribute">x</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">y</span>=<span class="cm-string">&quot;20&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;10&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">rect</span> <span class="cm-attribute">x</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">y</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;10&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">rect</span> <span class="cm-attribute">x</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">y</span>=<span class="cm-string">&quot;60&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;10&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">rect</span> <span class="cm-attribute">x</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">y</span>=<span class="cm-string">&quot;80&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;10&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">rect</span> <span class="cm-attribute">x</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">y</span>=<span class="cm-string">&quot;100&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;10&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">rect</span> <span class="cm-attribute">x</span>=<span class="cm-string">&quot;0&quot;</span> <span class="cm-attribute">y</span>=<span class="cm-string">&quot;120&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;10&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;50&quot;</span> <span class="cm-attribute">fill</span>=<span class="cm-string">&quot;lightblue&quot;</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_23AEmE8TDg" href="#h_23AEmE8TDg" tabindex="-1" role="presentation"></a>The General Form: Call Enter, Merge, and Exit</h2>
+
+<p><a class="p_ident" id="p_9g7nj68ELc" href="#p_9g7nj68ELc" tabindex="-1" role="presentation"></a>Often we don’t know whether the parent container has too few or too many visual elements, so we process both the <em>entry selection</em> and <em>exit selection</em>, since there is no harm in doing so.  The code shown below is the general form for binding data.</p><pre>
+var update = d3.select("#bargraph4")
+          .selectAll("rect")
+          .data(arr);
+
+update.enter()
+ .append("rect")
+ .merge(update)
+ .attr("height", 10)
+ .attr("width", (d) => d * (400/13))
+ .attr("x", 0)
+ .attr("y", (d, i) => i * 20)
+ .attr("fill", "pink");
+
+update.exit().remove();
+</pre>
+
+
+<h2><a class="h_ident" id="h_xfTSsiMFES" href="#h_xfTSsiMFES" tabindex="-1" role="presentation"></a>Selection.join</h2>
+
+<p><a class="p_ident" id="p_nXCXqAOEzi" href="#p_nXCXqAOEzi" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_join"><code>Selection.<wbr>join(enter[, update][, exit]</code></a> is a convenience method that allows us to process the entry, update, and exit selections with one method call.</p>
+
+<p><a class="p_ident" id="p_RwioN8sw1B" href="#p_RwioN8sw1B" tabindex="-1" role="presentation"></a>The <code>join</code> method requires at least one argument, but may take three.  The first argument may be either a string or a function and the last two must be functions.  <code>Join</code> returns a selection that contains a set of newly appended elements as well as the elements in the update selection.</p>
+
+<p><a class="p_ident" id="p_Br18GKJfzU" href="#p_Br18GKJfzU" tabindex="-1" role="presentation"></a>In the example, rather than appending ‘rect’ elements to the enter selection and then merging the selection returned from append with the update selection, after we call <code>data</code>, we simply call <code>join</code> and pass it the a string specifying the type of element to append.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_mtgyvvWTZ3" href="#c_mtgyvvWTZ3" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span> 
+  <span class="cm-keyword">function</span> <span class="cm-def">createBarGraph5</span>() {
+      <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#bargraph5&quot;</span>)
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;rect&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable">arr</span>)
+        .<span class="cm-property">join</span>(<span class="cm-string">'rect'</span>)  
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;height&quot;</span>, <span class="cm-number">10</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;width&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span> <span class="cm-operator">*</span> (<span class="cm-number">400</span><span class="cm-operator">/</span><span class="cm-number">13</span>))
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-number">0</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">20</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;lightblue&quot;</span>);
+  }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;createBarGraph5()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Bind Data<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;bargraph5&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;400&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;90&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_56azZOXL+n" href="#p_56azZOXL+n" tabindex="-1" role="presentation"></a>If the first, second, or third argument passed to <code>join</code> is a function, it is passed a reference to the enter, update, or exit selection respectively.</p>
+
+<h2><a class="h_ident" id="h_s9Ye7fc1OP" href="#h_s9Ye7fc1OP" tabindex="-1" role="presentation"></a>Working With Multiple Groups</h2>
+
+<p><a class="p_ident" id="p_WWniNT1aFN" href="#p_WWniNT1aFN" tabindex="-1" role="presentation"></a>In the above examples, we created selections on which <code>data</code> was called by calling <code>select</code> followed by <code>selectAll</code> producing selections having a single group.  In cases like these where a selection has a single group, it is appropriate to pass an array to <code>data</code>.  When we do, the <code>i</code><sup>th</sup> value in the array is bound to the <code>i</code><sup>th</sup> element in the group.  When a selection has multiple groups, for example when we chain two calls to <code>selectAll</code> together, <code>data</code> processes each group in the selection separately, so it may be more appropriate to pass a function to <code>data</code> that returns a different array for each group.</p>
+
+<h3><a class="i_ident" id="i_c66YY4zF86" href="#i_c66YY4zF86" tabindex="-1" role="presentation"></a>Using 2-dimensional Data</h3>
+
+<p><a class="p_ident" id="p_9FrSdlsSiP" href="#p_9FrSdlsSiP" tabindex="-1" role="presentation"></a>Given a <code>N x M</code> dataset, we can create <code>N*M</code> visual elements and bind the dataset values to the visual elements in various ways.  One way is to copy the values in the 2D array to a 1D array and create the elements using the technique showed above.  Another way is to bind each of the <code>N</code> rows of data (arrays) to non-visual elements, and then create create <code>M</code> visual elements for each non-visual element.</p>
+
+<p><a class="p_ident" id="p_ynDCVo/7hU" href="#p_ynDCVo/7hU" tabindex="-1" role="presentation"></a>Consider the following example.  In it we have an <code>svg</code> element and a 2D array of data held in the variable <code>arr2</code>.</p><pre>
+var arr2 = [[1,2,3],
+           [4,5,6]];
+</pre>
+
+
+<p><a class="p_ident" id="p_ukJwWdXMyQ" href="#p_ukJwWdXMyQ" tabindex="-1" role="presentation"></a>Since the dataset has two rows, we’d like to create two <code>g</code> elements and bind the array <code>[1,2,3]</code> to one of them, and bind <code>[4,5,6]</code> to the other.  To do this we select the <code>svg</code> element, and then call <code>selectAll</code> to create an empty selection.  When we then bind <code>arr2</code> (an array containing 2 arrays) to the empty selection using <code>data</code>, since there are 2 elements in <code>arr2</code> and no elements in the selection, the enter selection will have 2 pseudo-elements in it, each having an array bound to it.  When we then call <code>join</code>, two new <code>g</code> elements are appended to the group with <code>[1,2,3]</code> bound to one of the <code>g</code> elements and <code>[4,5,6]</code> bound to the other.</p><pre>
+var g_nodes = d3.select(`#dataSVG`)
+.selectAll('g')
+.data(arr)
+.join('g');
+</pre>
+
+
+<p><a class="p_ident" id="p_xYtX9vBGhS" href="#p_xYtX9vBGhS" tabindex="-1" role="presentation"></a>Now we need to create 3 <code>circle</code> elements for each <code>g</code> element.  To do so, we’ll use the data (arrays) bound to the <code>g</code> elements.</p>
+
+<p><a class="p_ident" id="p_boWyKdZYDL" href="#p_boWyKdZYDL" tabindex="-1" role="presentation"></a>Our goal is to create an enter selection having two groups, with each group having 3 pseudo-elements from which we can create the <code>circle</code> elements.  We’ll again create an empty selection by calling <code>selectAll</code> on the selection of <code>g</code> elements.  Since the selection of <code>g</code> elements contains two element, when we call <code>selectAll</code> to create the empty selection, we create two (empty) groups in the empty selection, each having a <code>g</code> element as their parent.</p>
+
+<p><a class="p_ident" id="p_D+ZOavxOVU" href="#p_D+ZOavxOVU" tabindex="-1" role="presentation"></a>Recall each parent has an array of length 3 bound to it.  When we call <code>data</code> on the empty selection, we pass a lambda expression that returns an array, rather than passing <code>data</code> an array.  When we do this, the lambda expression is invoked <em>for each group</em> and the elements in the array returned by the lambda expression are bound to the elements in the group.</p>
+
+<p><a class="p_ident" id="p_c5xsCU3V6t" href="#p_c5xsCU3V6t" tabindex="-1" role="presentation"></a>When <code>data</code> is passed a function (or lambda expression), the data bound to the group’s parent (<code>d</code>) is passed to the function.  In our case, the parents are the two <code>g</code> elements and the data bound to them are the arrays <code>[1,2,3]</code> and <code>[4,5,6]</code>.  Our lambda expression simply returns the array that is passed to it (<code>d</code>).  The elements in the array are then bound to the elements in the respective (empty) groups.  Since each array contains three elements and the groups are empty, each group in the enter selection will have three pseudo-elements.  We then call <code>join</code> to create <code>circle</code> elements for each of the six pseudo-elements.</p><pre>
+var c_nodes = g_nodes.selectAll('circle')
+  .data(d => d)
+  .join('circle');
+</pre>
+
+
+<p><a class="p_ident" id="p_7mAXbuvflP" href="#p_7mAXbuvflP" tabindex="-1" role="presentation"></a>Alas, we select all of the <code>circle</code> elements and set their size, location, and fill color.</p><pre>
+c_nodes.attr('r', d => d * 3)
+  .attr('cx' , d => 55 * d)
+  .attr('cy', 30)
+  .attr('fill', 'pink');
+</pre> 
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_goH75ZFgUP" href="#c_goH75ZFgUP" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">arr2</span> <span class="cm-operator">=</span> [[<span class="cm-number">1</span>,<span class="cm-number">2</span>,<span class="cm-number">3</span>],[<span class="cm-number">4</span>,<span class="cm-number">5</span>,<span class="cm-number">6</span>]];
+
+  <span class="cm-keyword">var</span> <span class="cm-def">g_nodes</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">'#dataSVG'</span>)
+    .<span class="cm-property">selectAll</span>(<span class="cm-string">'g'</span>)
+    .<span class="cm-property">data</span>(<span class="cm-variable">arr2</span>)
+    .<span class="cm-property">join</span>(<span class="cm-string">'g'</span>);
+
+  <span class="cm-keyword">var</span> <span class="cm-def">c_nodes</span> <span class="cm-operator">=</span> <span class="cm-variable">g_nodes</span>.<span class="cm-property">selectAll</span>(<span class="cm-string">'circle'</span>)
+    .<span class="cm-property">data</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>)
+    .<span class="cm-property">join</span>(<span class="cm-string">'circle'</span>);
+  
+  <span class="cm-variable">c_nodes</span>.<span class="cm-property">attr</span>(<span class="cm-string">'r'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span> <span class="cm-operator">*</span> <span class="cm-number">3</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'cx'</span> , <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-number">55</span> <span class="cm-operator">*</span> <span class="cm-variable-2">d</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'cy'</span>, <span class="cm-number">30</span>)
+    .<span class="cm-property">attr</span>(<span class="cm-string">'fill'</span>, <span class="cm-string">'pink'</span>);
+    
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;dataSVG&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;400&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;60&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_K04aQ1q4gw" href="#h_K04aQ1q4gw" tabindex="-1" role="presentation"></a>Setting and Getting Bound Data</h2>
+
+<p><a class="p_ident" id="p_uw/ckXj7g6" href="#p_uw/ckXj7g6" tabindex="-1" role="presentation"></a>The <a href="https://github.com/d3/d3-selection/blob/v1.4.0/README.md#selection_datum">selection.datum([value])</a> method can be used to get set, or clear the data bound to the elements of a selection.  The method has an optional argument that can hold null, a constant, or a function.  Regardless of the input, the method returns the selection on which it is called.  Unlike <code>selection.data</code>, the selection returned does not contain enter or exit selections.</p>
+
+<p><a class="p_ident" id="p_o+GqTAyLcv" href="#p_o+GqTAyLcv" tabindex="-1" role="presentation"></a>If no value is passed to the <code>datum</code> method, then the method returns the data that is bound to the <em>first</em> non-null element in the selection.  If null is passed to the <code>datum</code> method, the data bound to the elements in the selection are cleared.   If a constant is passed to the method, the constant is bound to each element in the selection.  If a function is passed to <code>datum</code> the function will be called for each element in the selection and will be passed <code>(d, i, nodes)</code> where <code>d</code> is the element’s current data, <code>i</code> is the group index for the element, and <code>nodes</code> is the current group (array).</p>
+
+<h2><a class="h_ident" id="h_uv1LVCgnRa" href="#h_uv1LVCgnRa" tabindex="-1" role="presentation"></a>Further Reading</h2>
+
+<p><a class="p_ident" id="p_Li3K+3pXBX" href="#p_Li3K+3pXBX" tabindex="-1" role="presentation"></a>The tutorial <a href="https://bost.ocks.org/mike/selection/">How Selections Work</a> written by Bostock describes in depth what d3.selection objects are and how data is joined to the elements in the selection.  We recommend everyone read this tutorial!</p><nav><a href="01_05_selection_call.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="02_02_binding_object_data.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

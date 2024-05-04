@@ -1,0 +1,745 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Tree, Cluster, and Radial Layouts</title>
+  <link rel="canonical" href="http://using-d3js.com/06_02_trees.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 06;</script></head>
+
+<article>
+<nav><a href="06_01_hierarchal.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="06_03_treemaps.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 06</span>Tree, Cluster, and Radial Layouts</h1><script src="https://d3js.org/d3.v4.min.js"></script>
+
+
+<p><a class="p_ident" id="p_3cBoChbO7E" href="#p_3cBoChbO7E" tabindex="-1" role="presentation"></a>A tree is a visual representation of a hierarchal model, where the nodes are (usually) represented by circles and the links are represented by lines.  A cluster layout positions each leaf node of the tree at the same level and a radial layout positions the branches of the tree about the root node.</p>
+
+<h2><a class="h_ident" id="h_Tp6UK8qx8p" href="#h_Tp6UK8qx8p" tabindex="-1" role="presentation"></a>Tree Layout</h2>
+
+<p><a class="p_ident" id="p_SzR1KUnP3k" href="#p_SzR1KUnP3k" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#tree">d3.tree()</a> is a function generator that returns a layout function that, when passed a root object of a hierarchy model, sets the x and y coordinates for each node in the hierarchy in a manner that keeps nodes that are at the same depth aligned vertically.</p>
+
+<p><a class="p_ident" id="p_2LUwM6LFa4" href="#p_2LUwM6LFa4" tabindex="-1" role="presentation"></a>In order to render the tree shown below we do the following:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_+JRH08GPc9" href="#p_+JRH08GPc9" tabindex="-1" role="presentation"></a>Create an JSON object that holds hierarchal data</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_L3L0YHh2+a" href="#p_L3L0YHh2+a" tabindex="-1" role="presentation"></a>Get the root of a d3.hierarchy object</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_l/EcCLlBG3" href="#p_l/EcCLlBG3" tabindex="-1" role="presentation"></a>Generate a tree layout function</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_I9znjsw0BH" href="#p_I9znjsw0BH" tabindex="-1" role="presentation"></a>Call the tree layout function, passing the root, to establish the x and y coordinates for the nodes</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_TWaynSXJcS" href="#p_TWaynSXJcS" tabindex="-1" role="presentation"></a>Render circles and lines to represent nodes and edges of the tree, respectively</p></li></ul>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_o2eGGMSmUQ" href="#c_o2eGGMSmUQ" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;A&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;D&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;C&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;F&quot;</span>},
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;E&quot;</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;B&quot;</span>}
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>)
+  .<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span>.<span class="cm-property">height</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>.<span class="cm-property">height</span> <span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-variable-2">a</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>.<span class="cm-property">localeCompare</span>(<span class="cm-variable-2">b</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>));
+
+<span class="cm-keyword">var</span> <span class="cm-def">treeLayout</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">tree</span>()
+  .<span class="cm-property">size</span>([<span class="cm-number">580</span>, <span class="cm-number">80</span>]);
+
+<span class="cm-variable">treeLayout</span>(<span class="cm-variable">root</span>);
+
+<span class="cm-comment">// Select the SVG element</span>
+<span class="cm-keyword">var</span> <span class="cm-def">svg</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1&quot;</span>);
+
+<span class="cm-comment">// Add links</span>
+<span class="cm-variable">svg</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.links'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'line.link'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">links</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'line'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'link'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x1'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">source</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y1'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">source</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x2'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">target</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y2'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">target</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">2</span>);
+
+<span class="cm-comment">// Add nodes</span>
+<span class="cm-variable">svg</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.nodes'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'circle.node'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'circle'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cx'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cy'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'r'</span>, <span class="cm-number">10</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;lightblue&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">1</span>);
+
+  <span class="cm-comment">// draw labels</span>
+<span class="cm-variable">svg</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.labels'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'text.label'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'text'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'label'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">style</span>(<span class="cm-string">'fill'</span>, <span class="cm-string">'gray'</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span><span class="cm-operator">-</span><span class="cm-number">5</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span><span class="cm-operator">+</span><span class="cm-number">5</span>;})
+  .<span class="cm-property">html</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">600</span> <span class="cm-attribute">height</span>=<span class="cm-string">100</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(0,10)&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;links&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;nodes&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;labels&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_6dUvEshUSd" href="#h_6dUvEshUSd" tabindex="-1" role="presentation"></a>Example Explained</h2>
+
+<p><a class="p_ident" id="p_kcf0Lo8HwO" href="#p_kcf0Lo8HwO" tabindex="-1" role="presentation"></a>We start by creating an <code>svg</code> element, like the one below, to hold the visual elements.  Notice that svg element has a group element that is translated 10 pixels down.  We do this because the layout function, as we’ll see later, positions the y-coordinate of the root element at 0.  When we draw nodes, we’ll make their radii 10 pixels.  Since the center of the root will be at <em>y=0</em>, we translate the entire tree down by 10, so that we can see the entire root node.</p><pre>
+&lt;svg id="demo1" width=600 height=100&gt;
+     &lt;g transform="translate(0,10)"&gt;
+         &lt;g class="links"&gt;&lt;/g&gt;
+         &lt;g class="nodes"&gt;&lt;/g&gt;
+     &lt;/g&gt;
+&lt;/svg&gt;
+</pre>
+
+
+<p><a class="p_ident" id="p_73210APEPG" href="#p_73210APEPG" tabindex="-1" role="presentation"></a>We pass a hierarchal data object to <code>d3.hierarchy</code> to create the hierarchal model and to obtain a reference to the root node.  We can also sort the nodes in the tree.  Below, we sort the nodes by height, and for siblings, we sort them by name.</p><pre>
+var data = {"name": "A", "children": [
+                {"name": "C"},
+                {"name": "D", "children": [
+                    {"name": "F"},
+                    {"name": "E"}
+                ]},
+                {"name": "B"}
+            ]};
+
+var root = d3.hierarchy(data)
+  .sort((a,b) => b.height - a.height || a.data.name.localeCompare(b.data.name));
+</pre>
+
+
+<p><a class="p_ident" id="p_vLdJwjK9dJ" href="#p_vLdJwjK9dJ" tabindex="-1" role="presentation"></a>Then, we create a tree layout function by calling <code>d3.tree</code> and chain a call to <a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#tree_size">tree.size([size])</a>, passing to <code>size</code> the dimensions of a region, that we want the tree to occupy. The layout function will then compute x and y coordinates for the nodes so that they fill the region.  In the example we specify a region 580 pixels wide and 80 pixels high.</p><pre>
+var treeLayout = d3.tree()
+    .size([580, 80]);
+</pre>
+
+
+<p><a class="p_ident" id="p_MFnxq94OEm" href="#p_MFnxq94OEm" tabindex="-1" role="presentation"></a>Next, we <em>call</em> the layout function, passing it the root node.  The layout function adds <code>x</code> and <code>y</code> properties to each node in the model.</p><pre>
+treeLayout(root);
+</pre>
+
+
+<p><a class="p_ident" id="p_WBMUDw1aLD" href="#p_WBMUDw1aLD" tabindex="-1" role="presentation"></a>We can see the <code>x</code> and <code>y</code> properties when inspecting the root object, as shown in the screenshot below.</p><img src="img/screenshots/tree_node.png" alt="" height="300" />
+
+
+<p><a class="p_ident" id="p_kANm7MwsuN" href="#p_kANm7MwsuN" tabindex="-1" role="presentation"></a>After updating the model with position information (x and y properties), we use the position information to render the lines, one for each link, and the circles, one for each node.</p>
+
+<p><a class="p_ident" id="p_sESqtTqxHr" href="#p_sESqtTqxHr" tabindex="-1" role="presentation"></a>To render the lines we join the link objects returned by <code>root.links</code> to an empty selection.  Each link has source.x, source.y, target.x, and target.y properties.  Then in the entry selection, we append a line element to the svg for each link.</p>
+
+<p><a class="p_ident" id="p_szgOnIistj" href="#p_szgOnIistj" tabindex="-1" role="presentation"></a>To render the circles we join the data returned by <code>root.descendants</code> to an empty selection.  In the entry selection, we append a circle element for each of the descendant nodes.  Since the layout function added x and y properties to each node we can use them to position each circle elements.</p><pre>
+var svg = d3.select("#demo1");
+
+svg.select('g.links')
+    .selectAll('line.link')
+    .data(root.links())
+    .enter()
+    .append('line')
+    .attr('x1', function(d) {return d.source.x;})
+    .attr('y1', function(d) {return d.source.y;})
+    .attr('x2', function(d) {return d.target.x;})
+    .attr('y2', function(d) {return d.target.y;})
+    .attr('stroke', "darkgray")
+    .attr('stroke-width', 2);
+
+svg.select('g.nodes')
+    .selectAll('circle.node')
+    .data(root.descendants())
+    .enter()
+    .append('circle')
+    .attr('cx', function(d) {return d.x;})
+    .attr('cy', function(d) {return d.y;})
+    .attr('r', 10)
+    .attr("fill", "lightblue")
+    .attr('stroke', "darkgray")
+    .attr('stroke-width', 1);
+</pre>
+
+
+<h2><a class="h_ident" id="h_2UCft3WLdR" href="#h_2UCft3WLdR" tabindex="-1" role="presentation"></a>Tree Layout Function Methods</h2>
+
+<p><a class="p_ident" id="p_v5phRCqed2" href="#p_v5phRCqed2" tabindex="-1" role="presentation"></a>The <code>d3.tree</code> tree layout function generator has three methods that can be called to initialize the layout function.  These methods are:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_lcpoX/wnru" href="#p_lcpoX/wnru" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#tree_size">tree.size([size])</a> - specifies the size of the region that the entire tree should fill.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_XDU8VoXdrM" href="#p_XDU8VoXdrM" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#tree_nodeSize">tree.nodeSize([size])</a> - specifies the size of the non-overlapping space that should be reserved for each node.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_baA1wSeCS5" href="#p_baA1wSeCS5" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy/blob/master/README.md#tree_separation">tree.separation([separation])</a> - specifies a function that is used to determine the desired separation between two nodes placed adjacent to one another.</p></li></ul>
+
+<h3><a class="i_ident" id="i_Wqcq56ZepM" href="#i_Wqcq56ZepM" tabindex="-1" role="presentation"></a>tree.size</h3>
+
+<p><a class="p_ident" id="p_xV3x1gvIrg" href="#p_xV3x1gvIrg" tabindex="-1" role="presentation"></a>The example shown above uses <code>tree.<wbr>size([width, height])</code> to specify the overall width and height of the tree.</p>
+
+<h3><a class="i_ident" id="i_MLoF5JmlSz" href="#i_MLoF5JmlSz" tabindex="-1" role="presentation"></a>tree.nodeSize</h3>
+
+<p><a class="p_ident" id="p_cJZsxSwzd5" href="#p_cJZsxSwzd5" tabindex="-1" role="presentation"></a>The <code>tree.<wbr>nodeSize([width, height])</code> method is used in lieu of <code>tree.size</code> and takes as an argument a pair of values that represent the width and height of non-overlapping rectangular spaces that are reserved for each node.  The method returns a tree layout function.</p>
+
+<p><a class="p_ident" id="p_2jmj7l5rSw" href="#p_2jmj7l5rSw" tabindex="-1" role="presentation"></a><code>var treeLayout = d3.<wbr>tree().<wbr>nodeSize([20, 40]);</code></p>
+
+<p><a class="p_ident" id="p_t1S3vfE7Kl" href="#p_t1S3vfE7Kl" tabindex="-1" role="presentation"></a>When called, the tree layout function sets the root node at (0,0) and uses these rectangular boundaries (in pink) to establish where to set the x and y coordinates for each node.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_+QCgeI+VBg" href="#c_+QCgeI+VBg" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;A&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>: <span class="cm-number">15</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;B&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>: <span class="cm-number">10</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;C&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>: <span class="cm-number">10</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;E&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>: <span class="cm-number">5</span>},
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;F&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>: <span class="cm-number">5</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;D&quot;</span>, <span class="cm-string cm-property">&quot;size&quot;</span>: <span class="cm-number">10</span>}
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>)
+    .<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span>.<span class="cm-property">height</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>.<span class="cm-property">height</span> <span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-variable-2">a</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>.<span class="cm-property">localeCompare</span>(<span class="cm-variable-2">b</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>));
+
+<span class="cm-keyword">var</span> <span class="cm-def">width</span> <span class="cm-operator">=</span> <span class="cm-number">30</span>;
+<span class="cm-keyword">var</span> <span class="cm-def">height</span> <span class="cm-operator">=</span> <span class="cm-number">60</span>;
+
+<span class="cm-keyword">var</span> <span class="cm-def">treeLayout2</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">tree</span>()
+   .<span class="cm-property">nodeSize</span>([<span class="cm-variable">width</span>, <span class="cm-variable">height</span>]);
+
+<span class="cm-variable">treeLayout2</span>(<span class="cm-variable">root</span>);
+
+<span class="cm-comment">// Select the SVG element</span>
+<span class="cm-keyword">var</span> <span class="cm-def">svg2</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo2&quot;</span>);
+
+<span class="cm-comment">// Rectangles</span>
+<span class="cm-variable">svg2</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.rects'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'rect.node'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'rect'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">&quot;rects&quot;</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span> <span class="cm-operator">-</span> (<span class="cm-variable">width</span><span class="cm-operator">/</span><span class="cm-number">2</span>);})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span> <span class="cm-operator">-</span> (<span class="cm-variable">height</span><span class="cm-operator">/</span><span class="cm-number">2</span>);})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'width'</span>, <span class="cm-variable">width</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'height'</span>, <span class="cm-variable">height</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">1</span>);
+
+<span class="cm-comment">// Links</span>
+<span class="cm-variable">svg2</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.links'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'line.link'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">links</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'line'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'link'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x1'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">source</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y1'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">source</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x2'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">target</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y2'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">target</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">2</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'z-index'</span>, <span class="cm-number">2</span>);
+
+<span class="cm-variable">svg2</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.nodes'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'circle.node'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'circle'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cx'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cy'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'r'</span>, <span class="cm-number">10</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;lightblue&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">1</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">580</span> <span class="cm-attribute">height</span>=<span class="cm-string">200</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(290,30)&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;rects&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;links&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;nodes&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h3><a class="i_ident" id="i_rQZyt0M2YA" href="#i_rQZyt0M2YA" tabindex="-1" role="presentation"></a>tree.separation</h3>
+
+<p><a class="p_ident" id="p_PTqz5Bo3zH" href="#p_PTqz5Bo3zH" tabindex="-1" role="presentation"></a>The <code>tree.separation</code> method is intended to be used with <code>tree.nodeSize</code>.  The method takes a function as an argument and returns a tree layout function.  The function argument must take two nodes as arguments and return a number.  The nodes are positioned so that the spacing between the two nodes is equal to the number returned by the function multiplied by the width of the bounding box specified in the call to <code>nodeSize</code>.  <em>Note:</em> the computed width is the spacing between the node positions and not the spacing between the node bounding boxes.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_Y0U45ihc1y" href="#c_Y0U45ihc1y" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;A&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;B&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;C&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;E&quot;</span>},
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;F&quot;</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;D&quot;</span>}
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>)
+  .<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span>.<span class="cm-property">height</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>.<span class="cm-property">height</span> <span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-variable-2">a</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>.<span class="cm-property">localeCompare</span>(<span class="cm-variable-2">b</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>));
+
+<span class="cm-keyword">var</span> <span class="cm-def">width</span> <span class="cm-operator">=</span> <span class="cm-number">30</span>;
+<span class="cm-keyword">var</span> <span class="cm-def">height</span> <span class="cm-operator">=</span> <span class="cm-number">60</span>;
+
+<span class="cm-keyword">var</span> <span class="cm-def">treeLayout3</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">tree</span>()
+  .<span class="cm-property">nodeSize</span>([<span class="cm-variable">width</span>, <span class="cm-variable">height</span>])
+  .<span class="cm-property">separation</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">a</span>.<span class="cm-property">depth</span>);
+
+<span class="cm-variable">treeLayout3</span>(<span class="cm-variable">root</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">svg3</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo3&quot;</span>);
+
+<span class="cm-comment">// Rectangles</span>
+<span class="cm-variable">svg3</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.rects'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'rect.boxes'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'rect'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">&quot;rects&quot;</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span> <span class="cm-operator">-</span> (<span class="cm-variable">width</span><span class="cm-operator">/</span><span class="cm-number">2</span>);})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span> <span class="cm-operator">-</span> (<span class="cm-variable">height</span><span class="cm-operator">/</span><span class="cm-number">2</span>);})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'width'</span>, <span class="cm-variable">width</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'height'</span>, <span class="cm-variable">height</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">1</span>);
+
+<span class="cm-comment">// draw links</span>
+<span class="cm-variable">svg3</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.links'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'line.link'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">links</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'line'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'link'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x1'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">source</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y1'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">source</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x2'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">target</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y2'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">target</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">2</span>);
+
+<span class="cm-comment">// draw nodes</span>
+<span class="cm-variable">svg3</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.nodes'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'circle.node'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'circle'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cx'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cy'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'r'</span>, <span class="cm-number">10</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;lightblue&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">1</span>);
+
+<span class="cm-comment">// draw labels</span>
+<span class="cm-variable">svg3</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.labels'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'text.label'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'text'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'label'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">style</span>(<span class="cm-string">'fill'</span>, <span class="cm-string">'gray'</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span><span class="cm-operator">-</span><span class="cm-number">5</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span><span class="cm-operator">+</span><span class="cm-number">5</span>;})
+  .<span class="cm-property">html</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo3&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">580</span> <span class="cm-attribute">height</span>=<span class="cm-string">200</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(290,30)&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;rects&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;links&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;nodes&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;labels&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_M5CHRJW00y" href="#p_M5CHRJW00y" tabindex="-1" role="presentation"></a>In the example above the separator function is</p><pre>
+(a,b) => a.depth
+</pre>
+
+
+<p><a class="p_ident" id="p_3eiyG2kXrM" href="#p_3eiyG2kXrM" tabindex="-1" role="presentation"></a>It is invoked 3 times (with nodes B and C,  with nodes C and D, and with nodes E and F).  Recalling the hierarchal data, each of the pairs of nodes that are passed into the lambda expression are siblings and nodes B, C, and D have a depth of 1, and nodes E and F have a depth of 2.  When the lambda expression is called with B and C, since B’s depth is 1, the lambda expression returns 1 creating a separation of 1 * 30 = 30 pixels between B and C.  The same happens when C and D are passed to the lambda expression.  When the lambda expression is called with E and F, since E has a depth of 2, the separation between E and F is 2 * 30 = 60 pixels.</p>
+
+<h2><a class="h_ident" id="h_au+YUMNLsv" href="#h_au+YUMNLsv" tabindex="-1" role="presentation"></a>Cluster Layout</h2>
+
+<p><a class="p_ident" id="p_6qH/zpp52a" href="#p_6qH/zpp52a" tabindex="-1" role="presentation"></a>The <a href="https://github.com/d3/d3-hierarchy#cluster">d3.cluster</a> layout positions the nodes so that the leaf nodes are positioned at the same y position.</p>
+
+<p><a class="p_ident" id="p_BniBWHBRTm" href="#p_BniBWHBRTm" tabindex="-1" role="presentation"></a>In the example below, like our first tree example above, we chain a call to <code>size</code> after the call to <code>d3.cluster</code> to specify the desired size of the entire tree.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_Ph5u1J26ts" href="#c_Ph5u1J26ts" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;A&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;B&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;C&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;E&quot;</span>},
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;F&quot;</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;D&quot;</span>}
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>)
+  .<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span>.<span class="cm-property">height</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>.<span class="cm-property">height</span> <span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-variable-2">a</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>.<span class="cm-property">localeCompare</span>(<span class="cm-variable-2">b</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>));
+
+<span class="cm-keyword">var</span> <span class="cm-def">width</span> <span class="cm-operator">=</span> <span class="cm-number">30</span>;
+<span class="cm-keyword">var</span> <span class="cm-def">height</span> <span class="cm-operator">=</span> <span class="cm-number">60</span>;
+
+<span class="cm-keyword">var</span> <span class="cm-def">treeLayout4</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">cluster</span>().<span class="cm-property">size</span>([<span class="cm-number">580</span>, <span class="cm-number">80</span>])
+
+<span class="cm-variable">treeLayout4</span>(<span class="cm-variable">root</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">svg4</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo4&quot;</span>);
+
+<span class="cm-comment">// draw links</span>
+<span class="cm-variable">svg4</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.links'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'line.link'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">links</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'line'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'link'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x1'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">source</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y1'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">source</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x2'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">target</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y2'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">target</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">2</span>);
+
+<span class="cm-comment">// draw nodes</span>
+<span class="cm-variable">svg4</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.nodes'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'circle.node'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'circle'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cx'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cy'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'r'</span>, <span class="cm-number">10</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;lightblue&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">1</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo4&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">580</span> <span class="cm-attribute">height</span>=<span class="cm-string">200</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(0,60)&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;links&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;nodes&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_2nCyfOl4tt" href="#p_2nCyfOl4tt" tabindex="-1" role="presentation"></a>Just like with the tree layout, we can specify the size of bounding boxes for the nodes rather than specifying the dimenions of the overall dendrogram.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_ocO0UJDCoD" href="#c_ocO0UJDCoD" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;A&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;B&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;C&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;E&quot;</span>},
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;F&quot;</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;D&quot;</span>}
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>)
+  .<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span>.<span class="cm-property">height</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>.<span class="cm-property">height</span> <span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-variable-2">a</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>.<span class="cm-property">localeCompare</span>(<span class="cm-variable-2">b</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>));
+
+<span class="cm-keyword">var</span> <span class="cm-def">width</span> <span class="cm-operator">=</span> <span class="cm-number">30</span>;
+<span class="cm-keyword">var</span> <span class="cm-def">height</span> <span class="cm-operator">=</span> <span class="cm-number">60</span>;
+
+<span class="cm-keyword">var</span> <span class="cm-def">treeLayout4</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">cluster</span>()
+  .<span class="cm-property">nodeSize</span>([<span class="cm-variable">width</span>, <span class="cm-variable">height</span>]);
+
+<span class="cm-variable">treeLayout4</span>(<span class="cm-variable">root</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">svg5</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo5&quot;</span>);
+
+<span class="cm-comment">// Rectangles</span>
+<span class="cm-variable">svg5</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.rects'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'rect.boxes'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'rect'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">&quot;rects&quot;</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span> <span class="cm-operator">-</span> (<span class="cm-variable">width</span><span class="cm-operator">/</span><span class="cm-number">2</span>);})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span> <span class="cm-operator">-</span> (<span class="cm-variable">height</span><span class="cm-operator">/</span><span class="cm-number">2</span>);})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'width'</span>, <span class="cm-variable">width</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'height'</span>, <span class="cm-variable">height</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">1</span>);
+
+<span class="cm-comment">// draw links</span>
+<span class="cm-variable">svg5</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.links'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'line.link'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">links</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'line'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'link'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x1'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">source</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y1'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">source</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x2'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">target</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y2'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">target</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">2</span>);
+
+<span class="cm-comment">// draw nodes</span>
+<span class="cm-variable">svg5</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.nodes'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'circle.node'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'circle'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cx'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cy'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'r'</span>, <span class="cm-number">10</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;lightblue&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">1</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo5&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">580</span> <span class="cm-attribute">height</span>=<span class="cm-string">200</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(290,30)&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;rects&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;links&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;nodes&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_oHDT82wzz4" href="#p_oHDT82wzz4" tabindex="-1" role="presentation"></a>The cluster layout also has a <code>separation</code> method that allows us to specify a separation factor that is used to compute the spacing between adjacent nodes.  When used with the cluster layout, the method passed to separation can be called on nodes that are not necessarily siblings in the hierarchal model.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_iesvw1YTjL" href="#c_iesvw1YTjL" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;A&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;B&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;C&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;E&quot;</span>},
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;F&quot;</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;D&quot;</span>}
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>)
+  .<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span>.<span class="cm-property">height</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>.<span class="cm-property">height</span> <span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-variable-2">a</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>.<span class="cm-property">localeCompare</span>(<span class="cm-variable-2">b</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>));
+
+<span class="cm-keyword">var</span> <span class="cm-def">width</span> <span class="cm-operator">=</span> <span class="cm-number">30</span>;
+<span class="cm-keyword">var</span> <span class="cm-def">height</span> <span class="cm-operator">=</span> <span class="cm-number">60</span>;
+
+<span class="cm-keyword">var</span> <span class="cm-def">treeLayout4</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">cluster</span>()
+  .<span class="cm-property">nodeSize</span>([<span class="cm-variable">width</span>, <span class="cm-variable">height</span>])
+  .<span class="cm-property">separation</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> (<span class="cm-variable-2">a</span>.<span class="cm-property">depth</span> <span class="cm-operator">&gt;</span> <span class="cm-variable-2">b</span>.<span class="cm-property">depth</span>) <span class="cm-operator">?</span> <span class="cm-variable-2">a</span>.<span class="cm-property">depth</span> : <span class="cm-variable-2">b</span>.<span class="cm-property">depth</span>);
+
+<span class="cm-variable">treeLayout4</span>(<span class="cm-variable">root</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">svg6</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo6&quot;</span>);
+
+<span class="cm-comment">// Rectangles</span>
+<span class="cm-variable">svg6</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.rects'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'rect.boxes'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'rect'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">&quot;rects&quot;</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span> <span class="cm-operator">-</span> (<span class="cm-variable">width</span><span class="cm-operator">/</span><span class="cm-number">2</span>);})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span> <span class="cm-operator">-</span> (<span class="cm-variable">height</span><span class="cm-operator">/</span><span class="cm-number">2</span>);})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'width'</span>, <span class="cm-variable">width</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'height'</span>, <span class="cm-variable">height</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">1</span>);
+
+<span class="cm-comment">// draw links</span>
+<span class="cm-variable">svg6</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.links'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'line.link'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">links</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'line'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'link'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x1'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">source</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y1'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">source</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'x2'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">target</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'y2'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">target</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">2</span>);
+
+<span class="cm-comment">// draw nodes</span>
+<span class="cm-variable">svg6</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.nodes'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'circle.node'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'circle'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cx'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cy'</span>, <span class="cm-keyword">function</span>(<span class="cm-def">d</span>) {<span class="cm-keyword">return</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>;})
+  .<span class="cm-property">attr</span>(<span class="cm-string">'r'</span>, <span class="cm-number">10</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;lightblue&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">1</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo6&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">580</span> <span class="cm-attribute">height</span>=<span class="cm-string">200</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(290,30)&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;rects&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;links&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;nodes&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_Lae65TpHnL" href="#p_Lae65TpHnL" tabindex="-1" role="presentation"></a>In the example above we pass the following lambda express to <code>separation</code>.</p><pre>
+(a,b) => (a.depth > b.depth) ? a.depth : b.depth
+</pre>
+
+
+<p><a class="p_ident" id="p_RX+HQ47dVr" href="#p_RX+HQ47dVr" tabindex="-1" role="presentation"></a>This ensures that the spacing between all of the leaves are the same.</p>
+
+<h2><a class="h_ident" id="h_lzMIVBSEwV" href="#h_lzMIVBSEwV" tabindex="-1" role="presentation"></a>Radial Layouts</h2>
+
+<p><a class="p_ident" id="p_9dBVs9vuZA" href="#p_9dBVs9vuZA" tabindex="-1" role="presentation"></a>We can also use the tree and cluster layouts to render a radial tree as shown below.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_ksJdgoOiz/" href="#c_ksJdgoOiz/" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;A&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;B&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;C&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;E&quot;</span>},
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;F&quot;</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;D&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;G&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;H&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;I&quot;</span>},
+                    {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;J&quot;</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;K&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;L&quot;</span>},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;M&quot;</span>, <span class="cm-string cm-property">&quot;children&quot;</span>: [
+                  {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;M&quot;</span>},
+                  {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;N&quot;</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;name&quot;</span>: <span class="cm-string">&quot;O&quot;</span>}
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>)
+  .<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span>.<span class="cm-property">height</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>.<span class="cm-property">height</span> <span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-variable-2">a</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>.<span class="cm-property">localeCompare</span>(<span class="cm-variable-2">b</span>.<span class="cm-property">data</span>.<span class="cm-property">name</span>));
+
+<span class="cm-keyword">var</span> <span class="cm-def">radius</span> <span class="cm-operator">=</span> <span class="cm-number">100</span>;
+
+<span class="cm-keyword">var</span> <span class="cm-def">treeLayout</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">cluster</span>()
+    .<span class="cm-property">size</span>([<span class="cm-number">360</span>, <span class="cm-variable">radius</span>]);
+
+<span class="cm-variable">treeLayout</span>(<span class="cm-variable">root</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">svg7</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo7&quot;</span>);
+
+<span class="cm-comment">// draw nodes</span>
+<span class="cm-variable">svg7</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.nodes'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'circle.node'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'circle'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cx'</span>, <span class="cm-number">0</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cy'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-operator">-</span><span class="cm-variable-2">d</span>.<span class="cm-property">y</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'r'</span>, <span class="cm-number">5</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;lightblue&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">1</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;transform&quot;</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-string-2">`</span>
+      <span class="cm-string-2">rotate(${</span><span class="cm-variable-2">d</span>.<span class="cm-property">x</span><span class="cm-string-2">}</span><span class="cm-string-2">, 0, 0)</span>
+  <span class="cm-string-2">`</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">lineGen</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">lineRadial</span>()
+  .<span class="cm-property">angle</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span> <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">/</span> <span class="cm-number">180</span>)
+  .<span class="cm-property">radius</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">linkGen</span> <span class="cm-operator">=</span>  <span class="cm-variable">d3</span>.<span class="cm-property">linkRadial</span>()
+  .<span class="cm-property">angle</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span> <span class="cm-operator">*</span> <span class="cm-variable">Math</span>.<span class="cm-property">PI</span> <span class="cm-operator">/</span> <span class="cm-number">180</span>)
+  .<span class="cm-property">radius</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>);
+
+<span class="cm-comment">// draw links</span>
+<span class="cm-variable">svg7</span>.<span class="cm-property">select</span>(<span class="cm-string">'g.links'</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'path.link'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">links</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'link'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke'</span>, <span class="cm-string">&quot;darkgray&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'stroke-width'</span>, <span class="cm-number">2</span>)
+  <span class="cm-comment">//.attr(&quot;d&quot;, linkGen);</span>
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">lineGen</span>([<span class="cm-variable-2">d</span>.<span class="cm-property">target</span>, <span class="cm-variable-2">d</span>.<span class="cm-property">source</span>]));
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo7&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">580</span> <span class="cm-attribute">height</span>=<span class="cm-string">250</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(290,125)&quot;</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;rects&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;links&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span> <span class="cm-attribute">class</span>=<span class="cm-string">&quot;nodes&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_g1jsfsLeUd" href="#p_g1jsfsLeUd" tabindex="-1" role="presentation"></a>To create this example we used the cluster layout so that all of the leaves were at the same depth.  We called <code>cluster.size</code>, passing to it <code>[360,radius]</code>.  When the layout function is called with the hierarchal data, it positions the nodes as if in a cluster tree, not in a radial layout.  When we position our circles and lines we’ll need to interpret the (x,y) coordinates that the cluster layout generated as angle and radii values.  Since the x values are between 0 and 360 we can use them as angle values and since the y values are between 0 and radius, we can use them as radii values.</p><pre>
+var treeLayout = d3.cluster()
+    .size([360, radius]);
+</pre>
+
+
+<p><a class="p_ident" id="p_q+hqCysj/H" href="#p_q+hqCysj/H" tabindex="-1" role="presentation"></a>After calling the layout function we create circles for each node and initially position each circle at <code>(0,-y)</code> where <code>y</code> is the y-coordinate that the layout function computed for the node.  Recall that this value will be between 0 and <code>radius</code>.  This will place all of the circles on the y-axis above the origin (at 0 degrees) and at the appropriate distance from the origin.</p><pre>
+  .append('circle')
+  .attr('cx', 0)
+  .attr('cy', d => -d.y)
+</pre>
+
+
+<p><a class="p_ident" id="p_l9ZYQKFA2X" href="#p_l9ZYQKFA2X" tabindex="-1" role="presentation"></a>We then rotate each circle about the origin so that its angle is equal to the x-coordinate computed by the layout function, a value between 0 and 360 degrees.</p><pre>
+  .attr("transform", d => `rotate(${d.x}, 0, 0)`);
+</pre>
+
+
+<p><a class="p_ident" id="p_CzzbqVkEQK" href="#p_CzzbqVkEQK" tabindex="-1" role="presentation"></a>For the links we create a lineRadial line generator and set its angle and radius functions.  Since the angle function has to return a value in radians we convert degrees to radians.</p><pre>
+var lineGen = d3.lineRadial()
+  .angle(d => d.x * Math.PI / 180)
+  .radius(d => d.y);
+</pre>
+
+
+<p><a class="p_ident" id="p_4rdUOGNIW3" href="#p_4rdUOGNIW3" tabindex="-1" role="presentation"></a>To get the string for the path’s <code>d</code> attribute we call the line generator and pass to it an array containing the source and target nodes.</p><pre>
+  .attr("d", (d) => lineGen([d.source, d.target]));
+</pre><nav><a href="06_01_hierarchal.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="06_03_treemaps.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

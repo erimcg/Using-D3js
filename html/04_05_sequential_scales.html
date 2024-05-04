@@ -1,0 +1,463 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Sequential Scales</title>
+  <link rel="canonical" href="http://using-d3js.com/04_05_sequential_scales.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 04;</script></head>
+
+<article>
+<nav><a href="04_04_working_with_dates.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_06_quantize_scales.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 04</span>Sequential Scales</h1><script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="//d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
+<script>
+var colorA = "purple", colorB = "orange";
+
+function drawScale(id, interpolator) {
+    var data = Array.from(Array(100).keys());
+
+    var cScale = d3.scaleSequential()
+        .interpolator(interpolator)
+        .domain([0,99]);
+
+    var xScale = d3.scaleLinear()
+        .domain([0,99])
+        .range([0, 580]);
+
+    var u = d3.select("#" + id)
+        .selectAll("rect")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("x", (d) => Math.floor(xScale(d)))
+        .attr("y", 0)
+        .attr("height", 40)
+        .attr("width", (d) => {
+            if (d == 99) {
+                return 6;
+            }
+            return Math.floor(xScale(d+1)) - Math.floor(xScale(d)) + 1;
+         })
+        .attr("fill", (d) => cScale(d));
+  }
+</script>
+
+
+<p><a class="p_ident" id="p_BYIC/799RM" href="#p_BYIC/799RM" tabindex="-1" role="presentation"></a>The <a href="https://github.com/d3/d3-scale/blob/master/README.md#sequential-scales">scaleSequential(interpolator)</a> method maps a continuous domain to a continuous range defined by an interpolator function.  You can define your own interpolator function or use a built-in d3 interpolator function. For information about defining your own interpolator function, see the D3 <a href="https://github.com/d3/d3-interpolate">interpolate documentation</a>.</p>
+
+<p><a class="p_ident" id="p_AWhFaS8tbG" href="#p_AWhFaS8tbG" tabindex="-1" role="presentation"></a>A sequential scale is particularly useful for mapping a continuous interval of numeric values to a series of colors. Below, we describe how to use <code>scaleSequential</code> and provide an inventory of the various interpolator functions provided by D3.</p>
+
+<h2><a class="h_ident" id="h_Iax+Vx3Hdo" href="#h_Iax+Vx3Hdo" tabindex="-1" role="presentation"></a>Defining a Sequential Scale</h2>
+
+<p><a class="p_ident" id="p_r9nG7aA9Im" href="#p_r9nG7aA9Im" tabindex="-1" role="presentation"></a>Recall that <code>scaleSequential</code> is a scaling function generator.  It generates a function that can be used to scale values from some domain to values in some range.</p>
+
+<p><a class="p_ident" id="p_7K6mOmIY/L" href="#p_7K6mOmIY/L" tabindex="-1" role="presentation"></a>There are two ways to create a sequential scaling function.  The first way is to call the <code>scaleSequential</code> generator method without passing it an argument.  This creates a scaling function on which we call <code>domain</code> to set the domain and <code>interpolator</code> to set the interpolator function.  The domain by default is the interval [0,1].</p>
+
+<p><a class="p_ident" id="p_YKBx5sdnBG" href="#p_YKBx5sdnBG" tabindex="-1" role="presentation"></a>In the example below, we create a sequential scaling function that maps the continuous domain of values between 0 and 99 to the continuous range of colors between <em>purple</em> and <em>orange</em>.</p><pre>
+colorScale = d3.scaleSequential()
+    .domain([0,99])
+    .interpolator(d3.interpolate("purple", "orange"));
+</pre>
+
+
+<p><a class="p_ident" id="p_9dBVs9vuZA" href="#p_9dBVs9vuZA" tabindex="-1" role="presentation"></a>We can also pass an interpolator directly to <code>scaleSequential</code> as shown below.</p><pre>
+var colorScale = d3.scaleSequential(d3.interpolate("purple", "orange"))
+    .domain([0,99]);
+</pre>
+
+
+<p><a class="p_ident" id="p_ctKJ8sh/Oy" href="#p_ctKJ8sh/Oy" tabindex="-1" role="presentation"></a>In each of the examples below we’ll use the function <code>drawScale</code> shown below.  The function fills an svg element with 100 rectangles that are positioned adjacent to one another.  Each rectangle is filled with a color that is determined by the sequential scaling function.</p>
+
+<p><a class="p_ident" id="p_qvyyOxIMrC" href="#p_qvyyOxIMrC" tabindex="-1" role="presentation"></a>The function has 2 arguments.  The first is the id of an svg element and the second is an interpolator.  The function first creates an array of integers from 0 to 99, creates a scaling function that maps the domain [0,99] to the continuous range of colors between purple and orange, and creates a linear scale that maps the domain [0,99] to [0, 580].</p>
+
+<p><a class="p_ident" id="p_F88y5ker4+" href="#p_F88y5ker4+" tabindex="-1" role="presentation"></a>Each of the 100 rectangles has a unique integer between 0 and 99 joined to it.  That data value is then used with the linear scale to find the position of the rectangle on the x-axis and used with the color scale to determine the color of the rectangle.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_WLmFWXTsRR" href="#c_WLmFWXTsRR" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-keyword">var</span> <span class="cm-def">colorA</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;purple&quot;</span>, <span class="cm-def">colorB</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;orange&quot;</span>;
+
+  <span class="cm-keyword">function</span> <span class="cm-def">drawScale</span>(<span class="cm-def">id</span>, <span class="cm-def">interpolator</span>) {
+    <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> <span class="cm-variable">Array</span>.<span class="cm-property">from</span>(<span class="cm-variable">Array</span>(<span class="cm-number">100</span>).<span class="cm-property">keys</span>());
+
+    <span class="cm-keyword">var</span> <span class="cm-def">cScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleSequential</span>()
+        .<span class="cm-property">interpolator</span>(<span class="cm-variable-2">interpolator</span>)
+        .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">99</span>]);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>()
+        .<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">99</span>])
+        .<span class="cm-property">range</span>([<span class="cm-number">0</span>, <span class="cm-number">580</span>]);
+
+    <span class="cm-keyword">var</span> <span class="cm-def">u</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">id</span>)
+        .<span class="cm-property">selectAll</span>(<span class="cm-string">&quot;rect&quot;</span>)
+        .<span class="cm-property">data</span>(<span class="cm-variable-2">data</span>)
+        .<span class="cm-property">enter</span>()
+        .<span class="cm-property">append</span>(<span class="cm-string">&quot;rect&quot;</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable">Math</span>.<span class="cm-property">floor</span>(<span class="cm-variable-2">xScale</span>(<span class="cm-variable-2">d</span>)))
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, <span class="cm-number">0</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;height&quot;</span>, <span class="cm-number">40</span>)
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;width&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> {
+            <span class="cm-keyword">if</span> (<span class="cm-variable-2">d</span> <span class="cm-operator">==</span> <span class="cm-number">99</span>) {
+                <span class="cm-keyword">return</span> <span class="cm-number">6</span>;
+            }
+            <span class="cm-keyword">return</span> <span class="cm-variable">Math</span>.<span class="cm-property">floor</span>(<span class="cm-variable-2">xScale</span>(<span class="cm-variable-2">d</span><span class="cm-operator">+</span><span class="cm-number">1</span>)) <span class="cm-operator">-</span> <span class="cm-variable">Math</span>.<span class="cm-property">floor</span>(<span class="cm-variable-2">xScale</span>(<span class="cm-variable-2">d</span>)) <span class="cm-operator">+</span> <span class="cm-number">1</span>;
+         })
+        .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">cScale</span>(<span class="cm-variable-2">d</span>));
+  }
+
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq1&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolate</span>(<span class="cm-variable">colorA</span>, <span class="cm-variable">colorB</span>));
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h3><a class="i_ident" id="i_saY83m2MVD" href="#i_saY83m2MVD" tabindex="-1" role="presentation"></a>Interpolator Generators</h3>
+
+<p><a class="p_ident" id="p_Xh+uA+PW7V" href="#p_Xh+uA+PW7V" tabindex="-1" role="presentation"></a>D3 provides a set of color space interpolator generators in the <a href="https://github.com/d3/d3-interpolate#color-spaces">interpolator</a> library. These interpolator generators take as an argument either a pair of colors or an array of colors and return an interpolator.  For example, below we pass to the scale’s <code>interpolator</code> method the RGB interpolator generator with the colors purple and orange.</p><pre>
+colorScale = d3.scaleSequential()
+    .interpolator(d3.interpolateRgb("purple", "orange"))
+    .domain([0,99]);
+</pre>
+
+
+<p><a class="p_ident" id="p_sdmhipGxGH" href="#p_sdmhipGxGH" tabindex="-1" role="presentation"></a>d3.interpolateRgb(a,b)</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_gxqq7V+PRN" href="#c_gxqq7V+PRN" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq20&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq20&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateRgb</span>(<span class="cm-variable">colorA</span>, <span class="cm-variable">colorB</span>));
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_ZYvv69cAKo" href="#p_ZYvv69cAKo" tabindex="-1" role="presentation"></a>d3.interpolateRgbBasis(colors)</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_c/X1TSk4Bx" href="#c_c/X1TSk4Bx" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq21&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq21&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateRgbBasis</span>([<span class="cm-variable">colorA</span>, <span class="cm-variable">colorB</span>]));
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_vCYMwYrQgp" href="#p_vCYMwYrQgp" tabindex="-1" role="presentation"></a>d3.interpolateRgbBasisClosed(colors)</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_DTPdnrv5UI" href="#c_DTPdnrv5UI" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq22&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq22&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateRgbBasisClosed</span>([<span class="cm-variable">colorA</span>, <span class="cm-variable">colorB</span>]));
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_qxOWrSPEMF" href="#p_qxOWrSPEMF" tabindex="-1" role="presentation"></a>d3.interpolateHsl(a, b)</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_o+Vn7Kgm8s" href="#c_o+Vn7Kgm8s" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq23&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq23&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateHsl</span>(<span class="cm-variable">colorA</span>, <span class="cm-variable">colorB</span>));
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_vU/KOSIac5" href="#p_vU/KOSIac5" tabindex="-1" role="presentation"></a>d3.interpolateHslLong(a, b)</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_4DunkL7bm0" href="#c_4DunkL7bm0" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq24&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq24&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateHslLong</span>(<span class="cm-variable">colorA</span>, <span class="cm-variable">colorB</span>));
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_P21V2KWZI0" href="#p_P21V2KWZI0" tabindex="-1" role="presentation"></a>d3.interpolateLab(a, b)</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_qNGQOl8sBq" href="#c_qNGQOl8sBq" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq25&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq25&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateLab</span>(<span class="cm-variable">colorA</span>, <span class="cm-variable">colorB</span>));
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_klb5yY2jKT" href="#p_klb5yY2jKT" tabindex="-1" role="presentation"></a>d3.interpolateHcl(a, b)</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_T8Xr8j4AxD" href="#c_T8Xr8j4AxD" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq26&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq26&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateHcl</span>(<span class="cm-variable">colorA</span>, <span class="cm-variable">colorB</span>));
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_qZXttMup5l" href="#p_qZXttMup5l" tabindex="-1" role="presentation"></a>d3.interpolateHclLong(a, b)</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_oD0LoeKKUn" href="#c_oD0LoeKKUn" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq27&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq27&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateHclLong</span>(<span class="cm-variable">colorA</span>, <span class="cm-variable">colorB</span>));
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_9zrEHnleun" href="#p_9zrEHnleun" tabindex="-1" role="presentation"></a>d3.interpolateCubehelix(a, b)</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_PWIVc2VLsD" href="#c_PWIVc2VLsD" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq28&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq28&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateCubehelix</span>(<span class="cm-variable">colorA</span>, <span class="cm-variable">colorB</span>));
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_a6xasIp+lX" href="#p_a6xasIp+lX" tabindex="-1" role="presentation"></a>d3.interpolateCubehelixLong(a, b)</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_5tZLRAbhxQ" href="#c_5tZLRAbhxQ" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq29&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq29&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateCubehelixLong</span>(<span class="cm-variable">colorA</span>, <span class="cm-variable">colorB</span>));
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_5Kt1wB3WIo" href="#h_5Kt1wB3WIo" tabindex="-1" role="presentation"></a>Chromatic Interpolators</h2>
+
+<p><a class="p_ident" id="p_oCZZNEk+2d" href="#p_oCZZNEk+2d" tabindex="-1" role="presentation"></a>D3’s <a href="https://github.com/d3/d3-scale-chromatic">chromatic library</a> contains a set of interpolators (not interpolator generators)  that are based on Cynthia A brewer’s ColorBrewer color schemes.  In order to use these interpolators you must load the chromatic script separately.</p><pre>&lt;script src="//d3js.org/d3-scale-chromatic.v0.3.min.js"&gt;&lt;/script&gt;</pre>
+
+
+<p><a class="p_ident" id="p_RfUWEFZkbe" href="#p_RfUWEFZkbe" tabindex="-1" role="presentation"></a>These interpolators don’t have arguments and are used as shown below.</p><pre>
+colorScale = d3.scaleSequential()
+    .interpolator(d3.interpolateBrBG)
+    .domain([0,99]);
+</pre>
+
+
+<h3><a class="i_ident" id="i_rhqLCk5HVM" href="#i_rhqLCk5HVM" tabindex="-1" role="presentation"></a>Diverging</h3>
+
+<p><a class="p_ident" id="p_Dvmu/oxakk" href="#p_Dvmu/oxakk" tabindex="-1" role="presentation"></a>d3.interpolateBrBG</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_cCk8kdCz/V" href="#c_cCk8kdCz/V" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq31&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq31&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateBrBG</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_yvo7ASc/Pk" href="#p_yvo7ASc/Pk" tabindex="-1" role="presentation"></a>d3.interpolatePRGn</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_igZknlOxcE" href="#c_igZknlOxcE" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq32&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq32&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolatePRGn</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_sOXBcXUl9V" href="#p_sOXBcXUl9V" tabindex="-1" role="presentation"></a>d3.interpolatePiYG</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_rCim8Ea5xr" href="#c_rCim8Ea5xr" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq33&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq33&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolatePiYG</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_tQwnUNy6Mr" href="#p_tQwnUNy6Mr" tabindex="-1" role="presentation"></a>d3.interpolatePuOr</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_x65rI4/OO9" href="#c_x65rI4/OO9" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq34&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq34&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolatePuOr</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_C9UjrU8zjI" href="#p_C9UjrU8zjI" tabindex="-1" role="presentation"></a>d3.interpolateRdBu</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_CoXhAeFNeW" href="#c_CoXhAeFNeW" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq35&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq35&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateRdBu</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_j0UeedPBcK" href="#p_j0UeedPBcK" tabindex="-1" role="presentation"></a>d3.interpolateRdGy</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_N75Uxl/Wzd" href="#c_N75Uxl/Wzd" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq36&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq36&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateRdGy</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_/itWGA9CIi" href="#p_/itWGA9CIi" tabindex="-1" role="presentation"></a>d3.interpolateRdYlBu</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_7N0+tkOUtP" href="#c_7N0+tkOUtP" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq37&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq37&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateRdYlBu</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_2q5Gtk8fL1" href="#p_2q5Gtk8fL1" tabindex="-1" role="presentation"></a>d3.interpolateRdYlGn</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_MwpolfGsKn" href="#c_MwpolfGsKn" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq38&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq38&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateRdYlGn</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_/0qlTO87nV" href="#p_/0qlTO87nV" tabindex="-1" role="presentation"></a>d3.interpolateSpectral</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_f19EYpYw5a" href="#c_f19EYpYw5a" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq39&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq39&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateSpectral</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h3><a class="i_ident" id="i_6BMady1DM3" href="#i_6BMady1DM3" tabindex="-1" role="presentation"></a>Single Hue</h3>
+
+<p><a class="p_ident" id="p_eIs13JRoVu" href="#p_eIs13JRoVu" tabindex="-1" role="presentation"></a>d3.interpolateBlues</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_OC/bjrYrgX" href="#c_OC/bjrYrgX" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq310&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq310&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateBlues</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_6zCjg2Tt9j" href="#p_6zCjg2Tt9j" tabindex="-1" role="presentation"></a>d3.interpolateGreens</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_zvQWj4WVwi" href="#c_zvQWj4WVwi" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq311&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq311&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateGreens</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_qDaX83aII4" href="#p_qDaX83aII4" tabindex="-1" role="presentation"></a>d3.interpolateGreys</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_ySMgfGiEgy" href="#c_ySMgfGiEgy" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq312&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq312&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateGreys</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_jtpmkEegTC" href="#p_jtpmkEegTC" tabindex="-1" role="presentation"></a>d3.interpolateOranges</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_238eY+KOym" href="#c_238eY+KOym" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq313&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq313&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateOranges</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_NySmNuVedt" href="#p_NySmNuVedt" tabindex="-1" role="presentation"></a>d3.interpolatePurples</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_4I2eH0kC3I" href="#c_4I2eH0kC3I" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq314&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq314&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolatePurples</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_DWPZqidDmT" href="#p_DWPZqidDmT" tabindex="-1" role="presentation"></a>d3.interpolateReds</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_I1fz7wboSr" href="#c_I1fz7wboSr" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq315&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq315&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateReds</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h3><a class="i_ident" id="i_DtwBEtuVdY" href="#i_DtwBEtuVdY" tabindex="-1" role="presentation"></a>Sequential</h3>
+
+<p><a class="p_ident" id="p_QMBYiWWQzT" href="#p_QMBYiWWQzT" tabindex="-1" role="presentation"></a>d3.interpolateViridis</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_//G97B4bol" href="#c_//G97B4bol" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq316&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq316&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateViridis</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_OrxvCljgGf" href="#p_OrxvCljgGf" tabindex="-1" role="presentation"></a>d3.interpolateInferno</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_xpQfgO/+Om" href="#c_xpQfgO/+Om" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq317&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq317&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateInferno</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_yL8wC9gjNk" href="#p_yL8wC9gjNk" tabindex="-1" role="presentation"></a>d3.interpolateMagma</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_Yp5NZPgdp0" href="#c_Yp5NZPgdp0" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq318&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq318&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateMagma</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_3FvPlneZy6" href="#p_3FvPlneZy6" tabindex="-1" role="presentation"></a>d3.interpolatePlasma</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_e6gxSYPE0w" href="#c_e6gxSYPE0w" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq319&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq319&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolatePlasma</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_yOIenq6qQo" href="#p_yOIenq6qQo" tabindex="-1" role="presentation"></a>d3.interpolateWarm</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_5GETJvBryU" href="#c_5GETJvBryU" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq320&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq320&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateWarm</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_YviRLct/Lx" href="#p_YviRLct/Lx" tabindex="-1" role="presentation"></a>d3.interpolateCool</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_w8a8jmPePw" href="#c_w8a8jmPePw" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq321&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq321&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateCool</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_rCtS1d7avb" href="#p_rCtS1d7avb" tabindex="-1" role="presentation"></a>d3.interpolateCubehelixDefault</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_Z3K6LWWmyE" href="#c_Z3K6LWWmyE" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq322&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq322&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateCubehelixDefault</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_hvdKmSVqYl" href="#p_hvdKmSVqYl" tabindex="-1" role="presentation"></a>d3.interpolateBuGn</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_v0F60l1L01" href="#c_v0F60l1L01" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq323&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq323&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateBuGn</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_J1QaLYED2z" href="#p_J1QaLYED2z" tabindex="-1" role="presentation"></a>d3.interpolateBuPu</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_MD9WXoBVPv" href="#c_MD9WXoBVPv" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq324&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq324&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateBuPu</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_viik2xr2nw" href="#p_viik2xr2nw" tabindex="-1" role="presentation"></a>d3.interpolateGnBu</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_Jabm5pm59L" href="#c_Jabm5pm59L" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq325&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq325&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateGnBu</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_dJ+WanSzOx" href="#p_dJ+WanSzOx" tabindex="-1" role="presentation"></a>d3.interpolateOrRd</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_t+hxA3Dn9r" href="#c_t+hxA3Dn9r" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq326&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq326&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateOrRd</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_EQkj4oo6Qf" href="#p_EQkj4oo6Qf" tabindex="-1" role="presentation"></a>d3.interpolatePuBuGn</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_sWqZ+929bP" href="#c_sWqZ+929bP" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq327&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq327&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolatePuBuGn</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_n872c2juwb" href="#p_n872c2juwb" tabindex="-1" role="presentation"></a>d3.interpolatePuBu</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_SI2H+uLhru" href="#c_SI2H+uLhru" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq328&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq328&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolatePuBu</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_DHoEZrXnHb" href="#p_DHoEZrXnHb" tabindex="-1" role="presentation"></a>d3.interpolatePuRd</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_VqK5a6RBNN" href="#c_VqK5a6RBNN" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq329&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq329&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolatePuRd</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_VA58xG8aQi" href="#p_VA58xG8aQi" tabindex="-1" role="presentation"></a>d3.interpolateRdPu</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_mxJXYJ1Uvw" href="#c_mxJXYJ1Uvw" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq330&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq330&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateRdPu</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_0hD50zKinK" href="#p_0hD50zKinK" tabindex="-1" role="presentation"></a>d3.interpolateYlGnBu</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_0ioLgSmp4P" href="#c_0ioLgSmp4P" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq331&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq331&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateYlGnBu</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_nlB6UCXURK" href="#p_nlB6UCXURK" tabindex="-1" role="presentation"></a>d3.interpolateYlGn</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_BVqYc41h17" href="#c_BVqYc41h17" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq332&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq332&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateYlGn</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_Wb89SNpnKu" href="#p_Wb89SNpnKu" tabindex="-1" role="presentation"></a>d3.interpolateYlOrBr</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_5F21Gm9KJq" href="#c_5F21Gm9KJq" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq333&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq333&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateYlOrBr</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<p><a class="p_ident" id="p_EGRTtyLYHz" href="#p_EGRTtyLYHz" tabindex="-1" role="presentation"></a>d3.interpolateYlOrRd</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_whLH2LHEqt" href="#c_whLH2LHEqt" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq334&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq334&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateYlOrRd</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h3><a class="i_ident" id="i_HDJGWfRhNF" href="#i_HDJGWfRhNF" tabindex="-1" role="presentation"></a>Cyclical</h3>
+
+<p><a class="p_ident" id="p_Lb0yasYUN3" href="#p_Lb0yasYUN3" tabindex="-1" role="presentation"></a>d3.interpolateRainbow</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_C2Bcx+iDSY" href="#c_C2Bcx+iDSY" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;seq335&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;580&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;40&quot;</span> <span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-variable">drawScale</span>(<span class="cm-string">&quot;seq335&quot;</span>, <span class="cm-variable">d3</span>.<span class="cm-property">interpolateRainbow</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre><nav><a href="04_04_working_with_dates.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="04_06_quantize_scales.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

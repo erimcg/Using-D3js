@@ -1,0 +1,112 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Require</title>
+  <link rel="canonical" href="http://using-d3js.com/08_03_require.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 08;</script></head>
+
+<article>
+<nav><a href="08_02_dispatches.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="08_04_timers.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 08</span>Require</h1><style>
+
+</style>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-require@1"></script>
+
+
+<p><a class="p_ident" id="p_W/+Iyff2kk" href="#p_W/+Iyff2kk" tabindex="-1" role="presentation"></a>In this section we discuss <code>d3.require</code>.</p>
+
+<p><a class="p_ident" id="p_9YC+NVyb3G" href="#p_9YC+NVyb3G" tabindex="-1" role="presentation"></a><code>d3.require</code> is a promise-based implementation to require <a href="https://github.com/amdjs/amdjs-api/blob/master/AMD.md">asynchronous module definitions</a> (AMD). As per the <a href="https://github.com/d3/d3-require#d3-require">API of D3.js</a>, <code>d3.require</code> is designed to work with browser-targeting libraries that implement one of the <a href="https://github.com/umdjs/umd">recommended UMD patterns</a>. <a href="https://github.com/d3/d3-require#d3-require">D3.js’s API</a> lays out the following constraints of this implementation:</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_+bu139HtOw" href="#p_+bu139HtOw" tabindex="-1" role="presentation"></a>The <code>define</code> method must be called synchronously by the library on load.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_RueNF5652C" href="#p_RueNF5652C" tabindex="-1" role="presentation"></a>Only the built-in <code>exports</code> and <code>module</code> dependencies are allowed; no <code>require</code> as in CommonJS. The <code>module</code> entry only contains an <code>exports</code> property.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_Sb4CbBl/os" href="#p_Sb4CbBl/os" tabindex="-1" role="presentation"></a>Named module definitions (<em>e.g.</em>, jQuery) are treated as anonymous modules.</p></li></ul>
+
+<p><a class="p_ident" id="p_LqnGKMqXSO" href="#p_LqnGKMqXSO" tabindex="-1" role="presentation"></a><code>d3.require</code> is not included in <code>https://<wbr>d3js.<wbr>org/<wbr>d3.<wbr>v5.<wbr>min.<wbr>js</code>, so it has to be loaded separately:</p><pre>
+&lt;script src="https://cdn.jsdelivr.net/npm/d3-require@1">&lt;/script>
+</pre>
+
+
+<p><a class="p_ident" id="p_cXuU2TRgHR" href="#p_cXuU2TRgHR" tabindex="-1" role="presentation"></a>To load a module we will use <code>d3.<wbr>require(names.<wbr>.<wbr>.<wbr>)</code> where <code>names</code> is a list of strings of the modules we wish to load. If we wish to load a particular version of a module we can add <code>@versionNumber</code> to the end of our module name. For instance to load the latest version of D3 we can call <code>d3.<wbr>require(&quot;d3@5&quot;)</code>.</p>
+
+<p><a class="p_ident" id="p_hZt0MCAaCL" href="#p_hZt0MCAaCL" tabindex="-1" role="presentation"></a>We can load multiple modules at once by making a list of the names of the modules we wish to load. For example to load <code>d3.js</code> and <code>d3-queue</code> at the same time: <code>d3.<wbr>require(&quot;d3@5&quot;, &quot;d3-queue&quot;)</code>.</p>
+
+<p><a class="p_ident" id="p_9eCYE39LCd" href="#p_9eCYE39LCd" tabindex="-1" role="presentation"></a>After <code>d3.require</code> loads the module(s), it will call the function inside of its’ <code>then</code> property passing in an object of the module(s) it just finished loaded. If multiple objects are loaded, the object passed in will be all of the modules combined.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_SXFQU8tqzL" href="#p_SXFQU8tqzL" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-require#require">d3.require(names…)</a> - Loads a module and returns a <code>require</code> function that calls the function in the object’s <code>then</code> property after the module is loaded, passing in an object containing the module(s) loaded.</p></li></ul>
+
+<p><a class="p_ident" id="p_L2ognbb0QO" href="#p_L2ognbb0QO" tabindex="-1" role="presentation"></a>In Figure 1 we use <code>d3.require</code> to load D3.js and d3-queue. We then use <code>d3.queue</code> to perform a task to add text to a <code>div</code> stating that the module is loaded.</p>
+
+<p><a class="p_ident" id="p_rrCc3Peu+H" href="#p_rrCc3Peu+H" tabindex="-1" role="presentation"></a><code>https://<wbr>d3js.<wbr>org/<wbr>d3.<wbr>v5.<wbr>min.<wbr>js</code> is <strong>not</strong> loaded on this page, so if we want to use most of D3.js we will load it via <code>d3.require</code>.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_y1Djlktbuk" href="#c_y1Djlktbuk" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-variable">d3</span>.<span class="cm-property">require</span>(<span class="cm-string">&quot;d3@5&quot;</span>, <span class="cm-string">&quot;d3-queue&quot;</span>).<span class="cm-property">then</span>(<span class="cm-def">d3</span> <span class="cm-operator">=&gt;</span> {
+        <span class="cm-variable-2">d3</span>.<span class="cm-property">queue</span>()
+            .<span class="cm-property">defer</span>( () <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1&quot;</span>).<span class="cm-property">text</span>(<span class="cm-string">&quot;d3.queue loaded&quot;</span>));
+    });
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 1  - d3.require loading d3-queue and then displaying when it is loaded.  </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_oXccGZhjdf" href="#h_oXccGZhjdf" tabindex="-1" role="presentation"></a>requireFrom</h2>
+
+<p><a class="p_ident" id="p_MFI+wcMxKd" href="#p_MFI+wcMxKd" tabindex="-1" role="presentation"></a>By default <code>d3.require</code> loads from <a href="https://www.jsdelivr.com/">jsDelivr</a>. To change this we can use <code>d3.requireFrom</code> to change where a require loads from.</p>
+
+<p><a class="p_ident" id="p_iZcdavm5fn" href="#p_iZcdavm5fn" tabindex="-1" role="presentation"></a><code>d3.requireFrom</code> returns a <em>require</em> function that loads modules from the <em>resolver</em>, which is the function that we set in <code>d3.requireFrom</code>. The <em>resolver</em> should take a module name and return back a URL that contains the module.</p>
+
+<p><a class="p_ident" id="p_cys3TrCtmU" href="#p_cys3TrCtmU" tabindex="-1" role="presentation"></a>For example, to set a <em>require</em> to load from <a href="https://unpkg.com">unpkg</a> instead of <a href="https://www.jsdelivr.com/">jsDelivr</a>:</p><pre>
+var require = d3.requireFrom(async name => {
+        return "https://unpkg.com/" + name;
+    });
+</pre>
+
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_GDUFGfZg9S" href="#p_GDUFGfZg9S" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-require#requireFrom">d3.requireFrom(resolver)</a> - Returns a <em>require</em> thats loads modules from the <em>resolver</em> function instead of <a href="https://www.jsdelivr.com/">jsDelivr</a>.</p></li></ul>
+
+<p><a class="p_ident" id="p_TY3XXRR4i4" href="#p_TY3XXRR4i4" tabindex="-1" role="presentation"></a>In Figure 2 we set a <em>require</em> to load from unpkg. Then as we did in Figure 1, we use <code>d3.queue</code> to perform a task to add text to a <code>div</code> stating that the module is loaded.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="visible" ><a class="c_ident" id="c_4ZEqh40yu8" href="#c_4ZEqh40yu8" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-keyword">var</span> <span class="cm-def">require</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">requireFrom</span>(<span class="cm-keyword">async</span> <span class="cm-def">name</span> <span class="cm-operator">=&gt;</span> {
+        <span class="cm-keyword">return</span> <span class="cm-string">&quot;https://unpkg.com/&quot;</span> <span class="cm-operator">+</span> <span class="cm-variable-2">name</span>;
+    });
+    
+    <span class="cm-variable">require</span>(<span class="cm-string">&quot;d3@5&quot;</span>, <span class="cm-string">&quot;d3-queue&quot;</span>).<span class="cm-property">then</span>(<span class="cm-def">d3</span> <span class="cm-operator">=&gt;</span> {
+        <span class="cm-variable-2">d3</span>.<span class="cm-property">queue</span>()
+            .<span class="cm-property">defer</span>( () <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo2&quot;</span>).<span class="cm-property">text</span>(<span class="cm-string">&quot;d3.queue loaded&quot;</span>));
+    });
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 2  - d3.require loading d3 and d3-queue from unpkg instead of jsdelivr.  </figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_gF6GqMv2KO" href="#h_gF6GqMv2KO" tabindex="-1" role="presentation"></a>Errors</h2>
+
+<p><a class="p_ident" id="p_SmPhVND49x" href="#p_SmPhVND49x" tabindex="-1" role="presentation"></a>If any errors are thrown from <code>d3.require</code>, the class of the error will be <a href="https://github.com/d3/d3-require#RequireError">d3.RequireError</a>.</p><nav><a href="08_02_dispatches.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="08_04_timers.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

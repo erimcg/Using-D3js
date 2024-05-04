@@ -1,0 +1,388 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Lines</title>
+  <link rel="canonical" href="http://using-d3js.com/05_02_lines.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 05;</script></head>
+
+<article>
+<nav><a href="05_01_paths.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_03_radial_lines.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 05</span>Lines</h1><script src="https://d3js.org/d3.v5.min.js"></script>
+
+
+<p><a class="p_ident" id="p_QKm7cTDMop" href="#p_QKm7cTDMop" tabindex="-1" role="presentation"></a>We learned in the previous section that we can draw lines in an SVG by creating a <code>path</code> element and setting its <code>d</code> attribute to a string that describes the path.  We also learned that we can create a string that describes a path using <code>d3.path</code> rather than manually writing the path description string.  When we use <code>d3.path</code>, however, we have to know the actual <em>x</em> and <em>y</em> coordinates of the starting, ending, and control points for the lines.  In this section we’ll discuss how to use <a href="https://github.com/d3/d3-shape#lines">d3.line()</a>, a line generator, which generates path description strings by interpolating the coordinates from an array of data.</p>
+
+<p><a class="p_ident" id="p_hpZfOn/geo" href="#p_hpZfOn/geo" tabindex="-1" role="presentation"></a>To begin, we create an instance of the line generator on which we can call various line methods, which themselves return a reference to <code>this</code> line generator, allowing us to chain multiple line method calls.</p><pre>
+var line = d3.line();
+</pre>
+
+
+<p><a class="p_ident" id="p_yZMBu1TgcD" href="#p_yZMBu1TgcD" tabindex="-1" role="presentation"></a>By default, the line generator assumes the data set is an array of coordinates, where each coordinate is specified by an array of two elements, <em>[x,y]</em>.</p>
+
+<p><a class="p_ident" id="p_bxrssykVTB" href="#p_bxrssykVTB" tabindex="-1" role="presentation"></a>The line shown in Figure 2 is generated using the following array of coordinates.</p><pre>
+var data = [
+  [25,  175],
+  [50,  152.5],
+  [75,  85],
+  [100, 115],
+  [125, 47.5],
+  [150, 62.5],
+  [175, 25]];
+</pre>
+
+
+<p><a class="p_ident" id="p_YuZJEnDXVj" href="#p_YuZJEnDXVj" tabindex="-1" role="presentation"></a>We can now compute the SVG <code>path</code> description string by invoking <a href="https://github.com/d3/d3-shape#_line">line(data)</a>.</p><pre>
+var desc = line(data);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_CYRVIQAWQb" href="#c_CYRVIQAWQb" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  [<span class="cm-number">25</span>,  <span class="cm-number">175</span>],
+  [<span class="cm-number">50</span>,  <span class="cm-number">152.5</span>],
+  [<span class="cm-number">75</span>,  <span class="cm-number">85</span>],
+  [<span class="cm-number">100</span>, <span class="cm-number">115</span>],
+  [<span class="cm-number">125</span>, <span class="cm-number">47.5</span>],
+  [<span class="cm-number">150</span>, <span class="cm-number">62.5</span>],
+  [<span class="cm-number">175</span>, <span class="cm-number">25</span>]];
+
+<span class="cm-keyword">var</span> <span class="cm-def">line</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">line</span>();
+<span class="cm-keyword">var</span> <span class="cm-def">desc</span> <span class="cm-operator">=</span> <span class="cm-variable">line</span>(<span class="cm-variable">data</span>);
+
+<span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">desc</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 1. Path element description string.</figcaption></figure>
+
+
+<p><a class="p_ident" id="p_90uIoEbv4P" href="#p_90uIoEbv4P" tabindex="-1" role="presentation"></a>We then render the line in an <code>svg</code> element by setting a <code>path</code> element’s <code>d</code> attribute equal to <code>line(data)</code>.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_fb9WitRjzs" href="#c_fb9WitRjzs" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  [<span class="cm-number">25</span>,  <span class="cm-number">175</span>],
+  [<span class="cm-number">50</span>,  <span class="cm-number">152.5</span>],
+  [<span class="cm-number">75</span>,  <span class="cm-number">85</span>],
+  [<span class="cm-number">100</span>, <span class="cm-number">115</span>],
+  [<span class="cm-number">125</span>, <span class="cm-number">47.5</span>],
+  [<span class="cm-number">150</span>, <span class="cm-number">62.5</span>],
+  [<span class="cm-number">175</span>, <span class="cm-number">25</span>]];
+
+<span class="cm-keyword">var</span> <span class="cm-def">line</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">line</span>();
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">line</span>(<span class="cm-variable">data</span>))
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 2. Line created using an array of coordinates.</figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_SEafCBa32L" href="#h_SEafCBa32L" tabindex="-1" role="presentation"></a>Accessor Methods</h2>
+
+<p><a class="p_ident" id="p_UgixQZLS6E" href="#p_UgixQZLS6E" tabindex="-1" role="presentation"></a>The line generator has two methods that can be called to assign the line generator custom <em>x</em> and <em>y</em> coordinate accessors.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_CNE6EWqVy+" href="#p_CNE6EWqVy+" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#line_x">line.x([x])</a> - sets or gets the x accessor.  If <code>x</code> is provided, it must be a number or a function that returns a number.  If <code>x</code> is not provide, returns the <em>x</em> coordinate accessor function.</p></li>
+
+<li>
+
+<p><a class="p_ident" id="p_qeYqh514kj" href="#p_qeYqh514kj" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#line_y">line.y([y])</a> - sets or gets the y accessor.  If <code>y</code> is provided, it must be a number or a function that returns a number.  If <code>y</code> is not provide, returns the <em>y</em> coordinate accessor function.</p></li></ul>
+
+<p><a class="p_ident" id="p_gm1BjedQKU" href="#p_gm1BjedQKU" tabindex="-1" role="presentation"></a>When <code>line.x</code> and <code>line.y</code> are passed functions (or lambda expressions), the functions are called for each element in the dataset and when called, are passed the current data element <code>d</code>, the index of the current element <code>i</code>, and the array of data on which the generator is invoked, <code>data</code>.</p>
+
+<p><a class="p_ident" id="p_t/0NdGhhSI" href="#p_t/0NdGhhSI" tabindex="-1" role="presentation"></a>When <code>line.x</code> and <code>line.y</code> are called without an argument, the methods return the line generator’s current accessor.</p>
+
+<p><a class="p_ident" id="p_xq52uh3FzO" href="#p_xq52uh3FzO" tabindex="-1" role="presentation"></a>In Figure 3, the data source is an array of objects, where each object contains two properties: <code>day</code> and <code>rank</code>.  In order to use the values in the <code>day</code> and <code>rank</code> properties as <em>x</em> and <em>y</em> coordinates, respectfully, we set <em>x</em> and <em>y</em> accessor functions.</p><pre>
+var data = [
+  {day: 25,  rank: 175},
+  {day: 50,  rank: 152.5},
+  {day: 75,  rank: 85},
+  {day: 100, rank: 115},
+  {day: 125, rank: 47.5},
+  {day: 150, rank: 62.5},
+  {day: 175, rank: 25}];
+
+var line = d3.line()
+  .x((d) => d.day)
+  .y((d) => d.rank);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_Een1UuSZzw" href="#c_Een1UuSZzw" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">day</span>: <span class="cm-number">25</span>,  <span class="cm-property">rank</span>: <span class="cm-number">175</span>},
+  {<span class="cm-property">day</span>: <span class="cm-number">50</span>,  <span class="cm-property">rank</span>: <span class="cm-number">152.5</span>},
+  {<span class="cm-property">day</span>: <span class="cm-number">75</span>,  <span class="cm-property">rank</span>: <span class="cm-number">85</span>},
+  {<span class="cm-property">day</span>: <span class="cm-number">100</span>, <span class="cm-property">rank</span>: <span class="cm-number">115</span>},
+  {<span class="cm-property">day</span>: <span class="cm-number">125</span>, <span class="cm-property">rank</span>: <span class="cm-number">47.5</span>},
+  {<span class="cm-property">day</span>: <span class="cm-number">150</span>, <span class="cm-property">rank</span>: <span class="cm-number">62.5</span>},
+  {<span class="cm-property">day</span>: <span class="cm-number">175</span>, <span class="cm-property">rank</span>: <span class="cm-number">25</span>}];
+
+<span class="cm-keyword">var</span> <span class="cm-def">line</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">line</span>()
+  .<span class="cm-property">x</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">day</span>)
+  .<span class="cm-property">y</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">rank</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo2&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">line</span>(<span class="cm-variable">data</span>))
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+    
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 3. Line created using array of objects and accessor functions.</figcaption></figure>
+
+
+<p><a class="p_ident" id="p_B/9r6V86As" href="#p_B/9r6V86As" tabindex="-1" role="presentation"></a>In Figure 4, we use <code>d3.scaleLinear</code> to scale the data in the dataset.  To begin, we create an array of data and create scales that will be used to scale the data to fit the svg.</p><pre>
+var data = [
+  {x: 0, y: 0},
+  {x: 1, y: 3},
+  {x: 2, y: 12},
+  {x: 3, y: 8},
+  {x: 4, y: 17},
+  {x: 5, y: 15},
+  {x: 6, y: 20}];
+
+var xScale = d3.scaleLinear().domain([0, 6]).range([25, 175]);
+var yScale = d3.scaleLinear().domain([0,20]).range([175, 25]);
+</pre>
+
+
+<p><a class="p_ident" id="p_cDZMwxkgQz" href="#p_cDZMwxkgQz" tabindex="-1" role="presentation"></a>Next, we create a line generator and use the scales in the <em>x</em> and <em>y</em> accessor methods.</p><pre>
+var line = d3.line()
+  .x(d => xScale(d.x))
+  .y(d => yScale(d.y));
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_64MxTkFGs+" href="#c_64MxTkFGs+" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">20</span>}];
+
+<span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">6</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+<span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+
+<span class="cm-keyword">var</span> <span class="cm-def">line</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">line</span>()
+  .<span class="cm-property">x</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+  .<span class="cm-property">y</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>));
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo3&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">line</span>(<span class="cm-variable">data</span>))
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo3&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 4. Line created using accessor functions and scales.</figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_y4MnN5PlkZ" href="#h_y4MnN5PlkZ" tabindex="-1" role="presentation"></a>Using Bound Data</h2>
+
+<p><a class="p_ident" id="p_f07JGKO7N0" href="#p_f07JGKO7N0" tabindex="-1" role="presentation"></a>We can also compute the <code>d</code> attribute of a <code>path</code> element, not by invoking the line generator directly, but rather, by joining the data to the <code>path</code> element and then passing the line generator as the second argument of <code>selection.attr</code> when setting the <code>d</code> attribute.</p><pre>
+d3.select("#demo1")
+  .append("path")
+  .data([data])          // bind the dataset to the path element
+  .attr("d", line)       // pass the line generator
+  .attr("fill", "none")
+  .attr("stroke", "red");
+</pre>
+
+
+<p><a class="p_ident" id="p_XM+LNpe2SP" href="#p_XM+LNpe2SP" tabindex="-1" role="presentation"></a>Note how we bind the dataset to the <code>path</code> element by passing to <code>selection.data</code> an <em>array</em> containing the dataset (<code>[data]</code>), not the dataset itself.  Also note that we pass the line generator itself to <code>selection.attr</code> not the string created by the line generator.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_0jdKx/u+Di" href="#c_0jdKx/u+Di" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">20</span>}];
+
+<span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">6</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+<span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+
+<span class="cm-keyword">var</span> <span class="cm-def">line</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">line</span>()
+  .<span class="cm-property">x</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+  .<span class="cm-property">y</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>));
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo4&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">data</span>([<span class="cm-variable">data</span>])
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">line</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo4&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 5. Line created from data bound to a path element.</figcaption></figure>
+
+
+<p><a class="p_ident" id="p_RDr1g3L1Vy" href="#p_RDr1g3L1Vy" tabindex="-1" role="presentation"></a>Note that the dataset is passed to <code>selection.data</code> inside an array.</p>
+
+<h2><a class="h_ident" id="h_G8vod4LBpa" href="#h_G8vod4LBpa" tabindex="-1" role="presentation"></a>Excluding Points</h2>
+
+<p><a class="p_ident" id="p_dcjFs3E5p2" href="#p_dcjFs3E5p2" tabindex="-1" role="presentation"></a>Sometimes we may want to exclude certain points on the line. To do this we can set the <em>defined</em> accessor function by calling <a href="https://github.com/d3/d3-shape#line_defined">line.defined([defined])</a> on our line generator.</p>
+
+<ul>
+
+<li>
+
+<p><a class="p_ident" id="p_mxVuxkJyr5" href="#p_mxVuxkJyr5" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-shape#line_defined">line.defined([defined])</a> - takes as an argument a boolean or a function that returns a boolean.</p></li></ul>
+
+<p><a class="p_ident" id="p_fso7ZREq7a" href="#p_fso7ZREq7a" tabindex="-1" role="presentation"></a>When the line generator computes points, it invokes the <em>defined</em> accessor for each element in the dataset, passing it the current data element <code>d</code>, the index of the current element <code>i</code>, and the array of data on which the generator is invoked, <code>data</code>.  If the <em>defined</em> accessor evaluates to true, a point is generated for the data element, otherwise the element is ignored.  By default, the <em>defined</em> accessor returns true for all elements in the dataset.</p>
+
+<p><a class="p_ident" id="p_XvAZ+HoJa/" href="#p_XvAZ+HoJa/" tabindex="-1" role="presentation"></a>In Figure 6 we exclude the point that was generated from the data element at index 4 by passing a lambda expression to <code>line.defined</code> which returns true unless <code>i</code> is <code>4</code>.</p><pre>
+var line = d3.line()
+  .x(d => xScale(d.x))
+  .y(d => yScale(d.y));
+  .defined((d,i) => i != 4);
+</pre> 
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_F9yEab7/TN" href="#c_F9yEab7/TN" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">20</span>}];
+
+<span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">6</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+<span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+
+<span class="cm-keyword">var</span> <span class="cm-def">line</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">line</span>()
+  .<span class="cm-property">x</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+  .<span class="cm-property">y</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>))
+  .<span class="cm-property">defined</span>((<span class="cm-def">d</span>,<span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">!=</span> <span class="cm-number">4</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo5&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">data</span>([<span class="cm-variable">data</span>])
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">line</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo5&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 6. Line with a missing point.</figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_9K8T4+AXbZ" href="#h_9K8T4+AXbZ" tabindex="-1" role="presentation"></a>Curving the Line</h2>
+
+<p><a class="p_ident" id="p_u3oqTE2n7j" href="#p_u3oqTE2n7j" tabindex="-1" role="presentation"></a>To create a curve we need to change the way that the points are interpolated.  For this we can call <a href="https://github.com/d3/d3-shape#line_curve">line.curve([curve])</a> passing it a predefined curve factory.  D3.js provides several curve factories which we discuss in the section on <a href="05_04_curves.html">curves</a>.</p>
+
+<p><a class="p_ident" id="p_YPByg+nVGo" href="#p_YPByg+nVGo" tabindex="-1" role="presentation"></a>If <code>line.curve</code> is called without an argument, the current curve factory is returned, which by default is the <a href="https://github.com/d3/d3-shape/blob/v1.3.4/README.md#curveLinear">d3.curveLinear</a> curve factory.</p>
+
+<p><a class="p_ident" id="p_Uryz8n+4Dj" href="#p_Uryz8n+4Dj" tabindex="-1" role="presentation"></a>Figure 7 sets the line generator’s curve factory to <code>d3.curveBasis</code> producing a cubic basis spline.</p><pre>
+var line = d3.line()
+  .x(d => xScale(d.x))
+  .y(d => yScale(d.y))
+  .curve(d3.curveBasis);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_y7M37ZFKBV" href="#c_y7M37ZFKBV" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">20</span>}];
+
+<span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">6</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+<span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+
+<span class="cm-keyword">var</span> <span class="cm-def">line</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">line</span>()
+  .<span class="cm-property">x</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+  .<span class="cm-property">y</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>))
+  .<span class="cm-property">curve</span>(<span class="cm-variable">d3</span>.<span class="cm-property">curveBasis</span>);
+  
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo6&quot;</span>)
+  .<span class="cm-property">append</span>(<span class="cm-string">&quot;path&quot;</span>)
+  .<span class="cm-property">data</span>([<span class="cm-variable">data</span>])
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;d&quot;</span>, <span class="cm-variable">line</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;none&quot;</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">&quot;stroke&quot;</span>, <span class="cm-string">&quot;red&quot;</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo6&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 7. Line contructed using data bound to a path element.</figcaption></figure>
+
+
+<h2><a class="h_ident" id="h_q8VcC/fiH6" href="#h_q8VcC/fiH6" tabindex="-1" role="presentation"></a>Rendering Lines to a Context</h2>
+
+<p><a class="p_ident" id="p_YOW10+oCrj" href="#p_YOW10+oCrj" tabindex="-1" role="presentation"></a>We can render the line in a <code>canvas</code> element’s <code>context</code> by using <a href="https://github.com/d3/d3-shape#line_context">line.context([context])</a>.</p>
+
+<p><a class="p_ident" id="p_yL4fC9r7CZ" href="#p_yL4fC9r7CZ" tabindex="-1" role="presentation"></a>If no argument is passed to <code>line.context</code>, the method returns the current context, which by default is null.  If, however, a context is passed to <code>line.context</code>, the line will be rendered in the context when the line generator is invoke.</p>
+
+<p><a class="p_ident" id="p_Z/2+eSJTy1" href="#p_Z/2+eSJTy1" tabindex="-1" role="presentation"></a>In Figure 8, we use the same data and scales as in the previous example.  After defining the data and the scales, we get the 2d <code>context</code> from the <code>canvas</code> element.</p><pre>
+var context = d3.select("#demo7").node().getContext("2d");
+</pre>
+
+
+<p><a class="p_ident" id="p_5a+hajUqI1" href="#p_5a+hajUqI1" tabindex="-1" role="presentation"></a>We then create the line generator and call <code>line.context</code> to set the context.</p><pre>
+var line = d3.line()
+  .x(d => xScale(d.x))
+  .y(d => yScale(d.y))
+  .context(context);
+</pre>
+
+
+<p><a class="p_ident" id="p_isUeRxEG/7" href="#p_isUeRxEG/7" tabindex="-1" role="presentation"></a>We then render the line by invoking the line generator, setting the stroke color, and calling  <code>context.stroke</code>.</p><pre>
+line(data);
+context.strokeStyle = "red";
+context.stroke();
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_rX03/W+GUA" href="#c_rX03/W+GUA" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+  {<span class="cm-property">x</span>: <span class="cm-number">0</span>, <span class="cm-property">y</span>: <span class="cm-number">0</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">1</span>, <span class="cm-property">y</span>: <span class="cm-number">3</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">2</span>, <span class="cm-property">y</span>: <span class="cm-number">12</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">3</span>, <span class="cm-property">y</span>: <span class="cm-number">8</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">4</span>, <span class="cm-property">y</span>: <span class="cm-number">17</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">15</span>},
+  {<span class="cm-property">x</span>: <span class="cm-number">6</span>, <span class="cm-property">y</span>: <span class="cm-number">20</span>}];
+
+<span class="cm-keyword">var</span> <span class="cm-def">xScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>, <span class="cm-number">6</span>]).<span class="cm-property">range</span>([<span class="cm-number">25</span>, <span class="cm-number">175</span>]);
+<span class="cm-keyword">var</span> <span class="cm-def">yScale</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">scaleLinear</span>().<span class="cm-property">domain</span>([<span class="cm-number">0</span>,<span class="cm-number">20</span>]).<span class="cm-property">range</span>([<span class="cm-number">175</span>, <span class="cm-number">25</span>]);
+
+<span class="cm-keyword">var</span> <span class="cm-def">context</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo7&quot;</span>).<span class="cm-property">node</span>().<span class="cm-property">getContext</span>(<span class="cm-string">&quot;2d&quot;</span>);
+
+  
+<span class="cm-keyword">var</span> <span class="cm-def">line</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">line</span>()
+  .<span class="cm-property">x</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">xScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">x</span>))
+  .<span class="cm-property">y</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">yScale</span>(<span class="cm-variable-2">d</span>.<span class="cm-property">y</span>))
+  .<span class="cm-property">context</span>(<span class="cm-variable">context</span>);
+  
+<span class="cm-variable">line</span>(<span class="cm-variable">data</span>);
+<span class="cm-variable">context</span>.<span class="cm-property">strokeStyle</span> <span class="cm-operator">=</span> <span class="cm-string">&quot;red&quot;</span>;
+<span class="cm-variable">context</span>.<span class="cm-property">stroke</span>();
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span> 
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">canvas</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo7&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;200&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;200&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">canvas</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure class="sandbox"><figcaption>Figure 8. Rendering a line in a canvas element.</figcaption></figure>
+<nav><a href="05_01_paths.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="05_03_radial_lines.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

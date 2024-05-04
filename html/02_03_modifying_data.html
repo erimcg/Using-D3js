@@ -1,0 +1,231 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Modifying Data</title>
+  <link rel="canonical" href="http://using-d3js.com/02_03_modifying_data.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 02;</script></head>
+
+<article>
+<nav><a href="02_02_binding_object_data.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="02_04_reordering_elements.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 02</span>Modifying Data</h1><script src="https://d3js.org/d3.v7.min.js"></script>
+
+
+<p><a class="p_ident" id="p_4SAS2tRqcL" href="#p_4SAS2tRqcL" tabindex="-1" role="presentation"></a>When the dataset used for a visualization changes, we may need to update the visual elements to reflect the new data, possibly adding or removing visual elements, and changing the visual characteristics of elements.</p>
+
+<p><a class="p_ident" id="p_VqcecDB0fu" href="#p_VqcecDB0fu" tabindex="-1" role="presentation"></a>If the data is held in an array, then the position of the new data in the array, may affect the rendering speed and appearance of the visualization as the following examples show.</p>
+
+<p><a class="p_ident" id="p_aH8Yh/zYxG" href="#p_aH8Yh/zYxG" tabindex="-1" role="presentation"></a>The two visualizations below use buttons to incrementally add data to an array.  The elements in the array are then bound to the elements in the visualization (appending elements when necessary) and the bound data is then used to change the appearance of the elements.</p>
+
+<p><a class="p_ident" id="p_LrhlqiDdXv" href="#p_LrhlqiDdXv" tabindex="-1" role="presentation"></a>When interacting with the two examples, notice how they render differently when the data is prepended to the beginning of the arrays and when data is inserted in the middle of the arrays.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_AJGyIRlTZr" href="#c_AJGyIRlTZr" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> [
+    {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Washington&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">21112</span>},
+    {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Texas&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">23548</span>},
+    {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Florida&quot;</span>,   <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">32190</span>},
+    {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;New York&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">89503</span>}
+];
+
+<span class="cm-keyword">var</span> <span class="cm-def">homeless</span> <span class="cm-operator">=</span> [{<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;California&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">134278</span>}];
+
+<span class="cm-keyword">function</span> <span class="cm-def">prependData</span>() {
+    <span class="cm-keyword">if</span> (<span class="cm-variable">data</span>.<span class="cm-property">length</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>) {
+        <span class="cm-keyword">return</span>;
+    }
+
+    <span class="cm-variable">homeless</span>.<span class="cm-property">unshift</span>(<span class="cm-variable">data</span>.<span class="cm-property">pop</span>());
+    <span class="cm-variable">joinWithoutKey</span>(<span class="cm-variable">homeless</span>);
+}
+
+<span class="cm-keyword">function</span> <span class="cm-def">insertData</span>() {
+    <span class="cm-keyword">if</span> (<span class="cm-variable">data</span>.<span class="cm-property">length</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>) {
+        <span class="cm-keyword">return</span>;
+    }
+
+    <span class="cm-keyword">var</span> <span class="cm-def">loc</span> <span class="cm-operator">=</span> <span class="cm-variable">Math</span>.<span class="cm-property">floor</span>(<span class="cm-variable">homeless</span>.<span class="cm-property">length</span> <span class="cm-operator">/</span> <span class="cm-number">2</span>);
+    <span class="cm-variable">homeless</span>.<span class="cm-property">splice</span>(<span class="cm-variable-2">loc</span>, <span class="cm-number">0</span>, <span class="cm-variable">data</span>.<span class="cm-property">pop</span>());
+    <span class="cm-variable">joinWithoutKey</span>(<span class="cm-variable">homeless</span>);
+}
+
+<span class="cm-keyword">function</span> <span class="cm-def">appendData</span>() {
+    <span class="cm-keyword">if</span> (<span class="cm-variable">data</span>.<span class="cm-property">length</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>) {
+        <span class="cm-keyword">return</span>;
+    }
+
+    <span class="cm-variable">homeless</span>.<span class="cm-property">push</span>(<span class="cm-variable">data</span>.<span class="cm-property">pop</span>());
+    <span class="cm-variable">joinWithoutKey</span>(<span class="cm-variable">homeless</span>);
+}
+
+<span class="cm-keyword">function</span> <span class="cm-def">reset</span>() {
+  <span class="cm-variable">data</span> <span class="cm-operator">=</span> [
+      {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Washington&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">21112</span>},
+      {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Texas&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">23548</span>},
+      {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Florida&quot;</span>,   <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">32190</span>},
+      {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;New York&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">89503</span>}
+  ];
+
+  <span class="cm-variable">homeless</span> <span class="cm-operator">=</span> [{<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;California&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">134278</span>}];
+  <span class="cm-variable">joinWithoutKey</span>(<span class="cm-variable">homeless</span>);
+}
+
+<span class="cm-keyword">function</span> <span class="cm-def">joinWithoutKey</span>(<span class="cm-def">array</span>) {
+    <span class="cm-keyword">var</span> <span class="cm-def">u</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#bargraph1&quot;</span>)
+      .<span class="cm-property">selectAll</span>(<span class="cm-string">'rect'</span>)
+      .<span class="cm-property">data</span>(<span class="cm-variable-2">array</span>);
+
+    <span class="cm-variable-2">u</span>.<span class="cm-property">join</span>(<span class="cm-string">'rect'</span>)
+      .<span class="cm-property">transition</span>()
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;height&quot;</span>, <span class="cm-number">19</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;width&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">population</span><span class="cm-operator">/</span><span class="cm-number">500</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-number">100</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">20</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>);
+      
+	<span class="cm-variable-2">u</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#bargraph1&quot;</span>)
+      .<span class="cm-property">selectAll</span>(<span class="cm-string">'text'</span>)
+      .<span class="cm-property">data</span>(<span class="cm-variable-2">array</span>);
+
+    <span class="cm-variable-2">u</span>.<span class="cm-property">join</span>(<span class="cm-string">'text'</span>)
+      .<span class="cm-property">text</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">state</span>)
+      .<span class="cm-property">transition</span>()
+      .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, <span class="cm-number">96</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">'text-anchor'</span>, <span class="cm-string">'end'</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">20</span> <span class="cm-operator">+</span> <span class="cm-number">17</span>);
+}
+
+<span class="cm-variable">joinWithoutKey</span>(<span class="cm-variable">homeless</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;bargraph1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;400&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;prependData()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Prepend<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;insertData()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Insert<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;appendData()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Append<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;reset()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Reset<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure>
+<figcaption style="text-align: center;">Example 1</figcaption>
+</figure>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_Of2wx1nGsR" href="#c_Of2wx1nGsR" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data2</span> <span class="cm-operator">=</span> [
+    {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Washington&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">21112</span>},
+    {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Texas&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">23548</span>},
+    {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Florida&quot;</span>,   <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">32190</span>},
+    {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;New York&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">89503</span>}
+];
+
+<span class="cm-keyword">var</span> <span class="cm-def">homeless2</span> <span class="cm-operator">=</span> [{<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;California&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">134278</span>}];
+
+<span class="cm-keyword">function</span> <span class="cm-def">prependData2</span>() {
+    <span class="cm-keyword">if</span> (<span class="cm-variable">data2</span>.<span class="cm-property">length</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>) {
+        <span class="cm-keyword">return</span>;
+    }
+
+    <span class="cm-variable">homeless2</span>.<span class="cm-property">unshift</span>(<span class="cm-variable">data2</span>.<span class="cm-property">pop</span>());
+    <span class="cm-variable">joinWithKey</span>(<span class="cm-variable">homeless2</span>);
+}
+
+<span class="cm-keyword">function</span> <span class="cm-def">insertData2</span>() {
+    <span class="cm-keyword">if</span> (<span class="cm-variable">data2</span>.<span class="cm-property">length</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>) {
+        <span class="cm-keyword">return</span>;
+    }
+
+    <span class="cm-keyword">var</span> <span class="cm-def">loc</span> <span class="cm-operator">=</span> <span class="cm-variable">Math</span>.<span class="cm-property">floor</span>(<span class="cm-variable">homeless2</span>.<span class="cm-property">length</span> <span class="cm-operator">/</span> <span class="cm-number">2</span>);
+    <span class="cm-variable">homeless2</span>.<span class="cm-property">splice</span>(<span class="cm-variable-2">loc</span>, <span class="cm-number">0</span>, <span class="cm-variable">data2</span>.<span class="cm-property">pop</span>());
+    <span class="cm-variable">joinWithKey</span>(<span class="cm-variable">homeless2</span>);
+}
+
+<span class="cm-keyword">function</span> <span class="cm-def">appendData2</span>() {
+    <span class="cm-keyword">if</span> (<span class="cm-variable">data2</span>.<span class="cm-property">length</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>) {
+        <span class="cm-keyword">return</span>;
+    }
+
+    <span class="cm-variable">homeless2</span>.<span class="cm-property">push</span>(<span class="cm-variable">data2</span>.<span class="cm-property">pop</span>());
+    <span class="cm-variable">joinWithKey</span>(<span class="cm-variable">homeless2</span>);
+}
+
+
+<span class="cm-keyword">function</span> <span class="cm-def">reset2</span>() {
+    <span class="cm-variable">data2</span> <span class="cm-operator">=</span> [
+    {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Washington&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">21112</span>},
+    {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Texas&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">23548</span>},
+    {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;Florida&quot;</span>,   <span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">32190</span>},
+    {<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;New York&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">89503</span>}
+    ];
+
+    <span class="cm-variable">homeless2</span> <span class="cm-operator">=</span> [{<span class="cm-string cm-property">&quot;state&quot;</span>: <span class="cm-string">&quot;California&quot;</span>,<span class="cm-string cm-property">&quot;population&quot;</span>: <span class="cm-number">134278</span>}];
+    <span class="cm-variable">joinWithKey</span>(<span class="cm-variable">homeless2</span>);
+}
+
+<span class="cm-keyword">function</span> <span class="cm-def">joinWithKey</span>(<span class="cm-def">array</span>) {
+    <span class="cm-keyword">var</span> <span class="cm-def">u</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#bargraph2&quot;</span>)
+      .<span class="cm-property">selectAll</span>(<span class="cm-string">'rect'</span>)
+      .<span class="cm-property">data</span>(<span class="cm-variable-2">array</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">state</span>);
+
+    <span class="cm-variable-2">u</span>.<span class="cm-property">join</span>(<span class="cm-string">'rect'</span>)
+      .<span class="cm-property">transition</span>()
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;height&quot;</span>, <span class="cm-number">19</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;width&quot;</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">population</span><span class="cm-operator">/</span><span class="cm-number">500</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;x&quot;</span>, <span class="cm-number">100</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;y&quot;</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">20</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">&quot;fill&quot;</span>, <span class="cm-string">&quot;pink&quot;</span>);
+      
+	<span class="cm-variable-2">u</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#bargraph2&quot;</span>)
+      .<span class="cm-property">selectAll</span>(<span class="cm-string">'text'</span>)
+      .<span class="cm-property">data</span>(<span class="cm-variable-2">array</span>, (<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">state</span>);
+
+    <span class="cm-variable-2">u</span>.<span class="cm-property">join</span>(<span class="cm-string">'text'</span>)
+      .<span class="cm-property">text</span>((<span class="cm-def">d</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">state</span>)
+      .<span class="cm-property">transition</span>()
+      .<span class="cm-property">attr</span>(<span class="cm-string">'x'</span>, <span class="cm-number">96</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">'text-anchor'</span>, <span class="cm-string">'end'</span>)
+      .<span class="cm-property">attr</span>(<span class="cm-string">'y'</span>, (<span class="cm-def">d</span>, <span class="cm-def">i</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">i</span> <span class="cm-operator">*</span> <span class="cm-number">20</span> <span class="cm-operator">+</span> <span class="cm-number">17</span>);
+}
+<span class="cm-variable">joinWithKey</span>(<span class="cm-variable">homeless</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;bargraph2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">&quot;400&quot;</span> <span class="cm-attribute">height</span>=<span class="cm-string">&quot;100&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;prependData2()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Prepend<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;insertData2()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Insert<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;appendData2()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Append<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">onclick</span>=<span class="cm-string">&quot;reset2()&quot;</span><span class="cm-tag cm-bracket">&gt;</span>Reset<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span></pre><figure>
+<figcaption style="text-align: center;">Example 2</figcaption>
+</figure>
+
+
+<p><a class="p_ident" id="p_x/aLiVRk1A" href="#p_x/aLiVRk1A" tabindex="-1" role="presentation"></a>The difference between the two examples shown above is the second example uses a <em>key function</em> while the first one does not.</p>
+
+<h2><a class="h_ident" id="h_SRZv41py5B" href="#h_SRZv41py5B" tabindex="-1" role="presentation"></a>Key Functions</h2>
+
+<p><a class="p_ident" id="p_mPJnpi0iok" href="#p_mPJnpi0iok" tabindex="-1" role="presentation"></a>The <a href="https://github.com/d3/d3-selection/blob/master/README.md#joining-data">selection.data([data[, key]])</a> method has two parameters: <code>data</code> (which can be an array or a function) and an optional <code>key</code> function.  The key function provided must return a string.  The strings returned by the key function arew used to determine which datum is bound to which visual elements.</p>
+
+<p><a class="p_ident" id="p_x5nU0RzcoE" href="#p_x5nU0RzcoE" tabindex="-1" role="presentation"></a>When a key function is passed to the <code>data</code> method, the key function is called for each data element in the selection (producing a string for each element) and the key function is called for each datum in the array (producing a string for each datum).   If a datum’s key string matches an element’s key string, the datum is bound to the element.</p>
+
+<p><a class="p_ident" id="p_bKS7364opf" href="#p_bKS7364opf" tabindex="-1" role="presentation"></a>This matching mechanism allows an element in the DOM to maintain the data that is bound to it regardless of the data’s position in the data array.  In example 1, when data is prepended to the array and the array is passed to <code>data</code> without a key function, the new data at index <code>0</code> is bound to an preexisting rectangle requiring the appearance (width) of the element to be modified.  The data that used to be bound to that element must be bound to a different element (perhaps a new one) and its appearance modified.  This cascading effect of moving the data bound to the existing elements causes all of the existing elements to be recomputed and rerendered.</p>
+
+<p><a class="p_ident" id="p_WyTOlFdWJH" href="#p_WyTOlFdWJH" tabindex="-1" role="presentation"></a>In the second example, the key function ensures that the data bound to the existing elements is never changed and so only the location of the elements might have to be changed.</p>
+
+<h2><a class="h_ident" id="h_m/Qxl8uVSK" href="#h_m/Qxl8uVSK" tabindex="-1" role="presentation"></a>Key Function Arguments</h2>
+
+<p><a class="p_ident" id="p_oiEt3x+aYW" href="#p_oiEt3x+aYW" tabindex="-1" role="presentation"></a>We stated above that the key function is called for each element in the selection and for each data element.  When called for an element in the selection, the key function is passed (<code>d</code>) the data that is already joined to the element, (<code>i</code>) the index of the element in the selection group, and (<code>nodes</code>) the group itself.</p>
+
+<p><a class="p_ident" id="p_4mihQ2G5vC" href="#p_4mihQ2G5vC" tabindex="-1" role="presentation"></a>When called for an element in the data array, the key function is passed (<code>d</code>) the data element, (<code>i</code>) the index of the element in the data array, and (<code>nodes</code>) the data array.</p>
+
+<p><a class="p_ident" id="p_rXMzDOC+ZU" href="#p_rXMzDOC+ZU" tabindex="-1" role="presentation"></a>In example 2, above, we pass a key function in the form of a lambda expression to the <code>data</code> method.</p><pre>
+.data(array, (d) =&gt; d.state);
+</pre>
+
+
+<p><a class="p_ident" id="p_hIobSlZvbI" href="#p_hIobSlZvbI" tabindex="-1" role="presentation"></a>This key function returns the string stored in the state property of the data object that is passed to it.</p><nav><a href="02_02_binding_object_data.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="02_04_reordering_elements.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>

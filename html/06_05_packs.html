@@ -1,0 +1,335 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title>Circle-Packing Layouts</title>
+  <link rel="canonical" href="http://using-d3js.com/06_05_packs.html" />
+
+  <link rel=stylesheet href="css/codemirror.css">
+  <link rel=stylesheet href="css/ejs.css">
+
+  <script src="js/acorn_codemirror.js"></script>
+  <script src="js/sandbox.js"></script><script>var chapNum = 06;</script></head>
+
+<article>
+<nav><a href="06_04_partitions.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="07_01_word_clouds.html" title="next chapter">▶</a></nav>
+
+<h1><span class=chap_num>Chapter 06</span>Circle-Packing Layouts</h1><script src="https://d3js.org/d3.v4.min.js"></script>
+<style>
+circle {
+  fill: cadetblue;
+  opacity: 0.3;
+  stroke: black;
+}
+</style>
+
+
+<p><a class="p_ident" id="p_dY674NqlZf" href="#p_dY674NqlZf" tabindex="-1" role="presentation"></a>The circle-pack layout represents nodes in a hierarchal model as circles and positions each child node’s circle inside its parent’s circle.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_A+r71g4jqz" href="#c_A+r71g4jqz" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;children&quot;</span>: [
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;children&quot;</span>: [
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">2</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">3</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;children&quot;</span>: [
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">2</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">2</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">2</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">4</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">4</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">8</span>}
+                ]},
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>)
+  .<span class="cm-property">sum</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">hasOwnProperty</span>(<span class="cm-string">&quot;stat&quot;</span>) <span class="cm-operator">?</span> <span class="cm-variable-2">d</span>.<span class="cm-property">stat</span> : <span class="cm-number">0</span>)
+  .<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span>.<span class="cm-property">value</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>.<span class="cm-property">value</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">partition</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pack</span>()
+  .<span class="cm-property">size</span>([<span class="cm-number">250</span>,<span class="cm-number">250</span>]);
+
+<span class="cm-variable">partition</span>(<span class="cm-variable">root</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo1 g&quot;</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'circle.node'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'circle'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cx'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cy'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'r'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">r</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo1&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">260</span> <span class="cm-attribute">height</span>=<span class="cm-string">260</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span>  <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(5,5)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_SPgPtrgXcj" href="#h_SPgPtrgXcj" tabindex="-1" role="presentation"></a>Getting Tightly Packed Circles</h2>
+
+<p><a class="p_ident" id="p_HF2UfxEhUZ" href="#p_HF2UfxEhUZ" tabindex="-1" role="presentation"></a>Sorting the hierarchal model may be necessary to produce a layout that tightly packs the circles.  Below is an example that uses a hierarchal model that is not sorted.  As you can see, the circles are not packed as tightly as when the hierarchal model is sorted.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_JxoAO6z6m2" href="#c_JxoAO6z6m2" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;children&quot;</span>: [
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;children&quot;</span>: [
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">2</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">3</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;children&quot;</span>: [
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">2</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">2</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">2</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">4</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">4</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">8</span>}
+                ]},
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>)
+  .<span class="cm-property">sum</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">hasOwnProperty</span>(<span class="cm-string">&quot;stat&quot;</span>) <span class="cm-operator">?</span> <span class="cm-variable-2">d</span>.<span class="cm-property">stat</span> : <span class="cm-number">0</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">partition</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pack</span>()
+  .<span class="cm-property">size</span>([<span class="cm-number">250</span>,<span class="cm-number">250</span>]);
+
+<span class="cm-variable">partition</span>(<span class="cm-variable">root</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo2 g&quot;</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'circle.node'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'circle'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cx'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cy'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'r'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">r</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo2&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">260</span> <span class="cm-attribute">height</span>=<span class="cm-string">260</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span>  <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(5,5)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_K0U649sIxu" href="#h_K0U649sIxu" tabindex="-1" role="presentation"></a>Creating a Circle-Packing Layout</h2>
+
+<p><a class="p_ident" id="p_Pss5C/B8Ak" href="#p_Pss5C/B8Ak" tabindex="-1" role="presentation"></a>The <a href="https://github.com/d3/d3-hierarchy#pack">d3.pack()</a> method is a function generator that returns a circle-packing layout.  We can chain a call to <a href="https://github.com/d3/d3-hierarchy#pack_size">pack.size([width,height])</a> to set the size of the rendering area.</p>
+
+<p><a class="p_ident" id="p_Zf0Eddtlpc" href="#p_Zf0Eddtlpc" tabindex="-1" role="presentation"></a>We can also chain a call to <a href="https://github.com/d3/d3-hierarchy#pack_padding">pack.padding([padding])</a> to add padding between tangent circles and between the enclosing parents’ circles and their children.</p>
+
+<p><a class="p_ident" id="p_r2cbK6beAX" href="#p_r2cbK6beAX" tabindex="-1" role="presentation"></a>Below we create a circle-packing with padding set to 10 pixels.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_h+GpcQKB53" href="#c_h+GpcQKB53" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;children&quot;</span>: [
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;children&quot;</span>: [
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">2</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">3</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;children&quot;</span>: [
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">2</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">2</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">2</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">4</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">4</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">8</span>}
+                ]},
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>)
+  .<span class="cm-property">sum</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">hasOwnProperty</span>(<span class="cm-string">&quot;stat&quot;</span>) <span class="cm-operator">?</span> <span class="cm-variable-2">d</span>.<span class="cm-property">stat</span> : <span class="cm-number">0</span>)
+  .<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span>.<span class="cm-property">value</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>.<span class="cm-property">value</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">partition</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pack</span>()
+  .<span class="cm-property">size</span>([<span class="cm-number">250</span>,<span class="cm-number">250</span>])
+  .<span class="cm-property">padding</span>(<span class="cm-number">10</span>);
+
+<span class="cm-variable">partition</span>(<span class="cm-variable">root</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo3 g&quot;</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'circle.node'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'circle'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cx'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cy'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'r'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">r</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo3&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">260</span> <span class="cm-attribute">height</span>=<span class="cm-string">260</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span>  <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(5,5)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_BgyEwwAwl7" href="#h_BgyEwwAwl7" tabindex="-1" role="presentation"></a>Setting the Radius Accessor Function</h2>
+
+<p><a class="p_ident" id="p_xlhXPVLGWi" href="#p_xlhXPVLGWi" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy#pack_radius">pack.radius([radius])</a> is used to set the radius accessor function.  The method takes a function as an argument and returns the layout.  By default, the radius is derived from the node’s <code>value</code> property.</p>
+
+<p><a class="p_ident" id="p_AMxwbR5AYS" href="#p_AMxwbR5AYS" tabindex="-1" role="presentation"></a>In the example below we set the radius accessor function so that the radii are computed using <code>Math.random()</code>.  Click on the reset button to render the circles with a different set of radii.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_j98uSNDs7q" href="#c_j98uSNDs7q" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> {<span class="cm-string cm-property">&quot;children&quot;</span>: [
+                {<span class="cm-string cm-property">&quot;children&quot;</span>: [
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;children&quot;</span>: [
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">2</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">3</span>}
+                ]},
+                {<span class="cm-string cm-property">&quot;children&quot;</span>: [
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">1</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">2</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">2</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">2</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">4</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">4</span>},
+                  {<span class="cm-string cm-property">&quot;stat&quot;</span>: <span class="cm-number">8</span>}
+                ]},
+            ]};
+
+<span class="cm-keyword">var</span> <span class="cm-def">root</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">hierarchy</span>(<span class="cm-variable">data</span>)
+  .<span class="cm-property">sum</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">hasOwnProperty</span>(<span class="cm-string">&quot;stat&quot;</span>) <span class="cm-operator">?</span> <span class="cm-variable-2">d</span>.<span class="cm-property">stat</span> : <span class="cm-number">0</span>)
+  .<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span>.<span class="cm-property">value</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>.<span class="cm-property">value</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">partition</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">pack</span>()
+  .<span class="cm-property">radius</span>(<span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable">Math</span>.<span class="cm-property">random</span>() <span class="cm-operator">*</span> <span class="cm-number">20</span>)
+  .<span class="cm-property">size</span>([<span class="cm-number">250</span>,<span class="cm-number">250</span>])
+
+<span class="cm-variable">partition</span>(<span class="cm-variable">root</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo4 g&quot;</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'circle.node'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">root</span>.<span class="cm-property">descendants</span>())
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'circle'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cx'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cy'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'r'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">r</span>);
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo4&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">260</span> <span class="cm-attribute">height</span>=<span class="cm-string">260</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span>  <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(5,5)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_BYU7pg5Wrk" href="#h_BYU7pg5Wrk" tabindex="-1" role="presentation"></a>Packing an Array of Circles</h2>
+
+<p><a class="p_ident" id="p_CyO0mbzor7" href="#p_CyO0mbzor7" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy#packSiblings">d3.packSiblings(cirlces)</a> positions takes an array of objects as an argument, each with an <code>r</code> property, and sets <code>x</code> and <code>y</code> properties in each object indicating the center of the circle.  <em>Note</em>: the array of objects that is passed to <code>packSiblings</code> need not be an array of svg circle elements.  It can simply be an array of objects with <code>r</code> properties as shown below.</p><pre>
+var circles = [{"r": 10},{"r": 20},{"r": 40}];
+</pre>
+
+
+<p><a class="p_ident" id="p_TuALCr84Bc" href="#p_TuALCr84Bc" tabindex="-1" role="presentation"></a>Before calling <code>packSiblings</code> you may want to sort the objects according to <code>r</code> (in decreasing order) in order to get a dense packing.</p><pre>
+circles.sort((a,b) => b.r - a.r);
+</pre>
+
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_54S6/eAERY" href="#c_54S6/eAERY" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">circles</span> <span class="cm-operator">=</span> [{<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">10</span>},
+               {<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">10</span>},
+               {<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">10</span>},
+               {<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">20</span>},
+               {<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">20</span>},
+               {<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">20</span>},
+               {<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">40</span>},
+               {<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">40</span>},
+               {<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">40</span>}];
+
+<span class="cm-variable">circles</span>.<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span>.<span class="cm-property">r</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>.<span class="cm-property">r</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">packSiblings</span>(<span class="cm-variable">circles</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo5 g&quot;</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'circle.node'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">circles</span>)
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'circle'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cx'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cy'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'r'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">r</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo5&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">250</span> <span class="cm-attribute">height</span>=<span class="cm-string">250</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span>  <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(125,125)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+
+<h2><a class="h_ident" id="h_YJ0ZvOP6w8" href="#h_YJ0ZvOP6w8" tabindex="-1" role="presentation"></a>Finding a Parent Circle</h2>
+
+<p><a class="p_ident" id="p_GMmeHHvidJ" href="#p_GMmeHHvidJ" tabindex="-1" role="presentation"></a><a href="https://github.com/d3/d3-hierarchy#packEnclose">d3.packEnclose(circles)</a> returns an object representing the smallest circle that encloses an array of objects representing circles.  Each object in the array must have <code>x</code>, <code>y</code>, and <code>r</code> properties, specifying the circle’s center and radius respectively.  The object returned also has <code>x</code>, <code>y</code>, and <code>r</code> properties.</p>
+
+<pre class="snippet cm-s-default" data-language="html" data-edit="editable" data-cm="hidden" ><a class="c_ident" id="c_CMehXhX14+" href="#c_CMehXhX14+" tabindex="-1" role="presentation"></a><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-keyword">var</span> <span class="cm-def">circles</span> <span class="cm-operator">=</span> [{<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">10</span>},
+               {<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">10</span>},
+               {<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">10</span>},
+               {<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">20</span>},
+               {<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">20</span>},
+               {<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">20</span>},
+               {<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">40</span>},
+               {<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">40</span>},
+               {<span class="cm-string cm-property">&quot;r&quot;</span>: <span class="cm-number">40</span>}];
+
+<span class="cm-variable">circles</span>.<span class="cm-property">sort</span>((<span class="cm-def">a</span>,<span class="cm-def">b</span>) <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">b</span>.<span class="cm-property">r</span> <span class="cm-operator">-</span> <span class="cm-variable-2">a</span>.<span class="cm-property">r</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">packSiblings</span>(<span class="cm-variable">circles</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">parent</span> <span class="cm-operator">=</span> <span class="cm-variable">d3</span>.<span class="cm-property">packEnclose</span>(<span class="cm-variable">circles</span>);
+<span class="cm-variable">circles</span>.<span class="cm-property">push</span>(<span class="cm-variable">parent</span>);
+
+<span class="cm-variable">d3</span>.<span class="cm-property">select</span>(<span class="cm-string">&quot;#demo6 g&quot;</span>)
+  .<span class="cm-property">selectAll</span>(<span class="cm-string">'circle.node'</span>)
+  .<span class="cm-property">data</span>(<span class="cm-variable">circles</span>)
+  .<span class="cm-property">enter</span>()
+  .<span class="cm-property">append</span>(<span class="cm-string">'circle'</span>)
+  .<span class="cm-property">classed</span>(<span class="cm-string">'node'</span>, <span class="cm-atom">true</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cx'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">x</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'cy'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">y</span>)
+  .<span class="cm-property">attr</span>(<span class="cm-string">'r'</span>, <span class="cm-def">d</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">d</span>.<span class="cm-property">r</span>);
+
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">svg</span> <span class="cm-attribute">id</span>=<span class="cm-string">&quot;demo6&quot;</span> <span class="cm-attribute">width</span>=<span class="cm-string">250</span> <span class="cm-attribute">height</span>=<span class="cm-string">250</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">g</span>  <span class="cm-attribute">transform</span>=<span class="cm-string">&quot;translate(125,125)&quot;</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">g</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">svg</span><span class="cm-tag cm-bracket">&gt;</span></pre><nav><a href="06_04_partitions.html" title="previous chapter">◀</a> <a href="index.html" title="cover">◆</a> <a href="07_01_word_clouds.html" title="next chapter">▶</a></nav>
+</article>
+<script src="js/ejs.js"></script>
